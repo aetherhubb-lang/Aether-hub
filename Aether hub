@@ -1,0 +1,502 @@
+-- ========================================================
+-- AETHER HUB - SCRIPT COMPLETO (by:atsu)
+-- ========================================================
+local CoreGui = game:GetService("CoreGui")
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local LocalPlayer = Players.LocalPlayer
+
+-- Limpa execuções anteriores do Hub
+if CoreGui:FindFirstChild("AetherHubSystem") then
+    CoreGui.AetherHubSystem:Destroy()
+end
+
+local CorrectKey = "AETHER-X"
+
+-- ScreenGui Principal
+local MainGui = Instance.new("ScreenGui")
+MainGui.Name = "AetherHubSystem"
+MainGui.Parent = CoreGui
+MainGui.ResetOnSpawn = false
+
+-- ========================================================
+-- INTERFACE DE KEY
+-- ========================================================
+local KeyFrame = Instance.new("Frame")
+KeyFrame.Name = "KeyFrame"
+KeyFrame.Size = UDim2.new(0, 300, 0, 180)
+KeyFrame.Position = UDim2.new(0.5, -150, 0.5, -90)
+KeyFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 26)
+KeyFrame.BorderSizePixel = 0
+KeyFrame.Active = true
+KeyFrame.Parent = MainGui
+
+local KeyCorner = Instance.new("UICorner")
+KeyCorner.CornerRadius = UDim.new(0, 12)
+KeyCorner.Parent = KeyFrame
+
+local KeyStroke = Instance.new("UIStroke")
+KeyStroke.Thickness = 1.5
+KeyStroke.Color = Color3.fromRGB(120, 80, 255)
+KeyStroke.Parent = KeyFrame
+
+local KeyTitle = Instance.new("TextLabel")
+KeyTitle.Size = UDim2.new(1, 0, 0, 30)
+KeyTitle.Position = UDim2.new(0, 0, 0, 10)
+KeyTitle.BackgroundTransparency = 1
+KeyTitle.Text = "Aether Hub"
+KeyTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+KeyTitle.TextSize = 18
+KeyTitle.Font = Enum.Font.GothamBold
+KeyTitle.Parent = KeyFrame
+
+local KeySubtitle = Instance.new("TextLabel")
+KeySubtitle.Size = UDim2.new(1, 0, 0, 15)
+KeySubtitle.Position = UDim2.new(0, 0, 0, 35)
+KeySubtitle.BackgroundTransparency = 1
+KeySubtitle.Text = "by:atsu"
+KeySubtitle.TextColor3 = Color3.fromRGB(160, 160, 160)
+KeySubtitle.TextSize = 12
+KeySubtitle.Font = Enum.Font.Gotham
+KeySubtitle.Parent = KeyFrame
+
+local KeyInput = Instance.new("TextBox")
+KeyInput.Size = UDim2.new(0.8, 0, 0, 35)
+KeyInput.Position = UDim2.new(0.1, 0, 0, 60)
+KeyInput.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+KeyInput.Text = ""
+KeyInput.PlaceholderText = "Insira a Key..."
+KeyInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+KeyInput.PlaceholderColor3 = Color3.fromRGB(120, 120, 120)
+KeyInput.TextSize = 14
+KeyInput.Font = Enum.Font.Gotham
+KeyInput.Parent = KeyFrame
+
+local KeyInputCorner = Instance.new("UICorner")
+KeyInputCorner.CornerRadius = UDim.new(0, 8)
+KeyInputCorner.Parent = KeyInput
+
+local KeyBtn = Instance.new("TextButton")
+KeyBtn.Size = UDim2.new(0.8, 0, 0, 35)
+KeyBtn.Position = UDim2.new(0.1, 0, 0, 110)
+KeyBtn.BackgroundColor3 = Color3.fromRGB(120, 80, 255)
+KeyBtn.Text = "Confirmar Key"
+KeyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+KeyBtn.TextSize = 14
+KeyBtn.Font = Enum.Font.GothamBold
+KeyBtn.Parent = KeyFrame
+
+local KeyBtnCorner = Instance.new("UICorner")
+KeyBtnCorner.CornerRadius = UDim.new(0, 8)
+KeyBtnCorner.Parent = KeyBtn
+
+-- ========================================================
+-- CARREGAMENTO DO HUB PRINCIPAL
+-- ========================================================
+local function LoadMainHub()
+    KeyFrame:Destroy()
+
+    -- Janela Principal do Hub
+    local MainFrame = Instance.new("Frame")
+    MainFrame.Name = "MainFrame"
+    MainFrame.Size = UDim2.new(0, 320, 0, 250)
+    MainFrame.Position = UDim2.new(0.5, -160, 0.5, -125)
+    MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 26)
+    MainFrame.BorderSizePixel = 0
+    MainFrame.Active = true
+    MainFrame.Parent = MainGui
+
+    local MainUICorner = Instance.new("UICorner")
+    MainUICorner.CornerRadius = UDim.new(0, 12)
+    MainUICorner.Parent = MainFrame
+
+    local MainStroke = Instance.new("UIStroke")
+    MainStroke.Thickness = 1.5
+    MainStroke.Color = Color3.fromRGB(120, 80, 255)
+    MainStroke.Parent = MainFrame
+
+    -- Barra Superior
+    local TopBar = Instance.new("Frame")
+    TopBar.Name = "TopBar"
+    TopBar.Size = UDim2.new(1, 0, 0, 40)
+    TopBar.BackgroundTransparency = 1
+    TopBar.Parent = MainFrame
+
+    local Title = Instance.new("TextLabel")
+    Title.Size = UDim2.new(0.6, 0, 0, 20)
+    Title.Position = UDim2.new(0, 12, 0, 4)
+    Title.BackgroundTransparency = 1
+    Title.Text = "Aether Hub"
+    Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Title.TextSize = 14
+    Title.Font = Enum.Font.GothamBold
+    Title.TextXAlignment = Enum.TextXAlignment.Left
+    Title.Parent = TopBar
+
+    local Subtitle = Instance.new("TextLabel")
+    Subtitle.Size = UDim2.new(0.6, 0, 0, 14)
+    Subtitle.Position = UDim2.new(0, 12, 0, 22)
+    Subtitle.BackgroundTransparency = 1
+    Subtitle.Text = "by:atsu"
+    Subtitle.TextColor3 = Color3.fromRGB(160, 160, 160)
+    Subtitle.TextSize = 11
+    Subtitle.Font = Enum.Font.Gotham
+    Subtitle.TextXAlignment = Enum.TextXAlignment.Left
+    Subtitle.Parent = TopBar
+
+    -- Botão Minimizar (-)
+    local MinimizeBtn = Instance.new("TextButton")
+    MinimizeBtn.Size = UDim2.new(0, 25, 0, 25)
+    MinimizeBtn.Position = UDim2.new(1, -60, 0, 7)
+    MinimizeBtn.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
+    MinimizeBtn.Text = "-"
+    MinimizeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    MinimizeBtn.TextSize = 16
+    MinimizeBtn.Font = Enum.Font.GothamBold
+    MinimizeBtn.Parent = TopBar
+
+    local MinCorner = Instance.new("UICorner")
+    MinCorner.CornerRadius = UDim.new(0, 6)
+    MinCorner.Parent = MinimizeBtn
+
+    -- Botão Cadeado
+    local LockBtn = Instance.new("TextButton")
+    LockBtn.Size = UDim2.new(0, 25, 0, 25)
+    LockBtn.Position = UDim2.new(1, -30, 0, 7)
+    LockBtn.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
+    LockBtn.Text = "🔓"
+    LockBtn.TextSize = 12
+    LockBtn.Parent = TopBar
+
+    local LockCorner = Instance.new("UICorner")
+    LockCorner.CornerRadius = UDim.new(0, 6)
+    LockCorner.Parent = LockBtn
+
+    -- Botão Flutuante (+)
+    local OpenBtn = Instance.new("TextButton")
+    OpenBtn.Size = UDim2.new(0, 45, 0, 45)
+    OpenBtn.Position = UDim2.new(0.05, 0, 0.2, 0)
+    OpenBtn.BackgroundColor3 = Color3.fromRGB(20, 20, 26)
+    OpenBtn.Text = "+"
+    OpenBtn.TextColor3 = Color3.fromRGB(120, 80, 255)
+    OpenBtn.TextSize = 24
+    OpenBtn.Font = Enum.Font.GothamBold
+    OpenBtn.Visible = false
+    OpenBtn.Parent = MainGui
+
+    local OpenCorner = Instance.new("UICorner")
+    OpenCorner.CornerRadius = UDim.new(0, 10)
+    OpenCorner.Parent = OpenBtn
+
+    local OpenStroke = Instance.new("UIStroke")
+    OpenStroke.Thickness = 1.5
+    OpenStroke.Color = Color3.fromRGB(120, 80, 255)
+    OpenStroke.Parent = OpenBtn
+
+    -- Container para os Botões
+    local Container = Instance.new("Frame")
+    Container.Size = UDim2.new(1, -20, 1, -50)
+    Container.Position = UDim2.new(0, 10, 0, 45)
+    Container.BackgroundTransparency = 1
+    Container.Parent = MainFrame
+
+    local UIList = Instance.new("UIListLayout")
+    UIList.Padding = UDim.new(0, 8)
+    UIList.SortOrder = Enum.SortOrder.LayoutOrder
+    UIList.Parent = Container
+
+    -- Drag (Arrastar Janela)
+    local dragging, dragInput, dragStart, startPos
+    local isLocked = false
+
+    local function updateDrag(input)
+        local delta = input.Position - dragStart
+        MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+
+    TopBar.InputBegan:Connect(function(input)
+        if not isLocked and (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
+            dragging = true
+            dragStart = input.Position
+            startPos = MainFrame.Position
+            
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
+        end
+    end)
+
+    TopBar.InputChanged:Connect(function(input)
+        if not isLocked and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+            dragInput = input
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(input)
+        if input == dragInput and dragging then
+            updateDrag(input)
+        end
+    end)
+
+    LockBtn.MouseButton1Click:Connect(function()
+        isLocked = not isLocked
+        if isLocked then
+            LockBtn.Text = "🔒"
+            LockBtn.BackgroundColor3 = Color3.fromRGB(180, 50, 50)
+        else
+            LockBtn.Text = "🔓"
+            LockBtn.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
+        end
+    end)
+
+    MinimizeBtn.MouseButton1Click:Connect(function()
+        MainFrame.Visible = false
+        OpenBtn.Visible = true
+    end)
+
+    OpenBtn.MouseButton1Click:Connect(function()
+        MainFrame.Visible = true
+        OpenBtn.Visible = false
+    end)
+
+    -- Criador Dinâmico de Botões
+    local function CreateToggleButton(name)
+        local btn = Instance.new("TextButton")
+        btn.Size = UDim2.new(1, 0, 0, 38)
+        btn.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+        btn.Text = name .. ": [OFF]"
+        btn.TextColor3 = Color3.fromRGB(200, 200, 200)
+        btn.TextSize = 13
+        btn.Font = Enum.Font.GothamSemibold
+        btn.Parent = Container
+
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(0, 8)
+        corner.Parent = btn
+
+        return btn
+    end
+
+    local GojoBtn = CreateToggleButton("Gojo 0.2")
+    local FlyBtn = CreateToggleButton("Fly Mobile")
+    local FocusBtn = CreateToggleButton("Focus Attack")
+
+    -- ========================================================
+    -- 1. GOJO 0.2 (TP LOOP EM VIVOS)
+    -- ========================================================
+    local gojoActive = false
+    GojoBtn.MouseButton1Click:Connect(function()
+        gojoActive = not gojoActive
+        GojoBtn.Text = "Gojo 0.2: " .. (gojoActive and "[ON]" or "[OFF]")
+        GojoBtn.TextColor3 = gojoActive and Color3.fromRGB(120, 255, 120) or Color3.fromRGB(200, 200, 200)
+
+        task.spawn(function()
+            while gojoActive do
+                for _, player in pairs(Players:GetPlayers()) do
+                    if not gojoActive then break end
+                    if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                        local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
+                        if humanoid and humanoid.Health > 0 then
+                            local myChar = LocalPlayer.Character
+                            if myChar and myChar:FindFirstChild("HumanoidRootPart") then
+                                myChar.HumanoidRootPart.CFrame = player.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, 3)
+                            end
+                            task.wait(0.05)
+                        end
+                    end
+                end
+                task.wait()
+            end
+        end)
+    end)
+
+    -- ========================================================
+    -- 2. FLY MOBILE (SETAS NA TELA)
+    -- ========================================================
+    local flyActive = false
+    local FlyGui = Instance.new("ScreenGui")
+    FlyGui.Name = "AetherFlyControls"
+    FlyGui.Parent = CoreGui
+
+    local flySpeed = 60
+    local inputsHolding = {F=0, B=0, L=0, R=0, U=0, D=0}
+
+    local function CreateArrow(parent, text, pos)
+        local btn = Instance.new("TextButton")
+        btn.Size = UDim2.new(0, 45, 0, 45)
+        btn.Position = pos
+        btn.BackgroundColor3 = Color3.fromRGB(20, 20, 26)
+        btn.Text = text
+        btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        btn.TextSize = 18
+        btn.Font = Enum.Font.GothamBold
+        btn.Parent = parent
+
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(0, 8)
+        corner.Parent = btn
+
+        local stroke = Instance.new("UIStroke")
+        stroke.Color = Color3.fromRGB(120, 80, 255)
+        stroke.Parent = btn
+
+        return btn
+    end
+
+    -- Controles Esquerda (Frente, Trás, Esquerda, Direita)
+    local LeftContainer = Instance.new("Frame")
+    LeftContainer.Size = UDim2.new(0, 140, 0, 140)
+    LeftContainer.Position = UDim2.new(0, 20, 0.5, -70)
+    LeftContainer.BackgroundTransparency = 1
+    LeftContainer.Visible = false
+    LeftContainer.Parent = FlyGui
+
+    local UpBtn = CreateArrow(LeftContainer, "▲", UDim2.new(0, 47, 0, 0))
+    local DownBtn = CreateArrow(LeftContainer, "▼", UDim2.new(0, 47, 0, 94))
+    local LeftBtn = CreateArrow(LeftContainer, "◄", UDim2.new(0, 0, 0, 47))
+    local RightBtn = CreateArrow(LeftContainer, "►", UDim2.new(0, 94, 0, 47))
+
+    -- Controles Direita (Subir, Descer)
+    local RightContainer = Instance.new("Frame")
+    RightContainer.Size = UDim2.new(0, 50, 0, 100)
+    RightContainer.Position = UDim2.new(1, -70, 0.5, -50)
+    RightContainer.BackgroundTransparency = 1
+    RightContainer.Visible = false
+    RightContainer.Parent = FlyGui
+
+    local RiseBtn = CreateArrow(RightContainer, "▲", UDim2.new(0, 0, 0, 0))
+    local SinkBtn = CreateArrow(RightContainer, "▼", UDim2.new(0, 0, 0, 50))
+
+    local function BindFlyInput(btn, key)
+        btn.MouseButton1Down:Connect(function() inputsHolding[key] = 1 end)
+        btn.MouseButton1Up:Connect(function() inputsHolding[key] = 0 end)
+    end
+
+    BindFlyInput(UpBtn, "F")
+    BindFlyInput(DownBtn, "B")
+    BindFlyInput(LeftBtn, "L")
+    BindFlyInput(RightBtn, "R")
+    BindFlyInput(RiseBtn, "U")
+    BindFlyInput(SinkBtn, "D")
+
+    FlyBtn.MouseButton1Click:Connect(function()
+        flyActive = not flyActive
+        FlyBtn.Text = "Fly: " .. (flyActive and "[ON]" or "[OFF]")
+        FlyBtn.TextColor3 = flyActive and Color3.fromRGB(120, 255, 120) or Color3.fromRGB(200, 200, 200)
+        
+        LeftContainer.Visible = flyActive
+        RightContainer.Visible = flyActive
+
+        local char = LocalPlayer.Character
+        if char and char:FindFirstChild("HumanoidRootPart") then
+            local hrp = char.HumanoidRootPart
+            if flyActive then
+                local bv = Instance.new("BodyVelocity")
+                bv.Name = "FlyVelocity"
+                bv.MaxForce = Vector3.new(1e9, 1e9, 1e9)
+                bv.Velocity = Vector3.zero
+                bv.Parent = hrp
+                
+                task.spawn(function()
+                    while flyActive and hrp:FindFirstChild("FlyVelocity") do
+                        local cam = workspace.CurrentCamera
+                        local forward = cam.CFrame.LookVector
+                        local right = cam.CFrame.RightVector
+                        
+                        local moveX = (inputsHolding.R - inputsHolding.L)
+                        local moveZ = (inputsHolding.B - inputsHolding.F)
+                        local moveY = (inputsHolding.U - inputsHolding.D)
+
+                        local dir = (forward * -moveZ) + (right * moveX) + (Vector3.new(0, 1, 0) * moveY)
+                        bv.Velocity = dir * flySpeed
+                        RunService.RenderStepped:Wait()
+                    end
+                end)
+            else
+                if hrp:FindFirstChild("FlyVelocity") then
+                    hrp.FlyVelocity:Destroy()
+                end
+            end
+        end
+    end)
+
+    -- ========================================================
+    -- 3. FOCUS (ROTAÇÃO E ATAQUE VELOCIDADE 100)
+    -- ========================================================
+    local focusActive = false
+    local orbitAngle = 0
+
+    local function GetClosestTarget()
+        local closest, minDistance = nil, 250
+        local myChar = LocalPlayer.Character
+        if not myChar or not myChar:FindFirstChild("HumanoidRootPart") then return nil end
+
+        for _, player in pairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                local hum = player.Character:FindFirstChildOfClass("Humanoid")
+                if hum and hum.Health > 0 then
+                    local dist = (myChar.HumanoidRootPart.Position - player.Character.HumanoidRootPart.Position).Magnitude
+                    if dist < minDistance then
+                        minDistance = dist
+                        closest = player.Character
+                    end
+                end
+            end
+        end
+        return closest
+    end
+
+    FocusBtn.MouseButton1Click:Connect(function()
+        focusActive = not focusActive
+        FocusBtn.Text = "Focus: " .. (focusActive and "[ON]" or "[OFF]")
+        FocusBtn.TextColor3 = focusActive and Color3.fromRGB(120, 255, 120) or Color3.fromRGB(200, 200, 200)
+
+        task.spawn(function()
+            while focusActive do
+                local target = GetClosestTarget()
+                local myChar = LocalPlayer.Character
+                
+                if target and myChar and myChar:FindFirstChild("HumanoidRootPart") then
+                    local targetHRP = target.HumanoidRootPart
+                    local myHRP = myChar.HumanoidRootPart
+                    
+                    orbitAngle = orbitAngle + (100 * RunService.RenderStepped:Wait())
+                    
+                    local radius = 4
+                    local offsetX = math.cos(orbitAngle) * radius
+                    local offsetZ = math.sin(orbitAngle) * radius
+                    
+                    myHRP.CFrame = CFrame.new(targetHRP.Position + Vector3.new(offsetX, 0, offsetZ), targetHRP.Position)
+                    
+                    local tool = myChar:FindFirstChildOfClass("Tool")
+                    if tool then
+                        tool:Activate()
+                    end
+                else
+                    task.wait(0.1)
+                end
+            end
+        end)
+    end)
+end
+
+-- ========================================================
+-- LOGICA DE VALIDAÇÃO DA KEY
+-- ========================================================
+KeyBtn.MouseButton1Click:Connect(function()
+    if KeyInput.Text == CorrectKey then
+        KeyBtn.Text = "Key Correta!"
+        KeyBtn.BackgroundColor3 = Color3.fromRGB(50, 180, 50)
+        task.wait(0.8)
+        LoadMainHub()
+    else
+        KeyBtn.Text = "Key Incorreta!"
+        KeyBtn.BackgroundColor3 = Color3.fromRGB(180, 50, 50)
+        task.wait(1)
+        KeyBtn.Text = "Confirmar Key"
+        KeyBtn.BackgroundColor3 = Color3.fromRGB(120, 80, 255)
+    end
+end)
