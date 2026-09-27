@@ -1,5 +1,5 @@
 --====================================================================--
---                        AETHER HUB - MOBILE                         --
+--                   AETHER HUB - MOBILE COM KEY                      --
 --                          by:atsu                                   --
 --====================================================================--
 
@@ -7,7 +7,6 @@ local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local RunService = game:GetService("RunService")
 local CoreGui = game:GetService("CoreGui")
-local UserInputService = game:GetService("UserInputService")
 local Workspace = game:GetService("Workspace")
 
 -- Limpeza de UI anterior
@@ -69,7 +68,7 @@ LockBtn.Font = Enum.Font.Gotham
 LockBtn.TextSize = 12
 Instance.new("UICorner", LockBtn).CornerRadius = UDim.new(0, 6)
 
--- Sistema de Draggable Personalizado
+-- Sistema de Draggable
 local isLocked = false
 Frame.Draggable = true
 
@@ -92,16 +91,48 @@ MinimizeBtn.MouseButton1Click:Connect(function()
     end
 end)
 
--- Container dos Botões
+--====================================================================--
+--                          PAINEL DE KEY                             --
+--====================================================================--
+local KeyPanel = Instance.new("Frame", Frame)
+KeyPanel.Size = UDim2.new(0.9, 0, 0.7, 0)
+KeyPanel.Position = UDim2.new(0.05, 0, 0.25, 0)
+KeyPanel.BackgroundTransparency = 1
+
+local KeyBox = Instance.new("TextBox", KeyPanel)
+KeyBox.Size = UDim2.new(1, 0, 0, 42)
+KeyBox.Position = UDim2.new(0, 0, 0, 10)
+KeyBox.PlaceholderText = "Insira a Key..."
+KeyBox.Text = ""
+KeyBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+KeyBox.PlaceholderColor3 = Color3.fromRGB(120, 120, 120)
+KeyBox.BackgroundColor3 = Color3.fromRGB(28, 25, 38)
+KeyBox.Font = Enum.Font.Gotham
+KeyBox.TextSize = 13
+Instance.new("UICorner", KeyBox).CornerRadius = UDim.new(0, 8)
+
+local KeyBtn = Instance.new("TextButton", KeyPanel)
+KeyBtn.Size = UDim2.new(1, 0, 0, 42)
+KeyBtn.Position = UDim2.new(0, 0, 0, 62)
+KeyBtn.Text = "Confirmar Key"
+KeyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+KeyBtn.BackgroundColor3 = Color3.fromRGB(147, 51, 234)
+KeyBtn.Font = Enum.Font.GothamBold
+KeyBtn.TextSize = 13
+Instance.new("UICorner", KeyBtn).CornerRadius = UDim.new(0, 8)
+
+--====================================================================--
+--                    CONTAINER DOS BOTÕES (MENU)                     --
+--====================================================================--
 local Content = Instance.new("Frame", Frame)
 Content.Size = UDim2.new(0.9, 0, 0.72, 0)
 Content.Position = UDim2.new(0.05, 0, 0.23, 0)
 Content.BackgroundTransparency = 1
+Content.Visible = false -- Escondido até colocar a key correta
 
 local ListLayout = Instance.new("UIListLayout", Content)
 ListLayout.Padding = UDim.new(0, 8)
 
--- Estados das Funções
 local States = { Gojo = false, Fly = false }
 
 local function CreateToggleButton(name, keyState)
@@ -124,7 +155,19 @@ local function CreateToggleButton(name, keyState)
 end
 
 CreateToggleButton("Gojo 0.2", "Gojo")
-local FlyBtn = CreateToggleButton("Fly Mobile", "Fly")
+CreateToggleButton("Fly Mobile", "Fly")
+
+-- Validação da Key
+KeyBtn.MouseButton1Click:Connect(function()
+    if KeyBox.Text == "AETHER-X" then
+        KeyPanel.Visible = false
+        Content.Visible = true
+    else
+        KeyBtn.Text = "Key Incorreta!"
+        task.wait(1.5)
+        KeyBtn.Text = "Confirmar Key"
+    end
+end)
 
 --====================================================================--
 --                      SISTEMA GOJO 0.2 (KILL ALL)                   --
@@ -143,15 +186,13 @@ task.spawn(function()
                     local myHrp = myChar and myChar:FindFirstChild("HumanoidRootPart")
 
                     if targetHrp and targetHum and targetHum.Health > 0 and myHrp then
-                        -- Teleporta colado no jogador em velocidade máxima
                         myHrp.CFrame = targetHrp.CFrame * CFrame.new(0, 0, -1.5)
                         
-                        -- Tenta ativar golpes/ferramentas equipadas
                         local tool = myChar:FindFirstChildOfClass("Tool")
                         if tool then
                             tool:Activate()
                         end
-                        task.wait() -- Mínimo intervalo para permitir o processamento de rede
+                        task.wait()
                     end
                 end
             end
