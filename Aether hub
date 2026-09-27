@@ -1,0 +1,189 @@
+--====================================================================--
+--                        AETHER HUB V2.0                             --
+--                      Desenvolvido por: Atsu                        --
+--====================================================================--
+
+-- [[ PARTE 1: CONFIGURAÇÃO INICIAL, UI & INTERFACE ]] --
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local CoreGui = game:GetService("CoreGui")
+local Lighting = game:GetService("Lighting")
+
+-- Verificação de Blacklist
+local Blacklist = {00000000}
+for _, id in ipairs(Blacklist) do
+    if LocalPlayer.UserId == id then
+        LocalPlayer:Kick("Foste colocado na Blacklist do Aether Hub.")
+        return
+    end
+end
+
+-- Paleta de Cores NEON (Roxo Claro)
+local NeonPurpleTheme = {
+    Primary = Color3.fromRGB(18, 12, 28),       -- Fundo Escuro com Tom Púrpura
+    Secondary = Color3.fromRGB(28, 18, 45),     -- Painéis Secundários
+    Accent = Color3.fromRGB(191, 90, 242),      -- Roxo Claro Neon (Brilho Principal)
+    Glow = Color3.fromRGB(216, 180, 254),        -- Roxo Neon Suave
+    Text = Color3.fromRGB(255, 255, 255)
+}
+
+-- Interface do Key System
+local KeySystemUI = Instance.new("ScreenGui")
+KeySystemUI.Name = "AetherHubKeyUI"
+KeySystemUI.Parent = (RunService:IsStudio() and LocalPlayer.PlayerGui) or CoreGui
+
+local KeyFrame = Instance.new("Frame", KeySystemUI)
+KeyFrame.Size = UDim2.new(0, 360, 0, 210)
+KeyFrame.Position = UDim2.new(0.5, -180, 0.5, -105)
+KeyFrame.BackgroundColor3 = NeonPurpleTheme.Primary
+KeyFrame.BorderSizePixel = 0
+
+-- Efeito Neon na Borda da Janela de Key
+local KeyGlow = Instance.new("UIStroke", KeyFrame)
+KeyGlow.Color = NeonPurpleTheme.Accent
+KeyGlow.Thickness = 2
+KeyGlow.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+
+local KeyTitle = Instance.new("TextLabel", KeyFrame)
+KeyTitle.Size = UDim2.new(1, 0, 0, 45)
+KeyTitle.Text = "AETHER HUB - Autenticação"
+KeyTitle.TextColor3 = NeonPurpleTheme.Glow
+KeyTitle.BackgroundColor3 = NeonPurpleTheme.Secondary
+KeyTitle.Font = Enum.Font.GothamBold
+KeyTitle.TextSize = 16
+
+local KeyInput = Instance.new("TextBox", KeyFrame)
+KeyInput.Size = UDim2.new(0.8, 0, 0, 40)
+KeyInput.Position = UDim2.new(0.1, 0, 0.35, 0)
+KeyInput.PlaceholderText = "Insere a Key..."
+KeyInput.Text = ""
+KeyInput.TextColor3 = NeonPurpleTheme.Text
+KeyInput.BackgroundColor3 = NeonPurpleTheme.Secondary
+KeyInput.Font = Enum.Font.Gotham
+KeyInput.TextSize = 14
+
+local KeyInputStroke = Instance.new("UIStroke", KeyInput)
+KeyInputStroke.Color = NeonPurpleTheme.Accent
+KeyInputStroke.Thickness = 1
+
+local KeySubmit = Instance.new("TextButton", KeyFrame)
+KeySubmit.Size = UDim2.new(0.8, 0, 0, 40)
+KeySubmit.Position = UDim2.new(0.1, 0, 0.65, 0)
+KeySubmit.Text = "ENTRAR"
+KeySubmit.TextColor3 = NeonPurpleTheme.Text
+KeySubmit.BackgroundColor3 = NeonPurpleTheme.Accent
+KeySubmit.Font = Enum.Font.GothamBold
+KeySubmit.TextSize = 14
+
+local KeyUnlocked = false
+
+-- Interface Principal
+local MainUI = Instance.new("ScreenGui")
+MainUI.Name = "AetherHubMainUI"
+MainUI.Enabled = false
+MainUI.Parent = (RunService:IsStudio() and LocalPlayer.PlayerGui) or CoreGui
+
+local MainFrame = Instance.new("Frame", MainUI)
+MainFrame.Size = UDim2.new(0, 650, 0, 420)
+MainFrame.Position = UDim2.new(0.5, -325, 0.5, -210)
+MainFrame.BackgroundColor3 = NeonPurpleTheme.Primary
+MainFrame.BorderSizePixel = 0
+
+-- Efeito Borda Neon Principal
+local MainGlow = Instance.new("UIStroke", MainFrame)
+MainGlow.Color = NeonPurpleTheme.Accent
+MainGlow.Thickness = 2
+
+local TopBar = Instance.new("Frame", MainFrame)
+TopBar.Size = UDim2.new(1, 0, 0, 35)
+TopBar.BackgroundColor3 = NeonPurpleTheme.Secondary
+
+local Title = Instance.new("TextLabel", TopBar)
+Title.Size = UDim2.new(0, 250, 1, 0)
+Title.Position = UDim2.new(0, 10, 0, 0)
+Title.Text = "AETHER HUB v2.0 | ATSU"
+Title.TextColor3 = NeonPurpleTheme.Glow
+Title.TextXAlignment = Enum.TextXAlignment.Left
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 14
+Title.BackgroundTransparency = 1
+
+local Sidebar = Instance.new("ScrollingFrame", MainFrame)
+Sidebar.Size = UDim2.new(0, 150, 1, -35)
+Sidebar.Position = UDim2.new(0, 0, 0, 35)
+Sidebar.BackgroundColor3 = NeonPurpleTheme.Secondary
+Sidebar.BorderSizePixel = 0
+Sidebar.CanvasSize = UDim2.new(0, 0, 5, 0)
+
+local ContentArea = Instance.new("Frame", MainFrame)
+ContentArea.Size = UDim2.new(1, -150, 1, -35)
+ContentArea.Position = UDim2.new(0, 150, 0, 35)
+ContentArea.BackgroundTransparency = 1
+
+
+-- [[ PARTE 2: MOVIMENTAÇÃO & UTILITÁRIOS ]] --
+
+local MovementSettings = { Speed = 16, Jump = 50, InfJump = false, Noclip = false }
+
+RunService.Stepped:Connect(function()
+    if MovementSettings.Noclip and LocalPlayer.Character then
+        for _, part in pairs(LocalPlayer.Character:GetDescendants()) do
+            if part:IsA("BasePart") then part.CanCollide = false end
+        end
+    end
+end)
+
+UserInputService.JumpRequest:Connect(function()
+    if MovementSettings.InfJump and LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid") then
+        LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState(Enum.HumanoidStateType.Jumping)
+    end
+end)
+
+
+-- [[ PARTE 3: PAINEL DE STATUS NEON ]] --
+
+local StatusLabel = Instance.new("TextLabel", TopBar)
+StatusLabel.Size = UDim2.new(0, 220, 1, 0)
+StatusLabel.Position = UDim2.new(1, -230, 0, 0)
+StatusLabel.TextXAlignment = Enum.TextXAlignment.Right
+StatusLabel.TextColor3 = NeonPurpleTheme.Glow
+StatusLabel.BackgroundTransparency = 1
+StatusLabel.Font = Enum.Font.Gotham
+StatusLabel.TextSize = 11
+
+RunService.RenderStepped:Connect(function(dt)
+    local fps = math.floor(1 / dt)
+    local ping = math.floor(workspace:GetRealPhysicsFPS())
+    local mem = math.floor(collectgarbage("count") / 1024)
+    StatusLabel.Text = string.format("FPS: %d | Ping: %d | Mem: %dMB", fps, ping, mem)
+end)
+
+
+-- [[ PARTE 4: AUTENTICAÇÃO E KEY SYSTEM ]] --
+
+-- Validação da Key AETHER-X
+KeySubmit.MouseButton1Click:Connect(function()
+    if KeyInput.Text == "AETHER-X" then
+        KeyUnlocked = true
+        KeySystemUI:Destroy()
+        MainUI.Enabled = true
+    else
+        KeyInput.Text = ""
+        KeyInput.PlaceholderText = "KEY INCORRETA!"
+    end
+end)
+
+-- Alternar visibilidade com a tecla Right Shift
+UserInputService.InputBegan:Connect(function(input, gpe)
+    if not gpe and input.KeyCode == Enum.KeyCode.RightShift then
+        if KeyUnlocked then
+            MainUI.Enabled = not MainUI.Enabled
+        end
+    end
+end)
+
+print("Aether Hub por Atsu carregado com sucesso!")
