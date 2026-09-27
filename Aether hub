@@ -145,13 +145,13 @@ local function AddButton(page, text, callback)
     Btn.MouseButton1Click:Connect(callback)
 end
 
--- [[ CRIAÇÃO DAS ABAS ]] --
+-- [[ CRIAÇÃO DAS ABAS E BOTÕES ]] --
 
 local TabGojo = CreateTab("Gojo / Combate")
 local TabMovimento = CreateTab("Movimento")
 local TabServidor = CreateTab("Servidor")
 
--- [[ LÓGICA DO GOJO KILL ALL ]] --
+-- Lógica do Gojo Kill All
 local GojoKilling = false
 
 AddButton(TabGojo, "Gojo: Kill All (Ativar/Desativar)", function()
@@ -164,13 +164,11 @@ AddButton(TabGojo, "Gojo: Kill All (Ativar/Desativar)", function()
                     if not GojoKilling then break end
                     if target ~= LocalPlayer and target.Character and target.Character:FindFirstChild("HumanoidRootPart") and target.Character:FindFirstChild("Humanoid") then
                         if target.Character.Humanoid.Health > 0 then
-                            -- Teleporta para as costas do alvo
                             local myHrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
                             if myHrp then
                                 myHrp.CFrame = target.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, 2.5)
                             end
                             
-                            -- Simula o ataque do personagem (Tool / Click)
                             local tool = LocalPlayer.Character:FindFirstChildOfClass("Tool")
                             if tool then
                                 tool:Activate()
@@ -186,7 +184,7 @@ AddButton(TabGojo, "Gojo: Kill All (Ativar/Desativar)", function()
     end
 end)
 
--- Opções na Aba Movimento
+-- Opções de Movimento
 AddButton(TabMovimento, "Aumentar Velocidade (Speed)", function()
     if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
         LocalPlayer.Character.Humanoid.WalkSpeed = 50
@@ -199,9 +197,9 @@ AddButton(TabMovimento, "Pulo Alto (Super Jump)", function()
     end
 end)
 
--- Opções na Aba Servidor
+-- Opções de Servidor
 AddButton(TabServidor, "Reentrar no Servidor (Rejoin)", function()
     game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, game.JobId, LocalPlayer)
 end)
 
-print("Aether Hub com Gojo Kill All carregado!")
+print("Aether Hub carregado!")
