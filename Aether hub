@@ -1,0 +1,553 @@
+-- Services
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local LocalPlayer = Players.LocalPlayer
+
+-- Global Configuration
+local CORRECT_KEY = "AETHER-X"
+local gojoActive = false
+local bypassActive = false
+local flyActive = false
+local focusActive = false
+
+local gojoConnection = nil
+local bypassConnection = nil
+local focusConnection = nil
+
+local moveSpeed = 60
+local focusAngle = 0 -- Ângulo para a rotação do Focus
+
+-- ScreenGui Principal
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "AetherHubGUI"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+--------------------------------------------------------------------------------
+-- HELPER: DRAGGABLE SYSTEM
+--------------------------------------------------------------------------------
+local isLocked = false
+local function makeDraggable(frame, handleBar)
+    local dragging, dragInput, dragStart, startPos
+
+    local function updateDrag(input)
+        local delta = input.Position - dragStart
+        frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+
+    handleBar.InputBegan:Connect(function(input)
+        if (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) and not isLocked then
+            dragging = true
+            dragStart = input.Position
+            startPos = frame.Position
+
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
+        end
+    end)
+
+    handleBar.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            dragInput = input
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(input)
+        if input == dragInput and dragging and not isLocked then
+            updateDrag(input)
+        end
+    end)
+end
+
+--------------------------------------------------------------------------------
+-- KEY SYSTEM GUI (AETHER-X)
+--------------------------------------------------------------------------------
+local KeyFrame = Instance.new("Frame")
+KeyFrame.Name = "KeyFrame"
+KeyFrame.Size = UDim2.new(0, 320, 0, 180)
+KeyFrame.Position = UDim2.new(0.5, -160, 0.4, -90)
+KeyFrame.BackgroundColor3 = Color3.fromRGB(28, 22, 38)
+KeyFrame.BorderSizePixel = 0
+KeyFrame.Active = true
+KeyFrame.Parent = ScreenGui
+
+local KeyCorner = Instance.new("UICorner")
+KeyCorner.CornerRadius = UDim.new(0, 12)
+KeyCorner.Parent = KeyFrame
+
+local KeyTitle = Instance.new("TextLabel")
+KeyTitle.Size = UDim2.new(1, 0, 0, 40)
+KeyTitle.BackgroundTransparency = 1
+KeyTitle.Text = "Aether Hub - Key System"
+KeyTitle.TextColor3 = Color3.fromRGB(200, 170, 240)
+KeyTitle.TextSize = 16
+KeyTitle.Font = Enum.Font.GothamBold
+KeyTitle.Parent = KeyFrame
+
+local KeyInput = Instance.new("TextBox")
+KeyInput.Size = UDim2.new(0.85, 0, 0, 40)
+KeyInput.Position = UDim2.new(0.075, 0, 0.3, 0)
+KeyInput.BackgroundColor3 = Color3.fromRGB(42, 32, 58)
+KeyInput.Text = ""
+KeyInput.PlaceholderText = "Cole sua Key aqui..."
+KeyInput.PlaceholderColor3 = Color3.fromRGB(150, 130, 180)
+KeyInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+KeyInput.TextSize = 14
+KeyInput.Font = Enum.Font.GothamMedium
+KeyInput.Parent = KeyFrame
+
+local KeyInputCorner = Instance.new("UICorner")
+KeyInputCorner.CornerRadius = UDim.new(0, 8)
+KeyInputCorner.Parent = KeyInput
+
+local SubmitBtn = Instance.new("TextButton")
+SubmitBtn.Size = UDim2.new(0.85, 0, 0, 40)
+SubmitBtn.Position = UDim2.new(0.075, 0, 0.65, 0)
+SubmitBtn.BackgroundColor3 = Color3.fromRGB(160, 110, 220)
+SubmitBtn.Text = "VERIFICAR KEY"
+SubmitBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+SubmitBtn.TextSize = 14
+SubmitBtn.Font = Enum.Font.GothamBold
+SubmitBtn.Parent = KeyFrame
+
+local SubmitCorner = Instance.new("UICorner")
+SubmitCorner.CornerRadius = UDim.new(0, 8)
+SubmitCorner.Parent = SubmitBtn
+
+--------------------------------------------------------------------------------
+-- MAIN HUB FRAME
+--------------------------------------------------------------------------------
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Size = UDim2.new(0, 320, 0, 335)
+MainFrame.Position = UDim2.new(0.5, -160, 0.4, -165)
+MainFrame.BackgroundColor3 = Color3.fromRGB(28, 22, 38)
+MainFrame.BorderSizePixel = 0
+MainFrame.Active = true
+MainFrame.Visible = false
+MainFrame.Parent = ScreenGui
+
+local MainUICorner = Instance.new("UICorner")
+MainUICorner.CornerRadius = UDim.new(0, 12)
+MainUICorner.Parent = MainFrame
+
+-- Top Bar
+local TopBar = Instance.new("Frame")
+TopBar.Name = "TopBar"
+TopBar.Size = UDim2.new(1, 0, 0, 40)
+TopBar.BackgroundColor3 = Color3.fromRGB(42, 32, 58)
+TopBar.BorderSizePixel = 0
+TopBar.Parent = MainFrame
+
+local TopBarCorner = Instance.new("UICorner")
+TopBarCorner.CornerRadius = UDim.new(0, 12)
+TopBarCorner.Parent = TopBar
+
+local TitleLabel = Instance.new("TextLabel")
+TitleLabel.Size = UDim2.new(1, -80, 0, 20)
+TitleLabel.Position = UDim2.new(0, 40, 0, 3)
+TitleLabel.BackgroundTransparency = 1
+TitleLabel.Text = "Aether Hub"
+TitleLabel.TextColor3 = Color3.fromRGB(215, 185, 255)
+TitleLabel.TextSize = 15
+TitleLabel.Font = Enum.Font.GothamBold
+TitleLabel.Parent = TopBar
+
+local SubtitleLabel = Instance.new("TextLabel")
+SubtitleLabel.Size = UDim2.new(1, -80, 0, 14)
+SubtitleLabel.Position = UDim2.new(0, 40, 0, 22)
+SubtitleLabel.BackgroundTransparency = 1
+SubtitleLabel.Text = "By: atsu"
+SubtitleLabel.TextColor3 = Color3.fromRGB(160, 140, 190)
+SubtitleLabel.TextSize = 11
+SubtitleLabel.Font = Enum.Font.GothamMedium
+SubtitleLabel.Parent = TopBar
+
+makeDraggable(MainFrame, TopBar)
+
+-- Lock Button
+local LockBtn = Instance.new("TextButton")
+LockBtn.Size = UDim2.new(0, 30, 0, 30)
+LockBtn.Position = UDim2.new(1, -35, 0, 5)
+LockBtn.BackgroundColor3 = Color3.fromRGB(55, 42, 75)
+LockBtn.Text = "🔓"
+LockBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+LockBtn.TextSize = 14
+LockBtn.Parent = TopBar
+
+local LockCorner = Instance.new("UICorner")
+LockCorner.CornerRadius = UDim.new(0, 6)
+LockCorner.Parent = LockBtn
+
+LockBtn.MouseButton1Click:Connect(function()
+    isLocked = not isLocked
+    if isLocked then
+        LockBtn.Text = "🔒"
+        LockBtn.BackgroundColor3 = Color3.fromRGB(180, 60, 90)
+    else
+        LockBtn.Text = "🔓"
+        LockBtn.BackgroundColor3 = Color3.fromRGB(55, 42, 75)
+    end
+end)
+
+-- Minimize Button
+local MinimizeBtn = Instance.new("TextButton")
+MinimizeBtn.Size = UDim2.new(0, 30, 0, 30)
+MinimizeBtn.Position = UDim2.new(0, 5, 0, 5)
+MinimizeBtn.BackgroundColor3 = Color3.fromRGB(55, 42, 75)
+MinimizeBtn.Text = "-"
+MinimizeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+MinimizeBtn.TextSize = 18
+MinimizeBtn.Font = Enum.Font.GothamBold
+MinimizeBtn.Parent = TopBar
+
+local MinCorner = Instance.new("UICorner")
+MinCorner.CornerRadius = UDim.new(0, 6)
+MinCorner.Parent = MinimizeBtn
+
+local OpenHubBtn = Instance.new("TextButton")
+OpenHubBtn.Size = UDim2.new(0, 45, 0, 45)
+OpenHubBtn.Position = UDim2.new(0, 15, 0.5, -22)
+OpenHubBtn.BackgroundColor3 = Color3.fromRGB(42, 32, 58)
+OpenHubBtn.Text = "+"
+OpenHubBtn.TextColor3 = Color3.fromRGB(200, 170, 240)
+OpenHubBtn.TextSize = 24
+OpenHubBtn.Font = Enum.Font.GothamBold
+OpenHubBtn.Visible = false
+OpenHubBtn.Parent = ScreenGui
+
+local OpenCorner = Instance.new("UICorner")
+OpenCorner.CornerRadius = UDim.new(0, 10)
+OpenCorner.Parent = OpenHubBtn
+
+MinimizeBtn.MouseButton1Click:Connect(function()
+    MainFrame.Visible = false
+    OpenHubBtn.Visible = true
+end)
+
+OpenHubBtn.MouseButton1Click:Connect(function()
+    MainFrame.Visible = true
+    OpenHubBtn.Visible = false
+end)
+
+--------------------------------------------------------------------------------
+-- ÁREA DE BOTÕES DO HUB
+--------------------------------------------------------------------------------
+local Container = Instance.new("Frame")
+Container.Size = UDim2.new(1, -20, 1, -55)
+Container.Position = UDim2.new(0, 10, 0, 45)
+Container.BackgroundTransparency = 1
+Container.Parent = MainFrame
+
+local UIList = Instance.new("UIListLayout")
+UIList.Padding = UDim.new(0, 8)
+UIList.SortOrder = Enum.SortOrder.LayoutOrder
+UIList.HorizontalAlignment = Enum.HorizontalAlignment.Center
+UIList.Parent = Container
+
+-- Botão Bypass
+local BypassBtn = Instance.new("TextButton")
+BypassBtn.Size = UDim2.new(1, 0, 0, 40)
+BypassBtn.BackgroundColor3 = Color3.fromRGB(50, 40, 68)
+BypassBtn.Text = "Bypass Anti-Cheat: OFF"
+BypassBtn.TextColor3 = Color3.fromRGB(220, 200, 255)
+BypassBtn.TextSize = 13
+BypassBtn.Font = Enum.Font.GothamMedium
+BypassBtn.Parent = Container
+
+local BypassCorner = Instance.new("UICorner")
+BypassCorner.CornerRadius = UDim.new(0, 8)
+BypassCorner.Parent = BypassBtn
+
+-- Botão Gojo 0.2
+local GojoBtn = Instance.new("TextButton")
+GojoBtn.Size = UDim2.new(1, 0, 0, 40)
+GojoBtn.BackgroundColor3 = Color3.fromRGB(50, 40, 68)
+GojoBtn.Text = "Gojo 0.2 (Kill Server): OFF"
+GojoBtn.TextColor3 = Color3.fromRGB(220, 200, 255)
+GojoBtn.TextSize = 13
+GojoBtn.Font = Enum.Font.GothamMedium
+GojoBtn.Parent = Container
+
+local GojoCorner = Instance.new("UICorner")
+GojoCorner.CornerRadius = UDim.new(0, 8)
+GojoCorner.Parent = GojoBtn
+
+-- Botão Focus
+local FocusBtn = Instance.new("TextButton")
+FocusBtn.Size = UDim2.new(1, 0, 0, 40)
+FocusBtn.BackgroundColor3 = Color3.fromRGB(50, 40, 68)
+FocusBtn.Text = "Focus (Spin Lock Target): OFF"
+FocusBtn.TextColor3 = Color3.fromRGB(220, 200, 255)
+FocusBtn.TextSize = 13
+FocusBtn.Font = Enum.Font.GothamMedium
+FocusBtn.Parent = Container
+
+local FocusCorner = Instance.new("UICorner")
+FocusCorner.CornerRadius = UDim.new(0, 8)
+FocusCorner.Parent = FocusBtn
+
+-- Botão Fly
+local FlyBtn = Instance.new("TextButton")
+FlyBtn.Size = UDim2.new(1, 0, 0, 40)
+FlyBtn.BackgroundColor3 = Color3.fromRGB(50, 40, 68)
+FlyBtn.Text = "Fly (Setas): OFF"
+FlyBtn.TextColor3 = Color3.fromRGB(220, 200, 255)
+FlyBtn.TextSize = 13
+FlyBtn.Font = Enum.Font.GothamMedium
+FlyBtn.Parent = Container
+
+local FlyCorner = Instance.new("UICorner")
+FlyCorner.CornerRadius = UDim.new(0, 8)
+FlyCorner.Parent = FlyBtn
+
+--------------------------------------------------------------------------------
+-- VALIDAÇÃO DA KEY
+--------------------------------------------------------------------------------
+SubmitBtn.MouseButton1Click:Connect(function()
+    if KeyInput.Text == CORRECT_KEY then
+        KeyFrame:Destroy()
+        MainFrame.Visible = true
+    else
+        SubmitBtn.Text = "KEY INCORRETA!"
+        SubmitBtn.BackgroundColor3 = Color3.fromRGB(180, 60, 90)
+        task.wait(1.5)
+        SubmitBtn.Text = "VERIFICAR KEY"
+        SubmitBtn.BackgroundColor3 = Color3.fromRGB(160, 110, 220)
+    end
+end)
+
+--------------------------------------------------------------------------------
+-- LÓGICA DO BYPASS
+--------------------------------------------------------------------------------
+local function enableBypass()
+    bypassConnection = RunService.Stepped:Connect(function()
+        if not bypassActive then return end
+        local char = LocalPlayer.Character
+        if char then
+            for _, part in pairs(char:GetChildren()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = false
+                end
+            end
+        end
+    end)
+end
+
+BypassBtn.MouseButton1Click:Connect(function()
+    bypassActive = not bypassActive
+    if bypassActive then
+        BypassBtn.Text = "Bypass Anti-Cheat: ON"
+        BypassBtn.BackgroundColor3 = Color3.fromRGB(160, 110, 220)
+        BypassBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        enableBypass()
+    else
+        BypassBtn.Text = "Bypass Anti-Cheat: OFF"
+        BypassBtn.BackgroundColor3 = Color3.fromRGB(50, 40, 68)
+        BypassBtn.TextColor3 = Color3.fromRGB(220, 200, 255)
+        if bypassConnection then
+            bypassConnection:Disconnect()
+        end
+    end
+end)
+
+--------------------------------------------------------------------------------
+-- LÓGICA DO FOCUS (ORBITA E TRAVA NO PLAYER MAIS PRÓXIMO)
+--------------------------------------------------------------------------------
+local function getClosestPlayer()
+    local closestPlayer = nil
+    local shortestDistance = math.huge
+    local myChar = LocalPlayer.Character
+    
+    if myChar and myChar:FindFirstChild("HumanoidRootPart") then
+        local myPos = myChar.HumanoidRootPart.Position
+        
+        for _, player in pairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                local hum = player.Character:FindFirstChildOfClass("Humanoid")
+                if hum and hum.Health > 0 then
+                    local dist = (player.Character.HumanoidRootPart.Position - myPos).Magnitude
+                    if dist < shortestDistance then
+                        shortestDistance = dist
+                        closestPlayer = player
+                    end
+                end
+            end
+        end
+    end
+    return closestPlayer
+end
+
+local function startFocus()
+    focusConnection = RunService.RenderStepped:Connect(function(dt)
+        if not focusActive then return end
+        local myChar = LocalPlayer.Character
+        if not myChar or not myChar:FindFirstChild("HumanoidRootPart") then return end
+        
+        local target = getClosestPlayer()
+        if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
+            local targetHRP = target.Character.HumanoidRootPart
+            local myHRP = myChar.HumanoidRootPart
+            
+            focusAngle = focusAngle + (dt * 10)
+            local radius = 6
+            
+            local offsetX = math.cos(focusAngle) * radius
+            local offsetZ = math.sin(focusAngle) * radius
+            
+            local newPos = targetHRP.Position + Vector3.new(offsetX, 1, offsetZ)
+            
+            myHRP.CFrame = CFrame.new(newPos, targetHRP.Position)
+            
+            local cam = workspace.CurrentCamera
+            if cam then
+                cam.CFrame = CFrame.new(cam.CFrame.Position, targetHRP.Position)
+            end
+        end
+    end)
+end
+
+FocusBtn.MouseButton1Click:Connect(function()
+    focusActive = not focusActive
+    if focusActive then
+        FocusBtn.Text = "Focus (Spin Lock Target): ON"
+        FocusBtn.BackgroundColor3 = Color3.fromRGB(160, 110, 220)
+        FocusBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        startFocus()
+    else
+        FocusBtn.Text = "Focus (Spin Lock Target): OFF"
+        FocusBtn.BackgroundColor3 = Color3.fromRGB(50, 40, 68)
+        FocusBtn.TextColor3 = Color3.fromRGB(220, 200, 255)
+        if focusConnection then
+            focusConnection:Disconnect()
+        end
+    end
+end)
+
+--------------------------------------------------------------------------------
+-- LÓGICA DO GOJO 0.2 (KILL SERVER LOOP)
+--------------------------------------------------------------------------------
+local function startGojo()
+    gojoConnection = RunService.Heartbeat:Connect(function()
+        if not gojoActive then return end
+        local char = LocalPlayer.Character
+        if not char or not char:FindFirstChild("HumanoidRootPart") then return end
+        
+        for _, player in pairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                local targetHum = player.Character:FindFirstChildOfClass("Humanoid")
+                local targetHRP = player.Character.HumanoidRootPart
+                
+                if targetHum and targetHum.Health > 0 then
+                    char.HumanoidRootPart.CFrame = targetHRP.CFrame * CFrame.new(0, 0, 1)
+                    
+                    if bypassActive then
+                        pcall(function()
+                            targetHum.Health = 0
+                            if char:FindFirstChildOfClass("Tool") then
+                                local tool = char:FindFirstChildOfClass("Tool")
+                                tool:Activate()
+                            end
+                        end)
+                    end
+                    task.wait(0.01)
+                end
+            end
+        end
+    end)
+end
+
+GojoBtn.MouseButton1Click:Connect(function()
+    gojoActive = not gojoActive
+    if gojoActive then
+        GojoBtn.Text = "Gojo 0.2 (Kill Server): ON"
+        GojoBtn.BackgroundColor3 = Color3.fromRGB(160, 110, 220)
+        GojoBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        startGojo()
+    else
+        GojoBtn.Text = "Gojo 0.2 (Kill Server): OFF"
+        GojoBtn.BackgroundColor3 = Color3.fromRGB(50, 40, 68)
+        GojoBtn.TextColor3 = Color3.fromRGB(220, 200, 255)
+        if gojoConnection then
+            gojoConnection:Disconnect()
+        end
+    end
+end)
+
+--------------------------------------------------------------------------------
+-- CONTROLES E LÓGICA DO FLY (SEM CAIR AO SOLTAR)
+--------------------------------------------------------------------------------
+local LeftControlGroup = Instance.new("Frame")
+LeftControlGroup.Size = UDim2.new(0, 150, 0, 150)
+LeftControlGroup.Position = UDim2.new(0, 20, 1, -170)
+LeftControlGroup.BackgroundTransparency = 1
+LeftControlGroup.Visible = false
+LeftControlGroup.Parent = ScreenGui
+
+local RightControlGroup = Instance.new("Frame")
+RightControlGroup.Size = UDim2.new(0, 60, 0, 120)
+RightControlGroup.Position = UDim2.new(1, -80, 1, -140)
+RightControlGroup.BackgroundTransparency = 1
+RightControlGroup.Visible = false
+RightControlGroup.Parent = ScreenGui
+
+local function createArrowButton(name, text, size, pos, parent)
+    local btn = Instance.new("TextButton")
+    btn.Name = name
+    btn.Size = size
+    btn.Position = pos
+    btn.BackgroundColor3 = Color3.fromRGB(42, 32, 58)
+    btn.BackgroundTransparency = 0.2
+    btn.Text = text
+    btn.TextColor3 = Color3.fromRGB(215, 185, 255)
+    btn.TextSize = 20
+    btn.Font = Enum.Font.GothamBold
+    btn.Parent = parent
+    
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 8)
+    corner.Parent = btn
+    return btn
+end
+
+local BtnForward = createArrowButton("Up", "▲", UDim2.new(0, 45, 0, 45), UDim2.new(0, 52, 0, 0), LeftControlGroup)
+local BtnBack = createArrowButton("Down", "▼", UDim2.new(0, 45, 0, 45), UDim2.new(0, 52, 0, 100), LeftControlGroup)
+local BtnLeft = createArrowButton("Left", "◄", UDim2.new(0, 45, 0, 45), UDim2.new(0, 2, 0, 50), LeftControlGroup)
+local BtnRight = createArrowButton("Right", "►", UDim2.new(0, 45, 0, 45), UDim2.new(0, 102, 0, 50), LeftControlGroup)
+
+local BtnUp = createArrowButton("Ascend", "▲", UDim2.new(0, 50, 0, 50), UDim2.new(0, 0, 0, 0), RightControlGroup)
+local BtnDown = createArrowButton("Descend", "▼", UDim2.new(0, 50, 0, 50), UDim2.new(0, 0, 0, 60), RightControlGroup)
+
+local holds = {Forward = false, Back = false, Left = false, Right = false, Up = false, Down = false}
+
+local function bindHold(btn, key)
+    btn.MouseButton1Down:Connect(function() holds[key] = true end)
+    btn.MouseButton1Up:Connect(function() holds[key] = false end)
+    btn.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.Touch then holds[key] = true end
+    end)
+    btn.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.Touch then holds[key] = false end
+    end)
+end
+
+bindHold(BtnForward, "Forward")
+bindHold(BtnBack, "Back")
+bindHold(BtnLeft, "Left")
+bindHold(BtnRight, "Right")
+bindHold(BtnUp, "Up")
+bindHold(BtnDown, "Down")
+
+RunService.RenderStepped:Connect(function(dt)
+    if not flyActive then return end
+    local char = LocalPlayer.Character
+    if not char then return end
+    local hrp = char:FindFirstChild("HumanoidRootPart")
+    local cam = workspace.CurrentCamera
+    if not hrp or not cam then return end
+
+    -- Mantém o personagem suspenso sem cair qua
