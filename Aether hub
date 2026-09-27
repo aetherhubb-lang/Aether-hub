@@ -1,0 +1,241 @@
+--====================================================================--
+--                        AETHER HUB - MOBILE                         --
+--                          by:atsu                                   --
+--====================================================================--
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local RunService = game:GetService("RunService")
+local CoreGui = game:GetService("CoreGui")
+local UserInputService = game:GetService("UserInputService")
+local Workspace = game:GetService("Workspace")
+
+-- Limpeza de UI anterior
+if CoreGui:FindFirstChild("AetherHubCustomUI") then
+    CoreGui.AetherHubCustomUI:Destroy()
+end
+
+-- ScreenGui Principal
+local MainUI = Instance.new("ScreenGui")
+MainUI.Name = "AetherHubCustomUI"
+MainUI.Parent = (RunService:IsStudio() and LocalPlayer.PlayerGui) or CoreGui
+
+-- Frame Principal
+local Frame = Instance.new("Frame", MainUI)
+Frame.Size = UDim2.new(0, 320, 0, 220)
+Frame.Position = UDim2.new(0.5, -160, 0.5, -110)
+Frame.BackgroundColor3 = Color3.fromRGB(18, 16, 24)
+Frame.BorderSizePixel = 0
+Frame.Active = true
+Frame.ClipsDescendants = true
+
+local Corner = Instance.new("UICorner", Frame)
+Corner.CornerRadius = UDim.new(0, 10)
+
+local Stroke = Instance.new("UIStroke", Frame)
+Stroke.Color = Color3.fromRGB(147, 51, 234)
+Stroke.Thickness = 1.5
+
+-- Título
+local Title = Instance.new("TextLabel", Frame)
+Title.Size = UDim2.new(1, -70, 0, 35)
+Title.Position = UDim2.new(0, 10, 0, 2)
+Title.Text = "Aether Hub | by:atsu"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 14
+Title.TextXAlignment = Enum.TextXAlignment.Left
+Title.BackgroundTransparency = 1
+
+-- Botão Minimizar (-)
+local MinimizeBtn = Instance.new("TextButton", Frame)
+MinimizeBtn.Size = UDim2.new(0, 25, 0, 25)
+MinimizeBtn.Position = UDim2.new(1, -60, 0, 7)
+MinimizeBtn.Text = "-"
+MinimizeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+MinimizeBtn.BackgroundColor3 = Color3.fromRGB(28, 25, 38)
+MinimizeBtn.Font = Enum.Font.GothamBold
+MinimizeBtn.TextSize = 16
+Instance.new("UICorner", MinimizeBtn).CornerRadius = UDim.new(0, 6)
+
+-- Botão Cadeado ( Lock / Drag )
+local LockBtn = Instance.new("TextButton", Frame)
+LockBtn.Size = UDim2.new(0, 25, 0, 25)
+LockBtn.Position = UDim2.new(1, -30, 0, 7)
+LockBtn.Text = "🔓"
+LockBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+LockBtn.BackgroundColor3 = Color3.fromRGB(28, 25, 38)
+LockBtn.Font = Enum.Font.Gotham
+LockBtn.TextSize = 12
+Instance.new("UICorner", LockBtn).CornerRadius = UDim.new(0, 6)
+
+-- Sistema de Draggable Personalizado
+local isLocked = false
+Frame.Draggable = true
+
+LockBtn.MouseButton1Click:Connect(function()
+    isLocked = not isLocked
+    Frame.Draggable = not isLocked
+    LockBtn.Text = isLocked and "🔒" or "🔓"
+end)
+
+-- Sistema de Minimizar
+local isMinimized = false
+MinimizeBtn.MouseButton1Click:Connect(function()
+    isMinimized = not isMinimized
+    if isMinimized then
+        Frame:TweenSize(UDim2.new(0, 320, 0, 38), Enum.EasingDirection.Out, Enum.EasingStyle.Quart, 0.3, true)
+        MinimizeBtn.Text = "+"
+    else
+        Frame:TweenSize(UDim2.new(0, 320, 0, 220), Enum.EasingDirection.Out, Enum.EasingStyle.Quart, 0.3, true)
+        MinimizeBtn.Text = "-"
+    end
+end)
+
+-- Container dos Botões
+local Content = Instance.new("Frame", Frame)
+Content.Size = UDim2.new(0.9, 0, 0.72, 0)
+Content.Position = UDim2.new(0.05, 0, 0.23, 0)
+Content.BackgroundTransparency = 1
+
+local ListLayout = Instance.new("UIListLayout", Content)
+ListLayout.Padding = UDim.new(0, 8)
+
+-- Estados das Funções
+local States = { Gojo = false, Fly = false }
+
+local function CreateToggleButton(name, keyState)
+    local Btn = Instance.new("TextButton", Content)
+    Btn.Size = UDim2.new(1, 0, 0, 42)
+    Btn.Text = name .. ": [OFF]"
+    Btn.TextColor3 = Color3.fromRGB(200, 200, 200)
+    Btn.BackgroundColor3 = Color3.fromRGB(28, 25, 38)
+    Btn.Font = Enum.Font.GothamBold
+    Btn.TextSize = 13
+    Instance.new("UICorner", Btn).CornerRadius = UDim.new(0, 8)
+
+    Btn.MouseButton1Click:Connect(function()
+        States[keyState] = not States[keyState]
+        Btn.Text = name .. (States[keyState] and ": [ON]" or ": [OFF]")
+        Btn.TextColor3 = States[keyState] and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(200, 200, 200)
+        Btn.BackgroundColor3 = States[keyState] and Color3.fromRGB(147, 51, 234) or Color3.fromRGB(28, 25, 38)
+    end)
+    return Btn
+end
+
+CreateToggleButton("Gojo 0.2", "Gojo")
+local FlyBtn = CreateToggleButton("Fly Mobile", "Fly")
+
+--====================================================================--
+--                      SISTEMA GOJO 0.2 (KILL ALL)                   --
+--====================================================================--
+task.spawn(function()
+    while true do
+        if States.Gojo then
+            local targets = Players:GetPlayers()
+            for _, target in ipairs(targets) do
+                if not States.Gojo then break end
+                
+                if target ~= LocalPlayer and target.Character then
+                    local targetHrp = target.Character:FindFirstChild("HumanoidRootPart")
+                    local targetHum = target.Character:FindFirstChildOfClass("Humanoid")
+                    local myChar = LocalPlayer.Character
+                    local myHrp = myChar and myChar:FindFirstChild("HumanoidRootPart")
+
+                    if targetHrp and targetHum and targetHum.Health > 0 and myHrp then
+                        -- Teleporta colado no jogador em velocidade máxima
+                        myHrp.CFrame = targetHrp.CFrame * CFrame.new(0, 0, -1.5)
+                        
+                        -- Tenta ativar golpes/ferramentas equipadas
+                        local tool = myChar:FindFirstChildOfClass("Tool")
+                        if tool then
+                            tool:Activate()
+                        end
+                        task.wait() -- Mínimo intervalo para permitir o processamento de rede
+                    end
+                end
+            end
+        else
+            task.wait(0.1)
+        end
+    end
+end)
+
+--====================================================================--
+--                    CONTROLES DE FLY MOBILE (SETAS)                 --
+--====================================================================--
+local FlyControlsGui = Instance.new("ScreenGui")
+FlyControlsGui.Name = "FlyControlsGui"
+FlyControlsGui.Parent = (RunService:IsStudio() and LocalPlayer.PlayerGui) or CoreGui
+FlyControlsGui.Enabled = false
+
+local LeftFrame = Instance.new("Frame", FlyControlsGui)
+LeftFrame.Size = UDim2.new(0, 150, 0, 150)
+LeftFrame.Position = UDim2.new(0, 20, 1, -170)
+LeftFrame.BackgroundTransparency = 1
+
+local RightFrame = Instance.new("Frame", FlyControlsGui)
+RightFrame.Size = UDim2.new(0, 80, 0, 150)
+RightFrame.Position = UDim2.new(1, -100, 1, -170)
+RightFrame.BackgroundTransparency = 1
+
+local FlyDirs = { Forward = false, Backward = false, Left = false, Right = false, Up = false, Down = false }
+
+local function MakeArrowBtn(parent, text, size, pos, dirKey)
+    local btn = Instance.new("TextButton", parent)
+    btn.Size = size
+    btn.Position = pos
+    btn.Text = text
+    btn.Font = Enum.Font.GothamBold
+    btn.TextSize = 18
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.BackgroundColor3 = Color3.fromRGB(28, 25, 38)
+    btn.BackgroundTransparency = 0.3
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
+    
+    local stroke = Instance.new("UIStroke", btn)
+    stroke.Color = Color3.fromRGB(147, 51, 234)
+
+    btn.MouseButton1Down:Connect(function() FlyDirs[dirKey] = true end)
+    btn.MouseButton1Up:Connect(function() FlyDirs[dirKey] = false end)
+    btn.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
+            FlyDirs[dirKey] = false
+        end
+    end)
+end
+
+-- Setas Esquerdas (Movimentação Horizontal)
+MakeArrowBtn(LeftFrame, "▲", UDim2.new(0, 45, 0, 45), UDim2.new(0.5, -22, 0, 0), "Forward")
+MakeArrowBtn(LeftFrame, "▼", UDim2.new(0, 45, 0, 45), UDim2.new(0.5, -22, 1, -45), "Backward")
+MakeArrowBtn(LeftFrame, "◄", UDim2.new(0, 45, 0, 45), UDim2.new(0, 0, 0.5, -22), "Left")
+MakeArrowBtn(LeftFrame, "►", UDim2.new(0, 45, 0, 45), UDim2.new(1, -45, 0.5, -22), "Right")
+
+-- Setas Direitas (Elevação)
+MakeArrowBtn(RightFrame, "▲", UDim2.new(0, 50, 0, 50), UDim2.new(0.5, -25, 0, 10), "Up")
+MakeArrowBtn(RightFrame, "▼", UDim2.new(0, 50, 0, 50), UDim2.new(0.5, -25, 1, -60), "Down")
+
+-- Loop Lógica de Voo
+local flySpeed = 60
+RunService.RenderStepped:Connect(function()
+    FlyControlsGui.Enabled = States.Fly
+    local char = LocalPlayer.Character
+    if States.Fly and char and char:FindFirstChild("HumanoidRootPart") then
+        local hrp = char.HumanoidRootPart
+        local cam = Workspace.CurrentCamera
+        local moveVec = Vector3.zero
+
+        if FlyDirs.Forward then moveVec = moveVec + cam.CFrame.LookVector end
+        if FlyDirs.Backward then moveVec = moveVec - cam.CFrame.LookVector end
+        if FlyDirs.Right then moveVec = moveVec + cam.CFrame.RightVector end
+        if FlyDirs.Left then moveVec = moveVec - cam.CFrame.RightVector end
+        if FlyDirs.Up then moveVec = moveVec + Vector3.new(0, 1, 0) end
+        if FlyDirs.Down then moveVec = moveVec - Vector3.new(0, 1, 0) end
+
+        if moveVec.Magnitude > 0 then
+            hrp.Velocity = moveVec.Unit * flySpeed
+        else
+            hrp.Velocity = Vector3.zero
+        end
+    end
+end)
