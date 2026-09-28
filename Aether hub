@@ -1,0 +1,643 @@
+--[[
+    ═══════════════════════════════════════════════════════
+    🌌 AETHER HUB | Delta Executor - PARTE 1/2
+    🔑 Key: AETHER-X
+    ═══════════════════════════════════════════════════════
+]]
+
+local CoreGui     = game:GetService("CoreGui")
+local Players     = game:GetService("Players")
+local UIS         = game:GetService("UserInputService")
+local RunService  = game:GetService("RunService")
+local LP          = Players.LocalPlayer
+
+local KEY = "AETHER-X"
+
+for _, n in ipairs({"AetherKey", "AetherHub", "AetherFlyUI"}) do
+    pcall(function()
+        local g = CoreGui:FindFirstChild(n)
+        if g then g:Destroy() end
+    end)
+end
+
+local loadMainHub
+
+--═══════════════════════════════════════════════════════
+-- 🔑 KEY SYSTEM
+--═══════════════════════════════════════════════════════
+local function createKeyGui()
+    local gui = Instance.new("ScreenGui")
+    gui.Name = "AetherKey"
+    gui.ResetOnSpawn = false
+    gui.Parent = CoreGui
+
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(0, 340, 0, 230)
+    frame.Position = UDim2.new(0.5, -170, 0.5, -115)
+    frame.BackgroundColor3 = Color3.fromRGB(18, 8, 32)
+    frame.BorderSizePixel = 0
+    frame.Active = true
+    frame.Draggable = true
+    frame.Parent = gui
+
+    local c = Instance.new("UICorner"); c.CornerRadius = UDim.new(0, 16); c.Parent = frame
+
+    local stroke = Instance.new("UIStroke")
+    stroke.Color = Color3.fromRGB(180, 130, 255)
+    stroke.Thickness = 2
+    stroke.Transparency = 0.1
+    stroke.Parent = frame
+
+    task.spawn(function()
+        while frame.Parent do
+            for i = 0, 1, 0.08 do
+                if not frame.Parent then break end
+                stroke.Transparency = 0.15 + math.abs(math.sin(i * math.pi)) * 0.5
+                task.wait(0.03)
+            end
+        end
+    end)
+
+    local title = Instance.new("TextLabel")
+    title.Size = UDim2.new(1, 0, 0, 50)
+    title.Position = UDim2.new(0, 0, 0, 15)
+    title.BackgroundTransparency = 1
+    title.Text = "🌌 AETHER HUB"
+    title.TextColor3 = Color3.fromRGB(210, 170, 255)
+    title.Font = Enum.Font.GothamBold
+    title.TextSize = 26
+    title.Parent = frame
+
+    local sub = Instance.new("TextLabel")
+    sub.Size = UDim2.new(1, 0, 0, 22)
+    sub.Position = UDim2.new(0, 0, 0, 62)
+    sub.BackgroundTransparency = 1
+    sub.Text = "Digite a Key de Acesso"
+    sub.TextColor3 = Color3.fromRGB(160, 130, 200)
+    sub.Font = Enum.Font.Gotham
+    sub.TextSize = 14
+    sub.Parent = frame
+
+    local box = Instance.new("TextBox")
+    box.Size = UDim2.new(0, 260, 0, 40)
+    box.Position = UDim2.new(0.5, -130, 0, 100)
+    box.BackgroundColor3 = Color3.fromRGB(35, 20, 55)
+    box.BorderSizePixel = 0
+    box.Text = ""
+    box.PlaceholderText = "AETHER-X"
+    box.TextColor3 = Color3.fromRGB(220, 200, 255)
+    box.PlaceholderColor3 = Color3.fromRGB(130, 100, 180)
+    box.Font = Enum.Font.Gotham
+    box.TextSize = 16
+    box.ClearTextOnFocus = false
+    box.Parent = frame
+
+    local bc = Instance.new("UICorner"); bc.CornerRadius = UDim.new(0, 10); bc.Parent = box
+    local bs = Instance.new("UIStroke")
+    bs.Color = Color3.fromRGB(180, 130, 255); bs.Thickness = 1.5; bs.Transparency = 0.3
+    bs.Parent = box
+
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0, 260, 0, 40)
+    btn.Position = UDim2.new(0.5, -130, 0, 150)
+    btn.BackgroundColor3 = Color3.fromRGB(130, 80, 220)
+    btn.BorderSizePixel = 0
+    btn.Text = "Verificar"
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.Font = Enum.Font.GothamBold
+    btn.TextSize = 16
+    btn.Parent = frame
+
+    local bbc = Instance.new("UICorner"); bbc.CornerRadius = UDim.new(0, 10); bbc.Parent = btn
+
+    local status = Instance.new("TextLabel")
+    status.Size = UDim2.new(1, 0, 0, 20)
+    status.Position = UDim2.new(0, 0, 0, 200)
+    status.BackgroundTransparency = 1
+    status.Text = ""
+    status.TextColor3 = Color3.fromRGB(255, 80, 80)
+    status.Font = Enum.Font.Gotham
+    status.TextSize = 13
+    status.Parent = frame
+
+    local verified = false
+    local function tryVerify()
+        if verified then return end
+        if box.Text == KEY then
+            verified = true
+            status.Text = "✔ Acesso Concedido"
+            status.TextColor3 = Color3.fromRGB(120, 255, 120)
+            task.wait(0.7)
+            gui:Destroy()
+            _G.AetherAuthenticated = true
+            loadMainHub()
+        else
+            status.Text = "✘ Key inválida"
+            box.Text = ""
+        end
+    end
+
+    btn.MouseButton1Click:Connect(tryVerify)
+    box.FocusLost:Connect(function(enter)
+        if enter then tryVerify() end
+    end)
+end
+
+--═══════════════════════════════════════════════════════
+-- 🌌 MAIN HUB
+--═══════════════════════════════════════════════════════
+loadMainHub = function()
+    local mainGui = Instance.new("ScreenGui")
+    mainGui.Name = "AetherHub"
+    mainGui.ResetOnSpawn = false
+    mainGui.Parent = CoreGui
+
+    local mainFrame = Instance.new("Frame")
+    mainFrame.Size = UDim2.new(0, 420, 0, 330)
+    mainFrame.Position = UDim2.new(0.5, -210, 0.5, -165)
+    mainFrame.BackgroundColor3 = Color3.fromRGB(18, 8, 32)
+    mainFrame.BorderSizePixel = 0
+    mainFrame.Active = true
+    mainFrame.Draggable = true
+    mainFrame.Parent = mainGui
+
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 18)
+    corner.Parent = mainFrame
+
+    local bgGrad = Instance.new("UIGradient")
+    bgGrad.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(32, 12, 58)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(8, 4, 18)),
+    })
+    bgGrad.Rotation = 135
+    bgGrad.Parent = mainFrame
+
+    local stroke = Instance.new("UIStroke")
+    stroke.Color = Color3.fromRGB(180, 130, 255)
+    stroke.Thickness = 2
+    stroke.Transparency = 0
+    stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    stroke.Parent = mainFrame
+
+    local stroke2 = Instance.new("UIStroke")
+    stroke2.Color = Color3.fromRGB(220, 180, 255)
+    stroke2.Thickness = 6
+    stroke2.Transparency = 0.85
+    stroke2.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    stroke2.Parent = mainFrame
+
+    task.spawn(function()
+        while mainFrame.Parent do
+            for i = 0, 1, 0.06 do
+                if not mainFrame.Parent then break end
+                local pulse = math.abs(math.sin(i * math.pi))
+                stroke.Transparency = 0.1 + pulse * 0.5
+                stroke2.Transparency = 0.7 + (1 - pulse) * 0.2
+                task.wait(0.03)
+            end
+        end
+    end)
+
+    local title = Instance.new("TextLabel")
+    title.Size = UDim2.new(1, -120, 0, 40)
+    title.Position = UDim2.new(0, 60, 0, 4)
+    title.BackgroundTransparency = 1
+    title.Text = "🌌 AETHER HUB"
+    title.TextColor3 = Color3.fromRGB(215, 175, 255)
+    title.Font = Enum.Font.GothamBold
+    title.TextSize = 20
+    title.Parent = mainFrame
+
+    local minBtn = Instance.new("TextButton")
+    minBtn.Size = UDim2.new(0, 30, 0, 30)
+    minBtn.Position = UDim2.new(0, 12, 0, 8)
+    minBtn.BackgroundColor3 = Color3.fromRGB(60, 30, 100)
+    minBtn.BorderSizePixel = 0
+    minBtn.Text = "-"
+    minBtn.TextColor3 = Color3.fromRGB(220, 190, 255)
+    minBtn.Font = Enum.Font.GothamBold
+    minBtn.TextSize = 22
+    minBtn.Parent = mainFrame
+    Instance.new("UICorner", minBtn).CornerRadius = UDim.new(0, 8)
+
+    local lockBtn = Instance.new("TextButton")
+    lockBtn.Size = UDim2.new(0, 30, 0, 30)
+    lockBtn.Position = UDim2.new(1, -42, 0, 8)
+    lockBtn.BackgroundColor3 = Color3.fromRGB(60, 30, 100)
+    lockBtn.BorderSizePixel = 0
+    lockBtn.Text = "🔓"
+    lockBtn.TextColor3 = Color3.fromRGB(220, 190, 255)
+    lockBtn.Font = Enum.Font.GothamBold
+    lockBtn.TextSize = 16
+    lockBtn.Parent = mainFrame
+    Instance.new("UICorner", lockBtn).CornerRadius = UDim.new(0, 8)
+
+    local list = Instance.new("Frame")
+    list.Size = UDim2.new(1, -40, 1, -70)
+    list.Position = UDim2.new(0, 20, 0, 60)
+    list.BackgroundTransparency = 1
+    list.Parent = mainFrame
+
+    local layout = Instance.new("UIListLayout")
+    layout.Padding = UDim.new(0, 8)
+    layout.SortOrder = Enum.SortOrder.LayoutOrder
+    layout.Parent = list
+
+    local function makeButton(text, order)
+        local b = Instance.new("TextButton")
+        b.Size = UDim2.new(1, 0, 0, 38)
+        b.BackgroundColor3 = Color3.fromRGB(45, 20, 80)
+        b.BorderSizePixel = 0
+        b.Text = text
+        b.TextColor3 = Color3.fromRGB(220, 200, 255)
+        b.Font = Enum.Font.GothamMedium
+        b.TextSize = 15
+        b.LayoutOrder = order
+        b.AutoButtonColor = true
+        b.Parent = list
+
+        local bc = Instance.new("UICorner")
+        bc.CornerRadius = UDim.new(0, 10)
+        bc.Parent = b
+
+        local bstroke = Instance.new("UIStroke")
+        bstroke.Color = Color3.fromRGB(150, 100, 240)
+        bstroke.Thickness = 1.2
+        bstroke.Transparency = 0.4
+        bstroke.Parent = b
+
+        return b
+    end    --════════════════════════════════════════════════
+    -- GOJO 0.2
+    --════════════════════════════════════════════════
+    local gojoActive = false
+    local gojoBtn = makeButton("Gojo 0.2: OFF", 1)
+
+    gojoBtn.MouseButton1Click:Connect(function()
+        gojoActive = not gojoActive
+        gojoBtn.Text = "Gojo 0.2: " .. (gojoActive and "ON" or "OFF")
+        if gojoActive then
+            task.spawn(function()
+                while gojoActive do
+                    local char = LP.Character
+                    local root = char and char:FindFirstChild("HumanoidRootPart")
+                    if root then
+                        for _, p in ipairs(Players:GetPlayers()) do
+                            if not gojoActive then break end
+                            if p ~= LP and p.Character then
+                                local tr  = p.Character:FindFirstChild("HumanoidRootPart")
+                                local hum = p.Character:FindFirstChildOfClass("Humanoid")
+                                if tr and hum and hum.Health > 0 then
+                                    root.CFrame = tr.CFrame
+                                    RunService.Heartbeat:Wait()
+                                end
+                            end
+                        end
+                    end
+                    RunService.Heartbeat:Wait()
+                end
+            end)
+        end
+    end)
+
+    --════════════════════════════════════════════════
+    -- FLY (setas menores + ▲=frente ▼=trás ◀ ▶=lados)
+    --════════════════════════════════════════════════
+    local flyActive = false
+    local flyBtn = makeButton("Fly: OFF", 2)
+    local flyMove = {left=0, right=0, up=0, down=0}
+    local flyGUIRef, flyBV, flyAng, flyConn
+
+    local function createFlyUI()
+        if flyGUIRef then flyGUIRef:Destroy() end
+        local gui = Instance.new("ScreenGui")
+        gui.Name = "AetherFlyUI"
+        gui.ResetOnSpawn = false
+        gui.DisplayOrder = 999999
+        gui.Parent = CoreGui
+        flyGUIRef = gui
+
+        local function makeArrow(x, y, text, dir)
+            local b = Instance.new("TextButton")
+            b.Size = UDim2.new(0, 58, 0, 58)
+            b.Position = UDim2.new(0, x, 0, y)
+            b.BackgroundColor3 = Color3.fromRGB(50, 25, 90)
+            b.BorderSizePixel = 0
+            b.Text = text
+            b.TextColor3 = Color3.fromRGB(240, 215, 255)
+            b.Font = Enum.Font.GothamBold
+            b.TextSize = 28
+            b.RichText = false
+            b.AutoButtonColor = false
+            b.Parent = gui
+
+            local c = Instance.new("UICorner")
+            c.CornerRadius = UDim.new(1, 0)
+            c.Parent = b
+
+            local s = Instance.new("UIStroke")
+            s.Color = Color3.fromRGB(180, 130, 255)
+            s.Thickness = 2.5
+            s.Parent = b
+
+            b.InputBegan:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseButton1
+                   or input.UserInputType == Enum.UserInputType.Touch then
+                    flyMove[dir] = 1
+                    b.BackgroundColor3 = Color3.fromRGB(140, 90, 230)
+                end
+            end)
+
+            b.InputEnded:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.MouseButton1
+                   or input.UserInputType == Enum.UserInputType.Touch then
+                    flyMove[dir] = 0
+                    b.BackgroundColor3 = Color3.fromRGB(50, 25, 90)
+                end
+            end)
+        end
+
+        makeArrow(80,  60,  "▲", "up")
+        makeArrow(15,  125, "◀", "left")
+        makeArrow(145, 125, "▶", "right")
+        makeArrow(80,  190, "▼", "down")
+    end
+
+    local function stopFly()
+        if flyConn then flyConn:Disconnect(); flyConn = nil end
+        if flyBV then flyBV:Destroy(); flyBV = nil end
+        if flyAng then flyAng:Destroy(); flyAng = nil end
+        local char = LP.Character
+        local hum = char and char:FindFirstChildOfClass("Humanoid")
+        if hum then hum.PlatformStand = false end
+        for k in pairs(flyMove) do flyMove[k] = 0 end
+    end
+
+    local function startFly()
+        local char = LP.Character
+        local root = char and char:FindFirstChild("HumanoidRootPart")
+        local hum  = char and char:FindFirstChildOfClass("Humanoid")
+        if not root or not hum then return end
+
+        hum.PlatformStand = true
+
+        flyBV = Instance.new("BodyVelocity")
+        flyBV.MaxForce = Vector3.new(1e5, 1e5, 1e5)
+        flyBV.Velocity = Vector3.zero
+        flyBV.Parent = root
+
+        flyAng = Instance.new("BodyAngularVelocity")
+        flyAng.MaxTorque = Vector3.new(1e5, 1e5, 1e5)
+        flyAng.AngularVelocity = Vector3.zero
+        flyAng.Parent = root
+
+        flyConn = RunService.Heartbeat:Connect(function()
+            if not flyActive then return end
+            local c = LP.Character
+            local r = c and c:FindFirstChild("HumanoidRootPart")
+            if not r then return end
+
+            local cam = workspace.CurrentCamera
+            local speed = 90
+            local vel = Vector3.zero
+
+            -- ◀ ▶ = esquerda/direita
+            vel += cam.CFrame.RightVector * (flyMove.right - flyMove.left) * speed
+            -- ▲ ▼ = frente/trás
+            vel += cam.CFrame.LookVector * (flyMove.up - flyMove.down) * speed
+
+            if flyBV then flyBV.Velocity = vel end
+        end)
+    end
+
+    flyBtn.MouseButton1Click:Connect(function()
+        flyActive = not flyActive
+        flyBtn.Text = "Fly: " .. (flyActive and "ON" or "OFF")
+        if flyActive then
+            createFlyUI()
+            startFly()
+        else
+            if flyGUIRef then flyGUIRef:Destroy(); flyGUIRef = nil end
+            stopFly()
+        end
+    end)
+
+    --════════════════════════════════════════════════
+    -- BYPASS
+    --════════════════════════════════════════════════
+    local bypassActive = false
+    local bypassBtn = makeButton("Bypass: OFF", 3)
+
+    local function AtualizarChar()
+        local char = LP.Character or LP.CharacterAdded:Wait()
+        return char,
+               char:WaitForChild("HumanoidRootPart", 5),
+               char:WaitForChild("Humanoid", 5)
+    end
+
+    local function ExecutarBypass()
+        local char, root = AtualizarChar()
+        if not root then return false end
+        local sucesso = false
+        pcall(function()
+            local jogadores = Players:GetPlayers()
+            for i = #jogadores, 1, -1 do
+                if jogadores[i] == LP then table.remove(jogadores, i) end
+            end
+            if #jogadores > 0 then
+                local alvo = jogadores[math.random(1, #jogadores)]
+                if alvo and alvo.Character
+                   and alvo.Character:FindFirstChild("HumanoidRootPart") then
+                    local posAlvo = alvo.Character.HumanoidRootPart.Position + Vector3.new(0, 3, 0)
+                    root.CFrame = CFrame.new(posAlvo)
+                    task.wait(0.5)
+                    if root and root.Parent
+                       and (root.Position - posAlvo).Magnitude < 25 then
+                        sucesso = true
+                    end
+                end
+            end
+        end)
+        return sucesso
+    end
+
+    local function rotaDoVoid()
+        local char, root, hum = AtualizarChar()
+        if not root or not hum then return end
+        pcall(function()
+            hum.PlatformStand = true
+            local bv = Instance.new("BodyVelocity")
+            bv.MaxForce = Vector3.new(9999999, 9999999, 9999999)
+            bv.Velocity = Vector3.new(0, 100, 0)
+            bv.Parent = root
+            task.wait(1.5)
+            bv.Velocity = Vector3.new(-700, 0, 0)
+            task.wait(2)
+            bv.Velocity = Vector3.zero
+            hum.PlatformStand = false
+            bv:Destroy()
+        end)
+    end
+
+    bypassBtn.MouseButton1Click:Connect(function()
+        bypassActive = not bypassActive
+        bypassBtn.Text = "Bypass: " .. (bypassActive and "ON" or "OFF")
+        if bypassActive then
+            task.spawn(function()
+                local tentativas = 0
+                while bypassActive do
+                    tentativas += 1
+                    print("💀 Bypass tentativa #" .. tentativas)
+                    local ok = ExecutarBypass()
+                    if ok then
+                        print("✅ Bypass FUNCIONOU na tentativa #" .. tentativas)
+                        bypassActive = false
+                        bypassBtn.Text = "Bypass: OFF"
+                        break
+                    else
+                        print("❌ Falhou #" .. tentativas .. " - Resetando...")
+                        rotaDoVoid()
+                        task.wait(3)
+                    end
+                end
+            end)
+        end
+    end)
+
+    --════════════════════════════════════════════════
+    -- FOCUS (personagem orbita o alvo)
+    --════════════════════════════════════════════════
+    local focusActive = false
+    local focusBtn = makeButton("Focus: OFF", 4)
+    local focusConn, focusTarget
+
+    local function findNearest()
+        local c = LP.Character
+        local r = c and c:FindFirstChild("HumanoidRootPart")
+        if not r then return nil end
+        local best, bestD = nil, math.huge
+        for _, p in ipairs(Players:GetPlayers()) do
+            if p ~= LP and p.Character then
+                local tr = p.Character:FindFirstChild("HumanoidRootPart")
+                local hum = p.Character:FindFirstChildOfClass("Humanoid")
+                if tr and hum and hum.Health > 0 then
+                    local d = (tr.Position - r.Position).Magnitude
+                    if d < bestD then bestD = d; best = p end
+                end
+            end
+        end
+        return best
+    end
+
+    local function stopFocus()
+        if focusConn then focusConn:Disconnect(); focusConn = nil end
+        local char = LP.Character
+        local hum = char and char:FindFirstChildOfClass("Humanoid")
+        if hum then hum.PlatformStand = false end
+        focusTarget = nil
+    end
+
+    local function startFocus()
+        focusTarget = findNearest()
+        if not focusTarget then
+            focusActive = false
+            focusBtn.Text = "Focus: OFF"
+            return
+        end
+
+        local angle = 0
+        local radius = 6
+        local speed = 5
+        local heightOffset = 3
+
+        focusConn = RunService.Heartbeat:Connect(function(dt)
+            if not focusActive then return end
+
+            if not focusTarget or not focusTarget.Character
+               or not focusTarget.Character.Parent then
+                focusTarget = findNearest()
+                if not focusTarget then return end
+            end
+
+            local char = LP.Character
+            local root = char and char:FindFirstChild("HumanoidRootPart")
+            local hum  = char and char:FindFirstChildOfClass("Humanoid")
+            local tr   = focusTarget.Character:FindFirstChild("HumanoidRootPart")
+            local tHum = focusTarget.Character:FindFirstChildOfClass("Humanoid")
+
+            if not root or not hum or not tr then return end
+            if tHum and tHum.Health <= 0 then
+                focusTarget = findNearest()
+                return
+            end
+
+            hum.PlatformStand = true
+
+            angle += dt * speed
+            local offset = Vector3.new(math.cos(angle) * radius, heightOffset, math.sin(angle) * radius)
+            local newPos = tr.Position + offset
+
+            root.CFrame = CFrame.new(newPos, tr.Position)
+            root.Velocity = Vector3.zero
+        end)
+    end
+
+    focusBtn.MouseButton1Click:Connect(function()
+        focusActive = not focusActive
+        focusBtn.Text = "Focus: " .. (focusActive and "ON" or "OFF")
+        if focusActive then startFocus() else stopFocus() end
+    end)
+
+    --════════════════════════════════════════════════
+    -- MINIMIZAR / CADEADO ("+" fica no mesmo lugar do "-")
+    --════════════════════════════════════════════════
+    local isMinimized = false
+    local savedPos = nil
+
+    minBtn.MouseButton1Click:Connect(function()
+        isMinimized = not isMinimized
+        if isMinimized then
+            savedPos = mainFrame.Position
+            mainFrame.Size = UDim2.new(0, 46, 0, 46)
+            minBtn.Text = "+"
+            minBtn.Size = UDim2.new(0, 34, 0, 34)
+            minBtn.Position = UDim2.new(0.5, -17, 0.5, -17)
+            title.Visible = false
+            lockBtn.Visible = false
+            list.Visible = false
+        else
+            mainFrame.Size = UDim2.new(0, 420, 0, 330)
+            if savedPos then mainFrame.Position = savedPos end
+            minBtn.Text = "-"
+            minBtn.Size = UDim2.new(0, 30, 0, 30)
+            minBtn.Position = UDim2.new(0, 12, 0, 8)
+            title.Visible = true
+            lockBtn.Visible = true
+            list.Visible = true
+        end
+    end)
+
+    local isLocked = false
+    lockBtn.MouseButton1Click:Connect(function()
+        isLocked = not isLocked
+        if isLocked then
+            lockBtn.Text = "🔒"
+            mainFrame.Draggable = false
+        else
+            lockBtn.Text = "🔓"
+            mainFrame.Draggable = true
+        end
+    end)
+end
+
+--═══════════════════════════════════════════════════════
+-- BOOT
+--═══════════════════════════════════════════════════════
+if _G.AetherAuthenticated then
+    loadMainHub()
+else
+    createKeyGui()
+end
+
+print("🌌 Aether Hub carregado! Key: AETHER-X")
