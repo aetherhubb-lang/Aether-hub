@@ -1,0 +1,1773 @@
+-- ============================================================================
+-- AETHER HUB - OTIMIZADO + ABA PERSONALIZAR
+-- by: atsu
+-- ============================================================================
+
+local players = game:GetService("Players")
+local ts = game:GetService("TweenService")
+local uis = game:GetService("UserInputService")
+local rs = game:GetService("RunService")
+local stats = game:GetService("Stats")
+local vim = game:GetService("VirtualInputManager")
+local teleport = game:GetService("TeleportService")
+local http = game:GetService("HttpService")
+local lighting = game:GetService("Lighting")
+local lp = players.LocalPlayer
+local pgui = lp:WaitForChild("PlayerGui")
+
+if pgui:FindFirstChild("AetherHubSystem") then pgui.AetherHubSystem:Destroy() end
+if pgui:FindFirstChild("AetherKey") then pgui.AetherKey:Destroy() end
+
+-- ============================================================================
+-- CONSTANTES (ROXO CLARO / ROXO ESCURO)
+-- ============================================================================
+local C = {
+    F  = Color3.fromRGB(28, 12, 45),
+    FE = Color3.fromRGB(18, 6, 30),
+    P  = Color3.fromRGB(38, 18, 60),
+    V  = Color3.fromRGB(180, 130, 255),
+    VE = Color3.fromRGB(130, 80, 210),
+    VN = Color3.fromRGB(210, 170, 255),
+    T  = Color3.fromRGB(240, 225, 255),
+    TS = Color3.fromRGB(170, 145, 210),
+    B  = Color3.fromRGB(180, 130, 255),
+    R  = Color3.fromRGB(220, 80, 120),
+    G  = Color3.fromRGB(65, 30, 100),
+    W  = Color3.fromRGB(255, 180, 0),
+    Gold = Color3.fromRGB(255, 215, 0),
+}
+
+local tI = TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+local tf = TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
+
+-- ============================================================================
+-- 🔑 KEY SYSTEM - AETHER-X
+-- ============================================================================
+local KEY_CORRETA = "AETHER-X"
+local AUTENTICADO = _G.AetherAuthenticated or false
+
+local keyGui
+if not AUTENTICADO then
+    keyGui = Instance.new("ScreenGui")
+    keyGui.Name = "AetherKey"
+    keyGui.ResetOnSpawn = false
+    keyGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    keyGui.Parent = pgui
+
+    local keyFrame = Instance.new("Frame", keyGui)
+    keyFrame.Size = UDim2.new(0, 340, 0, 230)
+    keyFrame.Position = UDim2.new(0.5, -170, 0.5, -115)
+    keyFrame.BackgroundColor3 = C.F
+    keyFrame.BorderSizePixel = 0
+    keyFrame.Active = true
+    keyFrame.Draggable = true
+    Instance.new("UICorner", keyFrame).CornerRadius = UDim.new(0, 16)
+
+    local keyStroke = Instance.new("UIStroke", keyFrame)
+    keyStroke.Color = C.B
+    keyStroke.Thickness = 2
+    keyStroke.Transparency = 0.1
+
+    local keyTitle = Instance.new("TextLabel", keyFrame)
+    keyTitle.Size = UDim2.new(1, 0, 0, 50)
+    keyTitle.Position = UDim2.new(0, 0, 0, 15)
+    keyTitle.BackgroundTransparency = 1
+    keyTitle.Text = "🌌 AETHER HUB"
+    keyTitle.TextColor3 = C.VN
+    keyTitle.Font = Enum.Font.GothamBold
+    keyTitle.TextSize = 26
+
+    local keySub = Instance.new("TextLabel", keyFrame)
+    keySub.Size = UDim2.new(1, 0, 0, 22)
+    keySub.Position = UDim2.new(0, 0, 0, 62)
+    keySub.BackgroundTransparency = 1
+    keySub.Text = "Digite a Key de Acesso"
+    keySub.TextColor3 = C.TS
+    keySub.Font = Enum.Font.Gotham
+    keySub.TextSize = 14
+
+    local keyBox = Instance.new("TextBox", keyFrame)
+    keyBox.Size = UDim2.new(0, 260, 0, 40)
+    keyBox.Position = UDim2.new(0.5, -130, 0, 100)
+    keyBox.BackgroundColor3 = Color3.fromRGB(45, 22, 70)
+    keyBox.BorderSizePixel = 0
+    keyBox.Text = ""
+    keyBox.PlaceholderText = "AETHER-X"
+    keyBox.TextColor3 = C.T
+    keyBox.PlaceholderColor3 = C.TS
+    keyBox.Font = Enum.Font.Gotham
+    keyBox.TextSize = 16
+    keyBox.ClearTextOnFocus = false
+    Instance.new("UICorner", keyBox).CornerRadius = UDim.new(0, 10)
+
+    local keyBtn = Instance.new("TextButton", keyFrame)
+    keyBtn.Size = UDim2.new(0, 260, 0, 40)
+    keyBtn.Position = UDim2.new(0.5, -130, 0, 150)
+    keyBtn.BackgroundColor3 = C.VE
+    keyBtn.BorderSizePixel = 0
+    keyBtn.Text = "Verificar"
+    keyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    keyBtn.Font = Enum.Font.GothamBold
+    keyBtn.TextSize = 16
+    Instance.new("UICorner", keyBtn).CornerRadius = UDim.new(0, 10)
+
+    local keyStatus = Instance.new("TextLabel", keyFrame)
+    keyStatus.Size = UDim2.new(1, 0, 0, 20)
+    keyStatus.Position = UDim2.new(0, 0, 0, 200)
+    keyStatus.BackgroundTransparency = 1
+    keyStatus.Text = ""
+    keyStatus.TextColor3 = C.R
+    keyStatus.Font = Enum.Font.Gotham
+    keyStatus.TextSize = 13
+
+    _G.AetherAuthCallback = nil
+    local verified = false
+    local function tryVerify()
+        if verified then return end
+        if keyBox.Text == KEY_CORRETA then
+            verified = true
+            keyStatus.Text = "✔ Acesso Concedido"
+            keyStatus.TextColor3 = Color3.fromRGB(120, 255, 120)
+            _G.AetherAuthenticated = true
+            task.wait(0.7)
+            keyGui:Destroy()
+            if _G.AetherAuthCallback then _G.AetherAuthCallback() end
+        else
+            keyStatus.Text = "✘ Key inválida"
+            keyBox.Text = ""
+        end
+    end
+
+    keyBtn.MouseButton1Click:Connect(tryVerify)
+    keyBox.FocusLost:Connect(function(enter)
+        if enter then tryVerify() end
+    end)
+end
+
+-- ============================================================================
+-- UI PRINCIPAL
+-- ============================================================================
+local sg = Instance.new("ScreenGui")
+sg.Name = "AetherHubSystem"
+sg.ResetOnSpawn = false
+sg.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+sg.Parent = pgui
+
+local main = Instance.new("Frame")
+main.Size = UDim2.new(0,520,0,340)
+main.Position = UDim2.new(0.5,-260,0.5,-170)
+main.BackgroundColor3 = C.F
+main.BackgroundTransparency = 0.15
+main.BorderSizePixel = 0
+main.ClipsDescendants = true
+main.Visible = false
+main.Parent = sg
+Instance.new("UICorner", main).CornerRadius = UDim.new(0,14)
+
+local ms = Instance.new("UIStroke", main)
+ms.Color = C.B
+ms.Thickness = 1.5
+ms.Transparency = 0.3
+
+local bgImg = Instance.new("ImageLabel", main)
+bgImg.Size = UDim2.new(1,0,1,0)
+bgImg.BackgroundTransparency = 1
+bgImg.Image = "rbxassetid://73537536078446"
+bgImg.ImageTransparency = 0.35
+bgImg.ScaleType = Enum.ScaleType.Crop
+bgImg.ZIndex = 0
+Instance.new("UICorner", bgImg).CornerRadius = UDim.new(0,14)
+
+local bgShade = Instance.new("Frame", main)
+bgShade.Size = UDim2.new(1,0,1,0)
+bgShade.BackgroundColor3 = Color3.fromRGB(15, 5, 25)
+bgShade.BackgroundTransparency = 0.55
+bgShade.BorderSizePixel = 0
+bgShade.ZIndex = 1
+Instance.new("UICorner", bgShade).CornerRadius = UDim.new(0,14)
+
+-- TOPBAR
+local tb = Instance.new("Frame", main)
+tb.Size = UDim2.new(1,0,0,45)
+tb.BackgroundColor3 = C.FE
+tb.BackgroundTransparency = 0.4
+tb.BorderSizePixel = 0
+tb.ZIndex = 3
+Instance.new("UICorner", tb).CornerRadius = UDim.new(0,14)
+
+local tc = Instance.new("Frame", tb)
+tc.Size = UDim2.new(1,0,0,15)
+tc.Position = UDim2.new(0,0,1,-15)
+tc.BackgroundColor3 = C.FE
+tc.BackgroundTransparency = 0.4
+tc.BorderSizePixel = 0
+tc.ZIndex = 3
+
+local dot = Instance.new("Frame", tb)
+dot.Size = UDim2.new(0,10,0,10)
+dot.Position = UDim2.new(0,15,0.5,-5)
+dot.BackgroundColor3 = C.VN
+dot.BorderSizePixel = 0
+dot.ZIndex = 4
+Instance.new("UICorner", dot).CornerRadius = UDim.new(1,0)
+
+local ttl = Instance.new("TextLabel", tb)
+ttl.Size = UDim2.new(0,200,1,0)
+ttl.Position = UDim2.new(0,35,0,0)
+ttl.BackgroundTransparency = 1
+ttl.Text = "🌌 AETHER HUB"
+ttl.TextColor3 = C.T
+ttl.Font = Enum.Font.GothamBold
+ttl.TextSize = 16
+ttl.TextXAlignment = Enum.TextXAlignment.Left
+ttl.ZIndex = 4
+
+local st = Instance.new("TextLabel", tb)
+st.Size = UDim2.new(0,150,1,0)
+st.Position = UDim2.new(0,160,0,1)
+st.BackgroundTransparency = 1
+st.Text = "by: atsu"
+st.TextColor3 = C.V
+st.Font = Enum.Font.GothamBold
+st.TextSize = 10
+st.TextXAlignment = Enum.TextXAlignment.Left
+st.ZIndex = 4
+
+local function mkTopBtn(x, c, txt)
+    local b = Instance.new("TextButton", tb)
+    b.Size = UDim2.new(0,26,0,26)
+    b.Position = UDim2.new(1,x,0.5,-13)
+    b.BackgroundColor3 = c
+    b.BackgroundTransparency = 1
+    b.BorderSizePixel = 0
+    b.Text = txt
+    b.TextColor3 = C.TS
+    b.Font = Enum.Font.GothamBold
+    b.TextSize = 14
+    b.AutoButtonColor = false
+    b.ZIndex = 5
+    Instance.new("UICorner", b).CornerRadius = UDim.new(1,0)
+    b.MouseEnter:Connect(function() ts:Create(b,tf,{BackgroundTransparency=0.7,TextColor3=c}):Play() end)
+    b.MouseLeave:Connect(function() ts:Create(b,tf,{BackgroundTransparency=1,TextColor3=C.TS}):Play() end)
+    return b
+end
+
+local clsBtn = mkTopBtn(-38, C.V, "✕")
+
+-- SIDEBAR
+local sb = Instance.new("Frame", main)
+sb.Size = UDim2.new(0,130,1,-55)
+sb.Position = UDim2.new(0,10,0,50)
+sb.BackgroundColor3 = C.P
+sb.BackgroundTransparency = 0.4
+sb.BorderSizePixel = 0
+sb.ZIndex = 3
+Instance.new("UICorner", sb).CornerRadius = UDim.new(0,10)
+
+local sbScroll = Instance.new("ScrollingFrame", sb)
+sbScroll.Size = UDim2.new(1,0,1,0)
+sbScroll.BackgroundTransparency = 1
+sbScroll.BorderSizePixel = 0
+sbScroll.ScrollBarThickness = 2
+sbScroll.ScrollBarImageColor3 = C.V
+sbScroll.CanvasSize = UDim2.new(0,0,0,0)
+sbScroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
+sbScroll.ZIndex = 3
+
+local sbLayout = Instance.new("UIListLayout", sbScroll)
+sbLayout.Padding = UDim.new(0,4)
+sbLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+local sbPad = Instance.new("UIPadding", sbScroll)
+sbPad.PaddingTop = UDim.new(0,6)
+sbPad.PaddingBottom = UDim.new(0,6)
+sbPad.PaddingLeft = UDim.new(0,6)
+sbPad.PaddingRight = UDim.new(0,6)
+
+-- ÁREA DE CONTEÚDO
+local ca = Instance.new("Frame", main)
+ca.Size = UDim2.new(1,-160,1,-55)
+ca.Position = UDim2.new(0,150,0,50)
+ca.BackgroundColor3 = C.P
+ca.BackgroundTransparency = 0.4
+ca.BorderSizePixel = 0
+ca.ZIndex = 3
+Instance.new("UICorner", ca).CornerRadius = UDim.new(0,10)
+
+local pd = Instance.new("UIPadding", ca)
+pd.PaddingTop = UDim.new(0,10)
+pd.PaddingBottom = UDim.new(0,26)
+pd.PaddingLeft = UDim.new(0,10)
+pd.PaddingRight = UDim.new(0,10)
+
+local sLabel = Instance.new("TextLabel", ca)
+sLabel.Size = UDim2.new(1,0,0,16)
+sLabel.Position = UDim2.new(0,0,1,-18)
+sLabel.BackgroundTransparency = 1
+sLabel.Text = "Sem Serviço"
+sLabel.TextColor3 = C.TS
+sLabel.Font = Enum.Font.Gotham
+sLabel.TextSize = 11
+sLabel.ZIndex = 5
+
+-- ============================================================================
+-- FÁBRICAS DE COMPONENTES
+-- ============================================================================
+local function mkPage(nome)
+    local p = Instance.new("ScrollingFrame", ca)
+    p.Name = nome
+    p.Size = UDim2.new(1,0,1,-22)
+    p.BackgroundTransparency = 1
+    p.BorderSizePixel = 0
+    p.ScrollBarThickness = 3
+    p.ScrollBarImageColor3 = C.V
+    p.CanvasSize = UDim2.new(0,0,0,0)
+    p.AutomaticCanvasSize = Enum.AutomaticSize.Y
+    p.Visible = false
+    p.ZIndex = 4
+    local l = Instance.new("UIListLayout", p)
+    l.Padding = UDim.new(0,8)
+    return p
+end
+
+local function baseCard(parent, titulo, desc)
+    local cd = Instance.new("TextButton", parent)
+    cd.Size = UDim2.new(1,-6,0,50)
+    cd.BackgroundColor3 = C.F
+    cd.BackgroundTransparency = 0.4
+    cd.BorderSizePixel = 0
+    cd.Text = ""
+    cd.AutoButtonColor = false
+    cd.ZIndex = 4
+    Instance.new("UICorner", cd).CornerRadius = UDim.new(0,8)
+    local cst = Instance.new("UIStroke", cd)
+    cst.Color = C.VE
+    cst.Thickness = 1
+    cst.Transparency = 0.7
+    local tl = Instance.new("TextLabel", cd)
+    tl.Size = UDim2.new(1,-40,0,20)
+    tl.Position = UDim2.new(0,30,0,6)
+    tl.BackgroundTransparency = 1
+    tl.Text = titulo
+    tl.TextColor3 = C.T
+    tl.Font = Enum.Font.GothamBold
+    tl.TextSize = 13
+    tl.TextXAlignment = Enum.TextXAlignment.Left
+    tl.ZIndex = 5
+    local dl = Instance.new("TextLabel", cd)
+    dl.Size = UDim2.new(1,-40,0,16)
+    dl.Position = UDim2.new(0,30,0,24)
+    dl.BackgroundTransparency = 1
+    dl.Text = desc
+    dl.TextColor3 = C.TS
+    dl.Font = Enum.Font.Gotham
+    dl.TextSize = 11
+    dl.TextXAlignment = Enum.TextXAlignment.Left
+    dl.ZIndex = 5
+    return cd, cst, tl, dl
+end
+
+local function mkCard(parent, titulo, desc, cb)
+    local cd, cst = baseCard(parent, titulo, desc)
+    local atv = false
+    cd.MouseButton1Click:Connect(function()
+        atv = not atv
+        if atv then
+            ts:Create(cd,tf,{BackgroundColor3=C.G,BackgroundTransparency=0.35}):Play()
+            ts:Create(cst,tf,{Color=C.VN,Transparency=0}):Play()
+        else
+            ts:Create(cd,tf,{BackgroundColor3=C.F,BackgroundTransparency=0.4}):Play()
+            ts:Create(cst,tf,{Color=C.VE,Transparency=0.7}):Play()
+        end
+        if cb then pcall(cb, atv, cd) end
+    end)
+    return cd
+end
+
+local function mkButton(parent, titulo, desc, cb)
+    local cd = baseCard(parent, titulo, desc)
+    cd.MouseButton1Click:Connect(function()
+        ts:Create(cd,tf,{BackgroundColor3=C.G,BackgroundTransparency=0.35}):Play()
+        task.wait(0.15)
+        ts:Create(cd,tf,{BackgroundColor3=C.F,BackgroundTransparency=0.4}):Play()
+        if cb then pcall(cb, cd) end
+    end)
+    return cd
+end
+
+local function mkSlider(parent, titulo, min, max, default, cb)
+    local frame = Instance.new("Frame", parent)
+    frame.Size = UDim2.new(1,-6,0,60)
+    frame.BackgroundColor3 = C.F
+    frame.BackgroundTransparency = 0.4
+    frame.BorderSizePixel = 0
+    frame.ZIndex = 4
+    Instance.new("UICorner", frame).CornerRadius = UDim.new(0,8)
+    local cst = Instance.new("UIStroke", frame)
+    cst.Color = C.VE
+    cst.Thickness = 1
+    cst.Transparency = 0.7
+
+    local tl = Instance.new("TextLabel", frame)
+    tl.Size = UDim2.new(1,-20,0,18)
+    tl.Position = UDim2.new(0,10,0,4)
+    tl.BackgroundTransparency = 1
+    tl.Text = titulo..": "..default
+    tl.TextColor3 = C.T
+    tl.Font = Enum.Font.GothamBold
+    tl.TextSize = 12
+    tl.TextXAlignment = Enum.TextXAlignment.Left
+    tl.ZIndex = 5
+
+    local bar = Instance.new("Frame", frame)
+    bar.Size = UDim2.new(1,-20,0,8)
+    bar.Position = UDim2.new(0,10,0,30)
+    bar.BackgroundColor3 = C.FE
+    bar.BorderSizePixel = 0
+    bar.ZIndex = 5
+    Instance.new("UICorner", bar).CornerRadius = UDim.new(1,0)
+
+    local fill = Instance.new("Frame", bar)
+    fill.Size = UDim2.new((default-min)/(max-min),0,1,0)
+    fill.BackgroundColor3 = C.VN
+    fill.BorderSizePixel = 0
+    fill.ZIndex = 6
+    Instance.new("UICorner", fill).CornerRadius = UDim.new(1,0)
+
+    local dragging = false
+    local function update(input)
+        local rel = math.clamp((input.Position.X - bar.AbsolutePosition.X) / bar.AbsoluteSize.X, 0, 1)
+        local val = math.floor(min + (max-min) * rel)
+        fill.Size = UDim2.new(rel,0,1,0)
+        tl.Text = titulo..": "..val
+        if cb then pcall(cb, val) end
+    end
+
+    bar.InputBegan:Connect(function(i)
+        if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            update(i)
+        end
+    end)
+    uis.InputChanged:Connect(function(i)
+        if dragging and (i.UserInputType == Enum.UserInputType.MouseMovement or i.UserInputType == Enum.UserInputType.Touch) then
+            update(i)
+        end
+    end)
+    uis.InputEnded:Connect(function(i)
+        if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then
+            dragging = false
+        end
+    end)
+    return frame
+end
+
+local function mkInput(parent, titulo, placeholder, cb)
+    local frame = Instance.new("Frame", parent)
+    frame.Size = UDim2.new(1,-6,0,60)
+    frame.BackgroundColor3 = C.F
+    frame.BackgroundTransparency = 0.4
+    frame.BorderSizePixel = 0
+    frame.ZIndex = 4
+    Instance.new("UICorner", frame).CornerRadius = UDim.new(0,8)
+    local cst = Instance.new("UIStroke", frame)
+    cst.Color = C.VE
+    cst.Thickness = 1
+    cst.Transparency = 0.7
+
+    local tl = Instance.new("TextLabel", frame)
+    tl.Size = UDim2.new(1,-20,0,18)
+    tl.Position = UDim2.new(0,10,0,4)
+    tl.BackgroundTransparency = 1
+    tl.Text = titulo
+    tl.TextColor3 = C.T
+    tl.Font = Enum.Font.GothamBold
+    tl.TextSize = 12
+    tl.TextXAlignment = Enum.TextXAlignment.Left
+    tl.ZIndex = 5
+
+    local box = Instance.new("TextBox", frame)
+    box.Size = UDim2.new(1,-20,0,26)
+    box.Position = UDim2.new(0,10,0,26)
+    box.BackgroundColor3 = C.FE
+    box.BorderSizePixel = 0
+    box.Text = ""
+    box.PlaceholderText = placeholder
+    box.PlaceholderColor3 = C.TS
+    box.TextColor3 = C.T
+    box.Font = Enum.Font.Gotham
+    box.TextSize = 12
+    box.ZIndex = 5
+    Instance.new("UICorner", box).CornerRadius = UDim.new(0,6)
+
+    box.FocusLost:Connect(function(enter)
+        if enter and cb then pcall(cb, box.Text) end
+    end)
+    return frame
+end
+
+local function mkDropdown(parent, titulo, opcoes, cb)
+    local frame = Instance.new("Frame", parent)
+    frame.Size = UDim2.new(1,-6,0,50)
+    frame.BackgroundColor3 = C.F
+    frame.BackgroundTransparency = 0.4
+    frame.BorderSizePixel = 0
+    frame.ZIndex = 4
+    Instance.new("UICorner", frame).CornerRadius = UDim.new(0,8)
+    local cst = Instance.new("UIStroke", frame)
+    cst.Color = C.VE
+    cst.Thickness = 1
+    cst.Transparency = 0.7
+
+    local tl = Instance.new("TextLabel", frame)
+    tl.Size = UDim2.new(1,-20,0,18)
+    tl.Position = UDim2.new(0,10,0,4)
+    tl.BackgroundTransparency = 1
+    tl.Text = titulo
+    tl.TextColor3 = C.T
+    tl.Font = Enum.Font.GothamBold
+    tl.TextSize = 12
+    tl.TextXAlignment = Enum.TextXAlignment.Left
+    tl.ZIndex = 5
+
+    local btn = Instance.new("TextButton", frame)
+    btn.Size = UDim2.new(1,-20,0,22)
+    btn.Position = UDim2.new(0,10,0,24)
+    btn.BackgroundColor3 = C.FE
+    btn.BorderSizePixel = 0
+    btn.Text = "▼ "..opcoes[1]
+    btn.TextColor3 = C.VN
+    btn.Font = Enum.Font.Gotham
+    btn.TextSize = 11
+    btn.ZIndex = 5
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0,6)
+
+    local idx = 1
+    btn.MouseButton1Click:Connect(function()
+        idx = idx + 1
+        if idx > #opcoes then idx = 1 end
+        btn.Text = "▼ "..opcoes[idx]
+        if cb then pcall(cb, opcoes[idx]) end
+    end)
+    return frame
+end
+
+-- ============================================================================
+-- CRIAÇÃO DAS PÁGINAS
+-- ============================================================================
+local pInicio       = mkPage("Inicio")
+local pFunc         = mkPage("Funcoes")
+local pNew          = mkPage("New")
+local pVisual       = mkPage("Visual")
+local pSkins        = mkPage("Skins")
+local pStatus       = mkPage("Status")
+local pAnti         = mkPage("AntiMorte")
+local pMisc         = mkPage("Misc")
+local pFun          = mkPage("Fun")
+local pPersonalizar = mkPage("Personalizar")
+
+-- ============================================================================
+-- SIDEBAR - BOTÕES DE NAVEGAÇÃO
+-- ============================================================================
+local paginas = {
+    {nome="Inicio",       page=pInicio},
+    {nome="Funcoes",      page=pFunc},
+    {nome="New",          page=pNew},
+    {nome="Visual",       page=pVisual},
+    {nome="Skins",        page=pSkins},
+    {nome="Status",       page=pStatus},
+    {nome="AntiMorte",    page=pAnti},
+    {nome="Misc",         page=pMisc},
+    {nome="Fun",          page=pFun},
+    {nome="Personalizar", page=pPersonalizar},
+}
+
+local buttonsNav = {}
+local function mostrarPagina(nome)
+    for _, info in ipairs(paginas) do
+        info.page.Visible = (info.nome == nome)
+    end
+    for _, btn in ipairs(buttonsNav) do
+        if btn.Name == "NavBtn_"..nome then
+            ts:Create(btn, tf, {BackgroundColor3=C.VE, BackgroundTransparency=0.2}):Play()
+        else
+            ts:Create(btn, tf, {BackgroundColor3=C.F, BackgroundTransparency=0.4}):Play()
+        end
+    end
+end
+
+for _, info in ipairs(paginas) do
+    local b = Instance.new("TextButton", sbScroll)
+    b.Name = "NavBtn_"..info.nome
+    b.Size = UDim2.new(1,0,0,32)
+    b.BackgroundColor3 =-- ============================================================================
+-- ABA INÍCIO
+-- ============================================================================
+mkCard(pInicio,"Aether Hub v2.0","by: atsu")
+mkCard(pInicio,"Sistema de Key","Key: AETHER-X")
+mkCard(pInicio,"Aba NEW","0,2 Auto + Anti-Morte")
+mkCard(pInicio,"Anti-Morte","Sobe alto e volta ao curar")
+mkCard(pInicio,"Funções","Bypass, ESP, Kill All, FPS Booster, Fly")
+mkCard(pInicio,"Skins","Rick Prime, Evil Morty, Rick C-137")
+
+-- ============================================================================
+-- ABA FUNÇÕES
+-- ============================================================================
+local function getChar() return lp.Character end
+local function getHRP() local c = getChar() return c and c:FindFirstChild("HumanoidRootPart") end
+local function getHum() local c = getChar() return c and c:FindFirstChildOfClass("Humanoid") end
+
+-- Gojo Kill All
+local gojoOn = false
+mkCard(pFunc,"☠️ Gojo Kill All","Teleporta para players",function(a)
+    gojoOn = a
+    if not a then return end
+    task.spawn(function()
+        while gojoOn do
+            for _, p in ipairs(players:GetPlayers()) do
+                if not gojoOn then break end
+                if p ~= lp and p.Character then
+                    local pr = p.Character:FindFirstChild("HumanoidRootPart")
+                    local ph = p.Character:FindFirstChildOfClass("Humanoid")
+                    if pr and ph and ph.Health > 0 then
+                        local r = getHRP()
+                        if r then r.CFrame = pr.CFrame * CFrame.new(0,0,2) end
+                    end
+                end
+                rs.RenderStepped:Wait()
+            end
+        end
+    end)
+end)
+
+-- AC Bypass
+local bOn = false
+local bConn
+local function resetB()
+    bOn = false
+    local h = getHum()
+    if h then h.PlatformStand = false end
+    local r = getHRP()
+    if r then
+        for _, n in ipairs({"AetherVel","AetherGyro"}) do
+            local o = r:FindFirstChild(n)
+            if o then o:Destroy() end
+        end
+    end
+    if bConn then bConn:Disconnect() bConn = nil end
+end
+
+mkCard(pFunc,"🛡️ AC Bypass","Voo anti-fling",function(a)
+    bOn = a
+    if not a then return resetB() end
+    local alvo = Vector3.new(372.105, 61.47, 394.779)
+    local et = 1
+    bConn = rs.RenderStepped:Connect(function()
+        local r = getHRP()
+        local h = getHum()
+        if not r or not h or h.Health <= 0 then return resetB() end
+        h.PlatformStand = true
+
+        local v = r:FindFirstChild("AetherVel")
+        if not v then
+            v = Instance.new("BodyVelocity")
+            v.Name = "AetherVel"
+            v.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+            v.Velocity = Vector3.zero
+            v.Parent = r
+        end
+        local g = r:FindFirstChild("AetherGyro")
+        if not g then
+            g = Instance.new("BodyGyro")
+            g.Name = "AetherGyro"
+            g.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
+            g.Parent = r
+        end
+
+        if et == 1 then
+            g.CFrame = CFrame.new(r.Position, Vector3.new(r.Position.X, 380, r.Position.Z))
+            local d = 380 - r.Position.Y
+            if math.abs(d) > 5 then
+                v.Velocity = Vector3.new(0, math.clamp(d*30, -1000, 1000), 0)
+            else et = 2 end
+        elseif et == 2 then
+            local vv = Vector3.new(alvo.X, 380, alvo.Z)
+            g.CFrame = CFrame.new(r.Position, vv)
+            if (vv - Vector3.new(r.Position.X, 380, r.Position.Z)).Magnitude > 15 then
+                v.Velocity = (vv - r.Position).Unit * 1000
+            else et = 3 end
+        elseif et == 3 then
+            g.CFrame = CFrame.new(r.Position, alvo)
+            local d = alvo.Y - r.Position.Y
+            if math.abs(d) > 5 then
+                v.Velocity = Vector3.new(0, math.clamp(d*30, -800, 800), 0)
+            else resetB() end
+        end
+    end)
+end)
+
+-- Bypass helpers
+local function ExecutarBypass()
+    local c = lp.Character or lp.CharacterAdded:Wait()
+    local r = c:WaitForChild("HumanoidRootPart", 5)
+    if not r then return false end
+    local sucesso = false
+    pcall(function()
+        local jogadores = players:GetPlayers()
+        for i = #jogadores, 1, -1 do
+            if jogadores[i] == lp then table.remove(jogadores, i) end
+        end
+        if #jogadores > 0 then
+            local alvo = jogadores[math.random(1, #jogadores)]
+            if alvo and alvo.Character and alvo.Character:FindFirstChild("HumanoidRootPart") then
+                local pos = alvo.Character.HumanoidRootPart.Position + Vector3.new(0,3,0)
+                r.CFrame = CFrame.new(pos)
+                task.wait(0.5)
+                if r and r.Parent and (r.Position - pos).Magnitude < 25 then
+                    sucesso = true
+                end
+            end
+        end
+    end)
+    return sucesso
+end
+
+local function rotaDoVoid()
+    pcall(function()
+        local r = getHRP()
+        local h = getHum()
+        if not r or not h then return end
+        h.PlatformStand = true
+        local bv = Instance.new("BodyVelocity")
+        bv.MaxForce = Vector3.new(9e6, 9e6, 9e6)
+        bv.Velocity = Vector3.new(0, 150, 0)
+        bv.Parent = r
+        task.wait(1.3)
+        bv.Velocity = Vector3.new(-300, 0, 0)
+        task.wait(2.4)
+        bv.Velocity = Vector3.zero
+        h.PlatformStand = false
+        bv:Destroy()
+    end)
+end
+
+local bypassAutoTask = nil
+local bypassAutoOn = false
+local function rodarBypassAuto(callbackSucesso)
+    if bypassAutoTask then return end
+    bypassAutoOn = true
+    bypassAutoTask = task.spawn(function()
+        local sucesso = false
+        local tentativas = 0
+        while not sucesso and tentativas < 20 and bypassAutoOn do
+            tentativas = tentativas + 1
+            sLabel.Text = "Bypass tentativa #"..tentativas
+            sLabel.TextColor3 = C.VN
+            sucesso = ExecutarBypass()
+            if sucesso then
+                sLabel.Text = "Bypass OK! (#"..tentativas..")"
+                sLabel.TextColor3 = C.VN
+            else
+                sLabel.Text = "Falhou, rota do void..."
+                sLabel.TextColor3 = C.R
+                rotaDoVoid()
+                task.wait(5)
+            end
+        end
+        bypassAutoOn = false
+        bypassAutoTask = nil
+        if sucesso then
+            task.wait(1)
+            if callbackSucesso then pcall(callbackSucesso) end
+        else
+            sLabel.Text = "Bypass falhou"
+            sLabel.TextColor3 = C.R
+            task.wait(3)
+            sLabel.Text = "Sem Serviço"
+            sLabel.TextColor3 = C.TS
+        end
+    end)
+end
+
+mkButton(pFunc,"🔁 Bypass Auto","Tenta até funcionar",function()
+    rodarBypassAuto(nil)
+end)
+
+mkButton(pFunc,"🧪 Teste Bypass","Testa o bypass uma vez",function()
+    task.spawn(function()
+        sLabel.Text = "Testando bypass..."
+        sLabel.TextColor3 = C.TS
+        local ok = ExecutarBypass()
+        if ok then
+            sLabel.Text = "✅ Bypass Ativado!"
+            sLabel.TextColor3 = C.VN
+        else
+            sLabel.Text = "❌ Bypass Desativado"
+            sLabel.TextColor3 = C.R
+            rotaDoVoid()
+        end
+        task.delay(3, function()
+            sLabel.Text = "Sem Serviço"
+            sLabel.TextColor3 = C.TS
+        end)
+    end)
+end)
+
+-- ESP Jogadores
+local ejOn = false
+local ejF = Instance.new("Folder", sg) ejF.Name = "AetherESP"
+
+mkCard(pFunc,"👁️ ESP Jogadores","Destaca players",function(a)
+    ejOn = a
+    if not a then ejF:ClearAllChildren() return end
+    task.spawn(function()
+        while ejOn do
+            ejF:ClearAllChildren()
+            for _, p in ipairs(players:GetPlayers()) do
+                if p ~= lp and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+                    local h = Instance.new("Highlight")
+                    h.Adornee = p.Character
+                    h.FillColor = C.VN
+                    h.OutlineColor = C.V
+                    h.FillTransparency = 0.5
+                    h.Parent = ejF
+                end
+            end
+            task.wait(1)
+        end
+        ejF:ClearAllChildren()
+    end)
+end)
+
+-- FPS Booster
+mkCard(pFunc,"🚀 FPS Booster","Remove sombras",function(a)
+    if a then
+        for _, v in ipairs(game:GetDescendants()) do
+            if v:IsA("BasePart") then
+                v.Material = Enum.Material.SmoothPlastic
+                v.CastShadow = false
+            elseif v:IsA("Decal") or v:IsA("Texture") then
+                v:Destroy()
+            elseif v:IsA("ParticleEmitter") or v:IsA("Trail") then
+                v.Enabled = false
+            end
+        end
+        workspace.GlobalShadows = false
+    else
+        workspace.GlobalShadows = true
+    end
+end)
+
+-- Speed
+local speedOn = false
+local speedVal = 50
+mkCard(pFunc,"💨 Speed Hack","Corre rápido",function(a)
+    speedOn = a
+    if a then
+        task.spawn(function()
+            while speedOn do
+                local h = getHum()
+                if h then h.WalkSpeed = speedVal end
+                task.wait(0.1)
+            end
+        end)
+    else
+        local h = getHum()
+        if h then h.WalkSpeed = 16 end
+    end
+end)
+mkSlider(pFunc,"Velocidade",16,300,50,function(val) speedVal = val end)
+
+-- Jump
+local jumpOn = false
+local jumpVal = 50
+mkCard(pFunc,"🦘 Jump Power","Pula alto",function(a)
+    jumpOn = a
+    if a then
+        task.spawn(function()
+            while jumpOn do
+                local h = getHum()
+                if h then h.JumpPower = jumpVal h.UseJumpPower = true end
+                task.wait(0.1)
+            end
+        end)
+    else
+        local h = getHum()
+        if h then h.JumpPower = 50 end
+    end
+end)
+mkSlider(pFunc,"Força do Pulo",50,500,50,function(val) jumpVal = val end)
+
+-- Infinite Jump
+local infJumpOn = false
+mkCard(pFunc,"♾️ Infinite Jump","Pula infinitamente",function(a)
+    infJumpOn = a
+    if not a then return end
+    task.spawn(function()
+        while infJumpOn do
+            local h = getHum()
+            if h then h:ChangeState(Enum.HumanoidStateType.Jumping) end
+            task.wait(0.1)
+        end
+    end)
+end)
+
+-- Noclip
+local noclipOn = false
+mkCard(pFunc,"🚪 Noclip","Atravessa paredes",function(a)
+    noclipOn = a
+    if not a then return end
+    task.spawn(function()
+        while noclipOn do
+            local c = getChar()
+            if c then
+                for _, v in ipairs(c:GetDescendants()) do
+                    if v:IsA("BasePart") then v.CanCollide = false end
+                end
+            end
+            task.wait(0.1)
+        end
+    end)
+end)
+
+-- Fly
+local flyOn = false
+local flyBV, flyBG
+mkCard(pFunc,"🕊️ Fly","Voe pelo mapa",function(a)
+    flyOn = a
+    if a then
+        local r = getHRP()
+        if not r then return end
+        flyBV = Instance.new("BodyVelocity")
+        flyBV.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+        flyBV.Velocity = Vector3.zero
+        flyBV.Parent = r
+        flyBG = Instance.new("BodyGyro")
+        flyBG.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
+        flyBG.Parent = r
+        task.spawn(function()
+            while flyOn do
+                local cam = workspace.CurrentCamera
+                local dir = Vector3.zero
+                local r2 = getHRP()
+                if r2 and flyBV and flyBV.Parent then
+                    if uis:IsKeyDown(Enum.KeyCode.W) then dir += cam.CFrame.LookVector end
+                    if uis:IsKeyDown(Enum.KeyCode.S) then dir -= cam.CFrame.LookVector end
+                    if uis:IsKeyDown(Enum.KeyCode.A) then dir -= cam.CFrame.RightVector end
+                    if uis:IsKeyDown(Enum.KeyCode.D) then dir += cam.CFrame.RightVector end
+                    if uis:IsKeyDown(Enum.KeyCode.Space) then dir += Vector3.new(0,1,0) end
+                    flyBV.Velocity = dir.Magnitude > 0 and dir.Unit * 100 or Vector3.zero
+                    flyBG.CFrame = cam.CFrame
+                end
+                task.wait()
+            end
+        end)
+    else
+        if flyBV then flyBV:Destroy() flyBV = nil end
+        if flyBG then flyBG:Destroy() flyBG = nil end
+    end
+end)
+
+-- ============================================================================
+-- ABA VISUAL
+-- ============================================================================
+mkCard(pVisual,"🌫️ Remover Névoa","Limpa atmosfera",function(a)
+    if a then
+        for _, v in ipairs(lighting:GetChildren()) do
+            if v:IsA("Atmosphere") or v:IsA("Fog") then v:Destroy() end
+        end
+        lighting.FogEnd = 100000
+    end
+end)
+
+mkCard(pVisual,"☀️ Fullbright","Iluminação total",function(a)
+    if a then
+        lighting.Brightness = 3
+        lighting.Ambient = Color3.fromRGB(255,255,255)
+        lighting.OutdoorAmbient = Color3.fromRGB(255,255,255)
+    else
+        lighting.Brightness = 2
+    end
+end)
+
+-- ============================================================================
+-- ABA SKINS
+-- ============================================================================
+local SKINS = {
+    {nome="Rick Prime", id=7442477220},
+    {nome="Evil Morty", id=3570129902},
+    {nome="Rick C-137", id=3946604117},
+}
+
+local function trocarSkin(userId, nomeSkin)
+    task.spawn(function()
+        local c = lp.Character or lp.CharacterAdded:Wait()
+        sLabel.Text = "Aplicando skin: "..nomeSkin.."..."
+        sLabel.TextColor3 = C.VN
+        local ok = pcall(function()
+            lp:ClearCharacterAppearance()
+        end)
+        task.wait(0.3)
+        local ok2, err = pcall(function()
+            lp.CharacterAppearanceId = userId
+        end)
+        if ok and ok2 then
+            sLabel.Text = "✅ Skin aplicada: "..nomeSkin
+            sLabel.TextColor3 = C.VN
+        else
+            sLabel.Text = "❌ Erro: "..nomeSkin
+            sLabel.TextColor3 = C.R
+        end
+        task.wait(3)
+        sLabel.Text = "Sem Serviço"
+        sLabel.TextColor3 = C.TS
+    end)
+end
+
+for _, skin in ipairs(SKINS) do
+    mkButton(pSkins, "👤 "..skin.nome, "ID: "..skin.id, function()
+        trocarSkin(skin.id, skin.nome)
+    end)
+end
+
+mkButton(pSkins, "🔄 Resetar Aparência", "Volta ao avatar", function()
+    task.spawn(function()
+        lp:ClearCharacterAppearance()
+        sLabel.Text = "✅ Aparência resetada!"
+        sLabel.TextColor3 = C.VN
+        task.wait(2)
+        sLabel.Text = "Sem Serviço"
+        sLabel.TextColor3 = C.TS
+    end)
+end)
+
+-- ============================================================================
+-- ABA STATUS
+-- ============================================================================
+local sF = Instance.new("Frame", pStatus)
+sF.Size = UDim2.new(1,-6,0,90)
+sF.BackgroundColor3 = C.F
+sF.BackgroundTransparency = 0.4
+sF.BorderSizePixel = 0
+sF.ZIndex = 4
+Instance.new("UICorner", sF).CornerRadius = UDim.new(0,8)
+
+local fSt = Instance.new("TextLabel", sF)
+fSt.Size = UDim2.new(1,-20,0,20)
+fSt.Position = UDim2.new(0,12,0,10)
+fSt.BackgroundTransparency = 1
+fSt.Text = "FPS: --"
+fSt.TextColor3 = C.VN
+fSt.Font = Enum.Font.GothamBold
+fSt.TextSize = 13
+fSt.TextXAlignment = Enum.TextXAlignment.Left
+fSt.ZIndex = 5
+
+local pSt = Instance.new("TextLabel", sF)
+pSt.Size = UDim2.new(1,-20,0,20)
+pSt.Position = UDim2.new(0,12,0,34)
+pSt.BackgroundTransparency = 1
+pSt.Text = "Ping: -- ms"
+pSt.TextColor3 = C.T
+pSt.Font = Enum.Font.Gotham
+pSt.TextSize = 12
+pSt.TextXAlignment = Enum.TextXAlignment.Left
+pSt.ZIndex = 5
+
+local mSt = Instance.new("TextLabel", sF)
+mSt.Size = UDim2.new(1,-20,0,20)
+mSt.Position = UDim2.new(0,12,0,56)
+mSt.BackgroundTransparency = 1
+mSt.Text = "Memória: -- MB"
+mSt.TextColor3 = C.T
+mSt.Font = Enum.Font.Gotham
+mSt.TextSize = 12
+mSt.TextXAlignment = Enum.TextXAlignment.Left
+mSt.ZIndex = 5
+
+task.spawn(function()
+    while sg.Parent do
+        local ok, f = pcall(function() return stats:GetFPS() end)
+        if ok and f then fSt.Text = "FPS: "..math.floor(f) end
+        local ok2, p = pcall(function() return stats.Network.ServerStatsItem["Data Ping"]:GetValue() end)
+        if ok2 and p then pSt.Text = "Ping: "..math.floor(p).." ms" end
+        local ok3, m = pcall(function() return stats:GetTotalMemoryUsageMb() end)
+        if ok3 and m then mSt.Text = "Memória: "..math.floor(m).." MB" end
+        task.wait(1)
+    end
+end)
+
+print("[AETHER] Parte 2/4 OK")-- ============================================================================
+-- ABA NEW - 0,2 AUTO + ANTI-MORTE INTEGRADO
+-- ============================================================================
+local gojo2On = false
+local gojoNoCol = false
+local gojoTpLoop = false
+local gojoConn
+local gojoIdx = 1
+
+local HP_MIN = 30
+local HP_MAX = 90
+local ALTURA_SUBIDA = 500
+local VELOCIDADE_SUBIDA = 200
+local fugindo = false
+local subindo = false
+local antiMorteBV, antiMorteBG
+
+local function gSetCol(state)
+    local c = getChar()
+    if not c then return end
+    for _, v in ipairs(c:GetDescendants()) do
+        if v:IsA("BasePart") then v.CanCollide = state end
+    end
+end
+
+local function gHpPct()
+    local h = getHum()
+    if not h then return 100 end
+    return (h.Health / h.MaxHealth) * 100
+end
+
+local function gGetPlayers()
+    local l = {}
+    for _, p in ipairs(players:GetPlayers()) do
+        if p ~= lp and p.Character then
+            local hrp = p.Character:FindFirstChild("HumanoidRootPart")
+            local hu = p.Character:FindFirstChildOfClass("Humanoid")
+            if hrp and hu and hu.Health > 0 then table.insert(l, hrp) end
+        end
+    end
+    return l
+end
+
+local function gStart()
+    if gojoConn then gojoConn:Disconnect() gojoConn = nil end
+    gojoConn = rs.PreSimulation:Connect(function()
+        if gojo2On and gojoTpLoop then
+            local l = gGetPlayers()
+            if #l > 0 then
+                if gojoIdx > #l then gojoIdx = 1 end
+                local t = l[gojoIdx]
+                if t and t.Parent then
+                    local m = getHRP()
+                    if m then m.CFrame = t.CFrame end
+                end
+                gojoIdx += 1
+            end
+        end
+    end)
+end
+
+rs.Stepped:Connect(function()
+    if gojo2On and gojoNoCol then gSetCol(false) end
+end)
+
+local function limparAntiMorte()
+    if antiMorteBV then antiMorteBV:Destroy() antiMorteBV = nil end
+    if antiMorteBG then antiMorteBG:Destroy() antiMorteBG = nil end
+end
+
+local function ativarAntiMorte()
+    local r, h = getHRP(), getHum()
+    if not r or not h then return end
+    for _, v in pairs(r:GetChildren()) do
+        if v:IsA("BodyVelocity") or v:IsA("BodyGyro") then v:Destroy() end
+    end
+    h.PlatformStand = true
+    antiMorteBV = Instance.new("BodyVelocity")
+    antiMorteBV.Name = "AntiMorteVel"
+    antiMorteBV.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+    antiMorteBV.Velocity = Vector3.new(0, VELOCIDADE_SUBIDA, 0)
+    antiMorteBV.Parent = r
+    antiMorteBG = Instance.new("BodyGyro")
+    antiMorteBG.Name = "AntiMorteGyro"
+    antiMorteBG.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
+    antiMorteBG.CFrame = r.CFrame
+    antiMorteBG.Parent = r
+end
+
+local function manterNoAr()
+    local r = getHRP()
+    if not r then return end
+    local y = math.max(r.Position.Y, ALTURA_SUBIDA)
+    r.CFrame = CFrame.new(r.Position.X, y, r.Position.Z)
+    r.AssemblyLinearVelocity = Vector3.zero
+    r.AssemblyAngularVelocity = Vector3.zero
+end
+
+local function desativarAntiMorte()
+    limparAntiMorte()
+    local h = getHum()
+    if h then h.PlatformStand = false end
+end
+
+local autoBypassOn = false
+local autoBypassTask
+local antiMorteTask
+
+local function iniciarAntiMorte()
+    if antiMorteTask then return end
+    antiMorteTask = task.spawn(function()
+        while autoBypassOn do
+            task.wait(0.15)
+            local hp = gHpPct()
+            local r = getHRP()
+            if not r then continue end
+            if not fugindo and hp < HP_MIN then
+                fugindo = true
+                subindo = true
+                sLabel.Text = "⚠️ Vida baixa! Subindo..."
+                sLabel.TextColor3 = C.R
+                ativarAntiMorte()
+            end
+            if fugindo and subindo then
+                if r.Position.Y >= ALTURA_SUBIDA then
+                    subindo = false
+                    limparAntiMorte()
+                    sLabel.Text = "🛡️ Parado no ar..."
+                    sLabel.TextColor3 = C.VN
+                elseif antiMorteBV and antiMorteBV.Parent then
+                    antiMorteBV.Velocity = Vector3.new(0, VELOCIDADE_SUBIDA, 0)
+                end
+            end
+            if fugindo and not subindo then
+                manterNoAr()
+                if hp >= HP_MAX then
+                    fugindo = false
+                    subindo = false
+                    desativarAntiMorte()
+                    sLabel.Text = "✅ Curado! Voltando..."
+                    sLabel.TextColor3 = C.VN
+                    task.wait(1)
+                end
+            end
+        end
+        antiMorteTask = nil
+    end)
+end
+
+local function gUltReady()
+    local u = lp:GetAttribute("Ultimate") or lp:GetAttribute("Ult") or lp:GetAttribute("Awakening")
+    if u and typeof(u) == "number" and u >= 100 then return true end
+    local uo = lp:FindFirstChild("Ultimate") or lp:FindFirstChild("UltBar")
+    if uo and uo:IsA("NumberValue") and uo.Value >= 100 then return true end
+    local pg = lp:FindFirstChild("PlayerGui")
+    if pg then
+        for _, s in ipairs(pg:GetChildren()) do
+            if s:IsA("ScreenGui") and s.Enabled then
+                for _, o in ipairs(s:GetDescendants()) do
+                    if o:IsA("TextLabel") then
+                        local n = (o.Name or ""):lower()
+                        local pn = (o.Parent and o.Parent.Name or ""):lower()
+                        if (n:find("ult") or pn:find("ult")) and (o.Text:find("100") or o.Text:find("MAX")) then
+                            return true
+                        end
+                    end
+                end
+            end
+        end
+    end
+    return false
+end
+
+local function gNearest()
+    local mc = getChar()
+    local mh = mc and mc:FindFirstChild("HumanoidRootPart")
+    if not mh then return nil end
+    local n, d = nil, math.huge
+    local function isPlayerModel(model)
+        if not model then return true end
+        for _, p in ipairs(players:GetPlayers()) do
+            if p.Character == model then return true end
+        end
+        return false
+    end
+    for _, o in ipairs(workspace:GetChildren()) do
+        if o:IsA("Model") and o ~= mc and not isPlayerModel(o) then
+            local h = o:FindFirstChildOfClass("Humanoid")
+            if h and h.Health > 0 then
+                local r = o:FindFirstChild("HumanoidRootPart") or o:FindFirstChild("Torso")
+                if r then
+                    local dd = (r.Position - mh.Position).Magnitude
+                    if dd < d then d = dd n = {Root=r, Human=h, Model=o} end
+                end
+            end
+        end
+    end
+    return n
+end
+
+local function gCombo()
+    local total = 0
+    while autoBypassOn do
+        if fugindo then task.wait(0.3) continue end
+        local t = gNearest()
+        if not t then task.wait(0.5) continue end
+        local mc = getChar()
+        local mh = mc and mc:FindFirstChild("HumanoidRootPart")
+        if not mh then break end
+        if (mh.Position - t.Root.Position).Magnitude > 20 then
+            mh.CFrame = t.Root.CFrame * CFrame.new(0,3,-5)
+            task.wait(0.1)
+        end
+        local last = 0
+        while autoBypassOn and t.Human and t.Human.Health > 0 and t.Root and t.Root.Parent do
+            if fugindo then break end
+            if gUltReady() then return true end
+            mc = getChar()
+            mh = mc and mc:FindFirstChild("HumanoidRootPart")
+            if not mh then break end
+            total += 8 * rs.Heartbeat:Wait()
+            local vx, vz = math.cos(total)*5, math.sin(total)*5
+            mh.CFrame = CFrame.lookAt(t.Root.Position + Vector3.new(vx,1,vz), t.Root.Position)
+            if tick() - last > 0.2 and (mh.Position - t.Root.Position).Magnitude < 15 then
+                last = tick()
+                task.spawn(function()
+                    pcall(function()
+                        vim:SendMouseButtonEvent(0,0,0,true,game,0)
+                        task.wait(0.02)
+                        vim:SendMouseButtonEvent(0,0,0,false,game,0)
+                    end)
+                end)
+            end
+        end
+    end
+    return false
+end
+
+local function gAutoLoop()
+    if autoBypassTask then return end
+    autoBypassTask = task.spawn(function()
+        while autoBypassOn do
+            local c = lp.Character or lp.CharacterAdded:Wait()
+            local h = c:WaitForChild("Humanoid", 10)
+            local r = c:WaitForChild("HumanoidRootPart", 10)
+            if h and r and h.Health > 0 then
+                task.wait(0.3)
+                if fugindo then task.wait(0.5) continue end
+                if autoBypassOn and gCombo() then
+                    if fugindo then continue end
+                    local cc = getChar()
+                    local rr = cc and cc:FindFirstChild("HumanoidRootPart")
+                    if rr then
+                        rr.CFrame = CFrame.new(-143, 55, 137)
+                        task.wait(0.3)
+                        vim:SendKeyEvent(true, Enum.KeyCode.G, false, game)
+                        task.wait(0.05)
+                        vim:SendKeyEvent(false, Enum.KeyCode.G, false, game)
+                        task.wait(0.001)
+                        vim:SendKeyEvent(true, Enum.KeyCode.R, false, game)
+                        task.wait(0.05)
+                        vim:SendKeyEvent(false, Enum.KeyCode.R, false, game)
+                        task.wait(5)
+                        gojo2On, gojoNoCol, gojoTpLoop = true, true, true
+                        gStart()
+                        sLabel.Text = "GOJO 0.2 Auto Ativado"
+                        task.wait(13)
+                        gojo2On, gojoNoCol, gojoTpLoop = false, false, false
+                        if gojoConn then gojoConn:Disconnect() gojoConn = nil end
+                        gojoIdx = 1
+                        gSetCol(true)
+                        if autoBypassOn then
+                            sLabel.Text = "0,2 Auto (reiniciando...)"
+                            task.wait(2)
+                        end
+                    end
+                end
+            else
+                task.wait(0.5)
+            end
+        end
+        autoBypassTask = nil
+    end)
+end
+
+local card02
+
+local function ligarAuto02()
+    if autoBypassOn then return end
+    autoBypassOn = true
+    fugindo, subindo = false, false
+    limparAntiMorte()
+    local h = getHum()
+    if h then h.PlatformStand = false end
+    gojo2On, gojoNoCol, gojoTpLoop = false, false, false
+    if gojoConn then gojoConn:Disconnect() gojoConn = nil end
+    gSetCol(true)
+    sLabel.Text = "0,2 Auto (rodando)"
+    sLabel.TextColor3 = C.VN
+    gAutoLoop()
+    iniciarAntiMorte()
+    if card02 then
+        local stroke02 = card02:FindFirstChildOfClass("UIStroke")
+        ts:Create(card02, tf, {BackgroundColor3=C.G, BackgroundTransparency=0.35}):Play()
+        if stroke02 then ts:Create(stroke02, tf, {Color=C.VN, Transparency=0}):Play() end
+    end
+end
+
+local function desligarAuto02()
+    autoBypassOn = false
+    if autoBypassTask then task.cancel(autoBypassTask) autoBypassTask = nil end
+    if antiMorteTask then task.cancel(antiMorteTask) antiMorteTask = nil end
+    fugindo, subindo = false, false
+    limparAntiMorte()
+    local h = getHum()
+    if h then h.PlatformStand = false end
+    gojo2On, gojoNoCol, gojoTpLoop = false, false, false
+    if gojoConn then gojoConn:Disconnect() gojoConn = nil end
+    gSetCol(true)
+    sLabel.Text = "Sem Serviço"
+    sLabel.TextColor3 = C.TS
+    if card02 then
+        local stroke02 = card02:FindFirstChildOfClass("UIStroke")
+        ts:Create(card02, tf, {BackgroundColor3=C.F, BackgroundTransparency=0.4}):Play()
+        if stroke02 then ts:Create(stroke02, tf, {Color=C.VE, Transparency=0.7}):Play() end
+    end
+end
+
+card02 = mkCard(pNew,"🛡️ 0,2 Auto","Roda infinito até desligar",function(a)
+    if a then ligarAuto02() else desligarAuto02() end
+end)
+
+lp.CharacterAdded:Connect(function()
+    if not autoBypassOn then return end
+    sLabel.Text = "💀 Morreu! Reativando..."
+    sLabel.TextColor3 = C.R
+    desligarAuto02()
+    task.wait(1.5)
+    rodarBypassAuto(function() ligarAuto02() end)
+end)
+
+-- ============================================================================
+-- ABA ANTI-MORTE (STANDALONE)
+-- ============================================================================
+local AM = {
+    Ativo = false, Voando = false,
+    VIDA_MINIMA = 35, VIDA_SEGURA = 90,
+    ALTURA_MAX = 1500, VELOCIDADE_SUBIDA = 250, VELOCIDADE_DESCIDA = 180,
+    INTERVALO = 0.1, BV = nil, BG = nil, Estado = "idle",
+}
+
+local function amGetHRP() local c = lp.Character return c and c:FindFirstChild("HumanoidRootPart") end
+local function amGetHum() local c = lp.Character return c and c:FindFirstChildOfClass("Humanoid") end
+local function amGetHP()
+    local h = amGetHum()
+    if not h then return 100 end
+    return (h.Health / math.max(h.MaxHealth, 1)) * 100
+end
+
+local function amLimparFisica()
+    local r = amGetHRP()
+    if not r then return end
+    for _, v in ipairs(r:GetChildren()) do
+        if v:IsA("BodyVelocity") or v:IsA("BodyGyro") then v:Destroy() end
+    end
+    AM.BV = nil AM.BG = nil
+end
+
+local function amCriarFisica(velY)
+    local r, h = amGetHRP(), amGetHum()
+    if not r or not h then return end
+    amLimparFisica()
+    h.PlatformStand = true
+    h.AutoRotate = false
+    AM.BV = Instance.new("BodyVelocity")
+    AM.BV.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+    AM.BV.Velocity = Vector3.new(0, velY, 0)
+    AM.BV.Parent = r
+    AM.BG = Instance.new("BodyGyro")
+    AM.BG.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
+    AM.BG.CFrame = r.CFrame
+    AM.BG.Parent = r
+end
+
+local function amPararTudo()
+    amLimparFisica()
+    local h = amGetHum()
+    if h then h.PlatformStand = false h.AutoRotate = true end
+    AM.Voando = false
+    AM.Estado = "idle"
+end
+
+local function amRaycastChao()
+    local r = amGetHRP()
+    if not r then return 999 end
+    local p = RaycastParams.new()
+    p.FilterDescendantsInstances = {lp.Character}
+    p.FilterType = Enum.RaycastFilterType.Exclude
+    local res = workspace:Raycast(r.Position, Vector3.new(0,-20,0), p)
+    return res and res.Distance or 999
+end
+
+local function amLoop()
+    while AM.Ativo do
+        task.wait(AM.INTERVALO)
+        local hp = amGetHP()
+        local r = amGetHRP()
+        local h = amGetHum()
+        if not r or not h or h.Health <= 0 then AM.Estado = "idle" continue end
+
+        if hp < AM.VIDA_MINIMA and AM.Estado ~= "subindo" and AM.Estado ~= "pairando" then
+            AM.Estado = "subindo"
+            AM.Voando = true
+            sLabel.Text = "💀 VIDA BAIXA → SUBINDO!"
+            sLabel.TextColor3 = C.R
+            amCriarFisica(AM.VELOCIDADE_SUBIDA)
+        end
+
+        if AM.Estado == "subindo" then
+            if r.Position.Y >= AM.ALTURA_MAX then
+                AM.Estado = "pairando"
+                sLabel.Text = "🛡️ PAIRANDO"
+                sLabel.TextColor3 = C.VN
+            elseif AM.BV and AM.BV.Parent then
+                AM.BV.Velocity = Vector3.new(0, AM.VELOCIDADE_SUBIDA, 0)
+            end
+        end
+
+        if AM.Estado == "pairando" then
+            if r.Position.Y > AM.ALTURA_MAX then
+                r.CFrame = CFrame.new(r.Position.X, AM.ALTURA_MAX, r.Position.Z)
+            end
+            if hp >= AM.VIDA_SEGURA then
+                AM.Estado = "descendo"
+                sLabel.Text = "✅ CURADO → DESCENDO..."
+                sLabel.TextColor3 = C.VN
+                amCriarFisica(-AM.VELOCIDADE_DESCIDA)
+            end
+        end
+
+        if AM.Estado == "descendo" then
+            local dist = amRaycastChao()
+            if dist < 6 then
+                AM.Estado = "idle"
+                AM.Voando = false
+                amPararTudo()
+                sLabel.Text = "✅ Anti-Morte: Protegido"
+                sLabel.TextColor3 = C.VN
+            elseif AM.BV and AM.BV.Parent then
+                AM.BV.Velocity = Vector3.new(0, -AM.VELOCIDADE_DESCIDA, 0)
+            end
+        end
+
+        if AM.Estado == "idle" and hp >= AM.VIDA_MINIMA then
+            sLabel.Text = "✅ Monitorando ("..math.floor(hp).."%)"
+            sLabel.TextColor3 = C.VN
+        end
+    end
+    amPararTudo()
+    sLabel.Text = "Sem Serviço"
+    sLabel.TextColor3 = C.TS
+end
+
+local amCard = Instance.new("Frame", pAnti)
+amCard.Size = UDim2.new(1,-6,0,78)
+amCard.BackgroundColor3 = C.F
+amCard.BackgroundTransparency = 0.4
+amCard.BorderSizePixel = 0
+amCard.ZIndex = 4
+Instance.new("UICorner", amCard).CornerRadius = UDim.new(0,8)
+
+local amStroke = Instance.new("UIStroke", amCard)
+amStroke.Color = C.VE
+amStroke.Thickness = 1
+amStroke.Transparency = 0.7
+
+local amTitle = Instance.new("TextLabel", amCard)
+amTitle.Size = UDim2.new(1,-20,0,20)
+amTitle.Position = UDim2.new(0,12,0,8)
+amTitle.BackgroundTransparency = 1
+amTitle.Text = "💀 Sistema Anti-Morte"
+amTitle.TextColor3 = C.T
+amTitle.Font = Enum.Font.GothamBold
+amTitle.TextSize = 13
+amTitle.TextXAlignment = Enum.TextXAlignment.Left
+amTitle.ZIndex = 5
+
+local amInfo = Instance.new("TextLabel", amCard)
+amInfo.Size = UDim2.new(1,-20,0,16)
+amInfo.Position = UDim2.new(0,12,0,28)
+amInfo.BackgroundTransparency = 1
+amInfo.Text = "Detecta vida baixa e sobe pro céu"
+amInfo.TextColor3 = C.TS
+amInfo.Font = Enum.Font.Gotham
+amInfo.TextSize = 11
+amInfo.TextXAlignment = Enum.TextXAlignment.Left
+amInfo.ZIndex = 5
+
+local amHpLabel = Instance.new("TextLabel", amCard)
+amHpLabel.Size = UDim2.new(1,-20,0,16)
+amHpLabel.Position = UDim2.new(0,12,0,46)
+amHpLabel.BackgroundTransparency = 1
+amHpLabel.Text = "Vida: --% | Inativo"
+amHpLabel.TextColor3 = C.TS
+amHpLabel.Font = Enum.Font.GothamBold
+amHpLabel.TextSize = 11
+amHpLabel.TextXAlignment = Enum.TextXAlignment.Left
+amHpLabel.ZIndex = 5
+
+task.spawn(function()
+    while sg.Parent do
+        if AM.Ativo then
+            local hp = amGetHP()
+            local cor = C.VN
+            if hp < AM.VIDA_MINIMA then cor = C.R
+            elseif hp < AM.VIDA_SEGURA then cor = C.W end
+            amHpLabel.Text = "Vida: "..math.floor(hp).."% | "..AM.Estado
+            amHpLabel.TextColor3 = cor
+        else
+            amHpLabel.Text = "Vida: --% | Inativo"
+            amHpLabel.TextColor3 = C.TS
+        end
+        task.wait(0.2)
+    end
+end)
+
+mkCard(pAnti,"💀 Ativar Anti-Morte","Sobe quando vida < 35%",function(a)
+    AM.Ativo = a
+    if a then
+        ts:Create(amCard, tf, {BackgroundColor3=C.G, BackgroundTransparency=0.35}):Play()
+        ts:Create(amStroke, tf, {Color=C.VN, Transparency=0}):Play()
+        task.spawn(amLoop)
+        sLabel.Text = "💀 Anti-Morte ativado"
+        sLabel.TextColor3 = C.VN
+    else
+        ts:Create(amCard, tf, {BackgroundColor3=C.F, BackgroundTransparency=0.4}):Play()
+        ts:Create(amStroke, tf, {Color=C.VE, Transparency=0.7}):Play()
+        amPararTudo()
+        sLabel.Text = "Anti-Morte desativado"
+        sLabel.TextColor3 = C.TS
+    end
+end)
+
+mkSlider(pAnti,"Vida mínima (%)",10,80,35,function(val) AM.VIDA_MINIMA = val end)
+mkSlider(pAnti,"Vida segura (%)",50,100,90,function(v) AM.VIDA_SEGURA = v end)
+mkSlider(pAnti,"Altura máxima",200,3000,1500,function(v) AM.ALTURA_MAX = v end)
+mkSlider(pAnti,"Velocidade subida",50,600,250,function(v) AM.VELOCIDADE_SUBIDA = v end)
+mkSlider(pAnti,"Velocidade descida",50,600,180,function(v) AM.VELOCIDADE_DESCIDA = v end)
+
+-- ============================================================================
+-- ABA MISC
+-- ============================================================================
+mkButton(pMisc,"🔓 Rejoin","Reentra no servidor",function()
+    task.spawn(function()
+        local ok, err = pcall(function()
+            teleport:Teleport(game.PlaceId, lp)
+        end)
+        if not ok then
+            sLabel.Text = "❌ Falha ao rejoin"
+            sLabel.TextColor3 = C.R
+        end
+    end)
+end)
+
+mkButton(pMisc,"🖥️ Servidor Info","Mostra dados do server",function()
+    sLabel.Text = "🏠 "..game.PlaceId.." | "..game.JobId:sub(1,8).." | "..#players:GetPlayers().." players"
+    sLabel.TextColor3 = C.VN
+  -- ============================================================================
+-- ABA PERSONALIZAR
+-- ============================================================================
+local TEMAS = {
+    {nome="Aether (Padrão)", cor={F=Color3.fromRGB(28,12,45), V=Color3.fromRGB(180,130,255), VN=Color3.fromRGB(210,170,255)}},
+    {nome="Neon Roxo",       cor={F=Color3.fromRGB(20,8,35),  V=Color3.fromRGB(160,80,255),  VN=Color3.fromRGB(220,150,255)}},
+    {nome="Roxo Escuro",     cor={F=Color3.fromRGB(15,5,25),  V=Color3.fromRGB(130,90,200),  VN=Color3.fromRGB(180,140,240)}},
+}
+
+for _, tema in ipairs(TEMAS) do
+    mkButton(pPersonalizar, "🎨 "..tema.nome, "Aplica tema", function()
+        ts:Create(main, tf, {BackgroundColor3=tema.cor.F}):Play()
+        ts:Create(ms, tf, {Color=tema.cor.V}):Play()
+        sLabel.Text = "🎨 Tema aplicado: "..tema.nome
+        sLabel.TextColor3 = C.VN
+        task.wait(2)
+        sLabel.Text = "Sem Serviço"
+        sLabel.TextColor3 = C.TS
+    end)
+end
+
+mkButton(pPersonalizar,"🔄 Resetar Layout","Volta ao tamanho original",function()
+    main.Size = UDim2.new(0,520,0,340)
+    main.Position = UDim2.new(0.5,-260,0.5,-170)
+    sLabel.Text = "✅ Layout resetado"
+    sLabel.TextColor3 = C.VN
+end)
+
+-- ============================================================================
+-- BOTÃO DE ABRIR/FECHAR O HUB
+-- ============================================================================
+local openBtn = Instance.new("TextButton", sg)
+openBtn.Name = "AetherOpenBtn"
+openBtn.Size = UDim2.new(0, 46, 0, 46)
+openBtn.Position = UDim2.new(0, 20, 0, 100)
+openBtn.BackgroundColor3 = C.VE
+openBtn.BorderSizePixel = 0
+openBtn.Text = "🌌"
+openBtn.TextColor3 = C.VN
+openBtn.Font = Enum.Font.GothamBold
+openBtn.TextSize = 22
+openBtn.ZIndex = 100
+openBtn.Active = true
+openBtn.Draggable = true
+Instance.new("UICorner", openBtn).CornerRadius = UDim.new(1,0)
+
+local openStroke = Instance.new("UIStroke", openBtn)
+openStroke.Color = C.V
+openStroke.Thickness = 2
+openStroke.Transparency = 0.1
+
+openBtn.MouseButton1Click:Connect(function()
+    main.Visible = not main.Visible
+end)
+
+clsBtn.MouseButton1Click:Connect(function()
+    main.Visible = false
+end)
+
+-- ============================================================================
+-- DRAG DO HUB
+-- ============================================================================
+local dragging = false
+local dragStart, startPos
+
+tb.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1
+       or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = main.Position
+    end
+end)
+
+uis.InputChanged:Connect(function(input)
+    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement
+       or input.UserInputType == Enum.UserInputType.Touch) then
+        local delta = input.Position - dragStart
+        main.Position = UDim2.new(
+            startPos.X.Scale, startPos.X.Offset + delta.X,
+            startPos.Y.Scale, startPos.Y.Offset + delta.Y
+        )
+    end
+end)
+
+uis.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1
+       or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = false
+    end
+end)
+
+-- ============================================================================
+-- MOSTRAR PÁGINA INICIAL + KEY
+-- ============================================================================
+mostrarPagina("Inicio")
+
+if AUTENTICADO then
+    main.Visible = true
+else
+    _G.AetherAuthCallback = function()
+        main.Visible = true
+    end
+end
+
+print("[AETHER] Parte 4/4 OK")
+print("🌌 Aether Hub carregado! Key: AETHER-X")
