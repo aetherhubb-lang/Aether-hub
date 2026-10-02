@@ -1,11 +1,8 @@
---[[ 🌌 AETHER HUB | Key: AETHER-X | by: atsu ]]
-
 local CoreGui = game:GetService("CoreGui")
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
 local LP = Players.LocalPlayer
-
 local KEY = "AETHER-X"
 
 for _, n in ipairs({"AetherHub", "AetherKey", "AetherFlyUI"}) do
@@ -17,7 +14,6 @@ end
 
 local loadMainHub
 
--- ═══ KEY SYSTEM ═══
 local function createKeyGui()
     local gui = Instance.new("ScreenGui")
     gui.Name = "AetherKey"
@@ -94,13 +90,13 @@ local function createKeyGui()
         if verified then return end
         if box.Text == KEY then
             verified = true
-            status.Text = "✔ Acesso Concedido"
+            status.Text = "Acesso Concedido"
             status.TextColor3 = Color3.fromRGB(60, 200, 100)
             task.wait(0.5)
             gui:Destroy()
             loadMainHub()
         else
-            status.Text = "✘ Key inválida"
+            status.Text = "Key invalida"
             box.Text = ""
         end
     end
@@ -110,7 +106,6 @@ local function createKeyGui()
         if enter then tryVerify() end
     end)
 endloadMainHub = function()
-    -- Cores Draxi Hub (vermelho/preto)
     local COR_MAIN   = Color3.fromRGB(220, 30, 40)
     local COR_BRIGHT = Color3.fromRGB(255, 80, 90)
     local COR_DARK   = Color3.fromRGB(120, 10, 20)
@@ -142,7 +137,6 @@ endloadMainHub = function()
     MainStroke.Thickness = 2
     MainStroke.Color = COR_MAIN
 
-    -- HEADER
     local Header = Instance.new("Frame", MainFrame)
     Header.Size = UDim2.new(1, 0, 0, 55)
     Header.BackgroundColor3 = BG_DARKER
@@ -174,14 +168,13 @@ endloadMainHub = function()
     MinButton.Position = UDim2.new(1, -40, 0.5, -14)
     MinButton.BackgroundColor3 = Color3.fromRGB(60, 15, 22)
     MinButton.BorderSizePixel = 0
-    MinButton.Text = "✕"
+    MinButton.Text = "X"
     MinButton.TextColor3 = COR_BRIGHT
     MinButton.Font = Enum.Font.GothamBold
     MinButton.TextSize = 14
     MinButton.AutoButtonColor = false
     Instance.new("UICorner", MinButton).CornerRadius = UDim.new(0, 6)
 
-    -- SIDEBAR
     local Sidebar = Instance.new("Frame", MainFrame)
     Sidebar.Size = UDim2.new(0, 130, 1, -75)
     Sidebar.Position = UDim2.new(0, 10, 0, 65)
@@ -196,7 +189,6 @@ endloadMainHub = function()
     local SidebarPad = Instance.new("UIPadding", Sidebar)
     SidebarPad.PaddingTop = UDim.new(0, 8)
 
-    -- CONTENT
     local Content = Instance.new("Frame", MainFrame)
     Content.Size = UDim2.new(1, -160, 1, -75)
     Content.Position = UDim2.new(0, 150, 0, 65)
@@ -234,7 +226,7 @@ endloadMainHub = function()
         {nome="Principal", page=pPrincipal},
         {nome="AC Bypass",  page=pCombate},
         {nome="Extras",     page=pVisual},
-        {nome="Créditos",   page=pCreditos},
+        {nome="Creditos",   page=pCreditos},
     }
     local tabBtns = {}
 
@@ -270,8 +262,7 @@ endloadMainHub = function()
         b.MouseButton1Click:Connect(function()
             mostrarPagina(info.nome)
         end)
-    end-- 🔘 BOTÃO ESTILO TOGGLE (Draxi Hub)
-local function makeButton(page, text, order)
+    endlocal function makeButton(page, text, order)
     local row = Instance.new("Frame", page)
     row.Size = UDim2.new(1, -6, 0, 38)
     row.BackgroundColor3 = BG_PANEL
@@ -337,7 +328,6 @@ local function makeButton(page, text, order)
     return clickArea, setToggle
 end
 
--- CRÉDITOS
 local credTitle = Instance.new("TextLabel", pCreditos)
 credTitle.Size = UDim2.new(1, -6, 0, 40)
 credTitle.BackgroundColor3 = BG_PANEL
@@ -364,7 +354,7 @@ local credVer = Instance.new("TextLabel", pCreditos)
 credVer.Size = UDim2.new(1, -6, 0, 28)
 credVer.BackgroundColor3 = BG_PANEL
 credVer.BorderSizePixel = 0
-credVer.Text = "Versão 2.0"
+credVer.Text = "Versao 2.0"
 credVer.TextColor3 = Color3.fromRGB(220, 180, 190)
 credVer.Font = Enum.Font.Gotham
 credVer.TextSize = 12
@@ -375,16 +365,13 @@ local credInfo = Instance.new("TextLabel", pCreditos)
 credInfo.Size = UDim2.new(1, -6, 0, 80)
 credInfo.BackgroundColor3 = BG_PANEL
 credInfo.BorderSizePixel = 0
-credInfo.Text = "🔑 Key: AETHER-X\n\n🌟 Funções: Gojo Kill All,\nMahito Ult Inf, Hakari 60% ult,\nFly, Bypass, Focus, ESP, FPS"
+credInfo.Text = "Key: AETHER-X\n\nFuncoes: Gojo, Mahito, Hakari,\nFly, Bypass, Focus, ESP, FPS"
 credInfo.TextColor3 = Color3.fromRGB(220, 180, 190)
 credInfo.Font = Enum.Font.Gotham
 credInfo.TextSize = 11
 credInfo.TextWrapped = true
 credInfo.LayoutOrder = 4
-Instance.new("UICorner", credInfo).CornerRadius = UDim.new(0, 8)
-
--- NOTIFICAÇÕES
-local notifContainer = Instance.new("Frame", ScreenGui)
+Instance.new("UICorner", credInfo).CornerRadius = UDim.new(0, 8)local notifContainer = Instance.new("Frame", ScreenGui)
 notifContainer.Size = UDim2.new(0, 300, 1, 0)
 notifContainer.Position = UDim2.new(1, -320, 0, 0)
 notifContainer.BackgroundTransparency = 1
@@ -460,308 +447,305 @@ TweenService:Create(MainFrame, TweenInfo.new(0.45, Enum.EasingStyle.Back, Enum.E
     Position = NORMAL_POS,
 }):Play()
 
-mostrarPagina("Principal")    -- ═══ GOJO KILL ALL ═══
-    local gojoActive = false
-    local gojoBtn, gojoSet = makeButton(pPrincipal, "☠️ Gojo Kill All", 1)
-    gojoBtn.MouseButton1Click:Connect(function()
-        gojoActive = not gojoActive
-        gojoSet(gojoActive)
-        notificar("☠️ Gojo Kill All", gojoActive and "Ativado" or "Desativado", COR_MAIN)
-        if gojoActive then
-            task.spawn(function()
-                while gojoActive do
-                    local char = LP.Character
-                    local root = char and char:FindFirstChild("HumanoidRootPart")
-                    if root then
-                        for _, p in ipairs(Players:GetPlayers()) do
-                            if not gojoActive then break end
-                            if p ~= LP and p.Character then
-                                local tr = p.Character:FindFirstChild("HumanoidRootPart")
-                                local hum = p.Character:FindFirstChildOfClass("Humanoid")
-                                if tr and hum and hum.Health > 0 then
-                                    root.CFrame = tr.CFrame
-                                    RunService.Heartbeat:Wait()
-                                end
+mostrarPagina("Principal")
+
+-- GOJO KILL ALL
+local gojoActive = false
+local gojoBtn, gojoSet = makeButton(pPrincipal, "Gojo Kill All", 1)
+gojoBtn.MouseButton1Click:Connect(function()
+    gojoActive = not gojoActive
+    gojoSet(gojoActive)
+    notificar("Gojo Kill All", gojoActive and "Ativado" or "Desativado", COR_MAIN)
+    if gojoActive then
+        task.spawn(function()
+            while gojoActive do
+                local char = LP.Character
+                local root = char and char:FindFirstChild("HumanoidRootPart")
+                if root then
+                    for _, p in ipairs(Players:GetPlayers()) do
+                        if not gojoActive then break end
+                        if p ~= LP and p.Character then
+                            local tr = p.Character:FindFirstChild("HumanoidRootPart")
+                            local hum = p.Character:FindFirstChildOfClass("Humanoid")
+                            if tr and hum and hum.Health > 0 then
+                                root.CFrame = tr.CFrame
+                                RunService.Heartbeat:Wait()
                             end
                         end
                     end
-                    RunService.Heartbeat:Wait()
                 end
-            end)
-        end
-    end)
-
-    -- ═══ MAHITO ULT INF ═══
-    local mahitoActive = false
-    local mahitoBtn, mahitoSet = makeButton(pPrincipal, "🌀 Mahito Ult Inf", 2)
-    mahitoBtn.MouseButton1Click:Connect(function()
-        mahitoActive = not mahitoActive
-        mahitoSet(mahitoActive)
-        notificar("🌀 Mahito Ult Inf", mahitoActive and "Ativado" or "Desativado", COR_MAIN)
-        if mahitoActive then
-            task.spawn(function()
-                while mahitoActive do
-                    local u = LP:GetAttribute("Ultimate") or LP:GetAttribute("Ult")
-                    if u then
-                        pcall(function() LP:SetAttribute("Ultimate", 100) end)
-                    end
-                    task.wait(0.5)
-                end
-            end)
-        end
-    end)
-
-    -- ═══ HAKARI 60% ULT ═══
-    local hakariActive = false
-    local hakariBtn, hakariSet = makeButton(pPrincipal, "🎰 Hakari 60% Ult", 3)
-    hakariBtn.MouseButton1Click:Connect(function()
-        hakariActive = not hakariActive
-        hakariSet(hakariActive)
-        notificar("🎰 Hakari 60% Ult", hakariActive and "Ativado" or "Desativado", COR_MAIN)
-        if hakariActive then
-            task.spawn(function()
-                while hakariActive do
-                    pcall(function()
-                        LP:SetAttribute("Ultimate", 60)
-                    end)
-                    task.wait(1)
-                end
-            end)
-        end
-    end)
-
-    -- ═══ FLY ═══
-    local flyActive = false
-    local flyBtn, flySet = makeButton(pPrincipal, "🕊️ Fly", 4)
-    local flyMove = {left=0, right=0, up=0, down=0}
-    local flyGUIRef, flyBV, flyAng, flyConn
-
-    local function createFlyUI()
-        if flyGUIRef then flyGUIRef:Destroy() end
-        local gui = Instance.new("ScreenGui")
-        gui.Name = "AetherFlyUI"
-        gui.ResetOnSpawn = false
-        gui.DisplayOrder = 999999
-        gui.Parent = CoreGui
-        flyGUIRef = gui
-        local function makeArrow(x, y, text, dir)
-            local b = Instance.new("TextButton", gui)
-            b.Size = UDim2.new(0, 58, 0, 58)
-            b.Position = UDim2.new(0, x, 0, y)
-            b.BackgroundColor3 = Color3.fromRGB(50, 15, 25)
-            b.BorderSizePixel = 0
-            b.Text = text
-            b.TextColor3 = Color3.fromRGB(255, 200, 210)
-            b.Font = Enum.Font.GothamBold
-            b.TextSize = 28
-            b.RichText = false
-            b.AutoButtonColor = false
-            Instance.new("UICorner", b).CornerRadius = UDim.new(1, 0)
-            local s = Instance.new("UIStroke", b)
-            s.Color = COR_MAIN
-            s.Thickness = 2.5
-            b.InputBegan:Connect(function(input)
-                if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-                    flyMove[dir] = 1
-                    b.BackgroundColor3 = Color3.fromRGB(140, 25, 35)
-                end
-            end)
-            b.InputEnded:Connect(function(input)
-                if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-                    flyMove[dir] = 0
-                    b.BackgroundColor3 = Color3.fromRGB(50, 15, 25)
-                end
-            end)
-        end
-        makeArrow(80, 60, "▲", "up")
-        makeArrow(15, 125, "◀", "left")
-        makeArrow(145, 125, "▶", "right")
-        makeArrow(80, 190, "▼", "down")
+                RunService.Heartbeat:Wait()
+            end
+        end)
     end
+end)
 
-    local function stopFly()
-        if flyConn then flyConn:Disconnect(); flyConn = nil end
-        if flyBV then flyBV:Destroy(); flyBV = nil end
-        if flyAng then flyAng:Destroy(); flyAng = nil end
-        local char = LP.Character
-        local hum = char and char:FindFirstChildOfClass("Humanoid")
-        if hum then hum.PlatformStand = false end
-        for k in pairs(flyMove) do flyMove[k] = 0 end
+-- MAHITO ULT INF
+local mahitoActive = false
+local mahitoBtn, mahitoSet = makeButton(pPrincipal, "Mahito Ult Inf", 2)
+mahitoBtn.MouseButton1Click:Connect(function()
+    mahitoActive = not mahitoActive
+    mahitoSet(mahitoActive)
+    notificar("Mahito Ult Inf", mahitoActive and "Ativado" or "Desativado", COR_MAIN)
+    if mahitoActive then
+        task.spawn(function()
+            while mahitoActive do
+                pcall(function()
+                    LP:SetAttribute("Ultimate", 100)
+                end)
+                task.wait(0.5)
+            end
+        end)
     end
+end)
 
-    local function startFly()
+-- HAKARI 60% ULT
+local hakariActive = false
+local hakariBtn, hakariSet = makeButton(pPrincipal, "Hakari 60% Ult", 3)
+hakariBtn.MouseButton1Click:Connect(function()
+    hakariActive = not hakariActive
+    hakariSet(hakariActive)
+    notificar("Hakari 60% Ult", hakariActive and "Ativado" or "Desativado", COR_MAIN)
+    if hakariActive then
+        task.spawn(function()
+            while hakariActive do
+                pcall(function()
+                    LP:SetAttribute("Ultimate", 60)
+                end)
+                task.wait(1)
+            end
+        end)
+    end
+end)-- FLY
+local flyActive = false
+local flyBtn, flySet = makeButton(pPrincipal, "Fly", 4)
+local flyMove = {left=0, right=0, up=0, down=0}
+local flyGUIRef, flyBV, flyAng, flyConn
+
+local function createFlyUI()
+    if flyGUIRef then flyGUIRef:Destroy() end
+    local gui = Instance.new("ScreenGui")
+    gui.Name = "AetherFlyUI"
+    gui.ResetOnSpawn = false
+    gui.DisplayOrder = 999999
+    gui.Parent = CoreGui
+    flyGUIRef = gui
+    local function makeArrow(x, y, text, dir)
+        local b = Instance.new("TextButton", gui)
+        b.Size = UDim2.new(0, 58, 0, 58)
+        b.Position = UDim2.new(0, x, 0, y)
+        b.BackgroundColor3 = Color3.fromRGB(50, 15, 25)
+        b.BorderSizePixel = 0
+        b.Text = text
+        b.TextColor3 = Color3.fromRGB(255, 200, 210)
+        b.Font = Enum.Font.GothamBold
+        b.TextSize = 28
+        b.RichText = false
+        b.AutoButtonColor = false
+        Instance.new("UICorner", b).CornerRadius = UDim.new(1, 0)
+        local s = Instance.new("UIStroke", b)
+        s.Color = COR_MAIN
+        s.Thickness = 2.5
+        b.InputBegan:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                flyMove[dir] = 1
+                b.BackgroundColor3 = Color3.fromRGB(140, 25, 35)
+            end
+        end)
+        b.InputEnded:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                flyMove[dir] = 0
+                b.BackgroundColor3 = Color3.fromRGB(50, 15, 25)
+            end
+        end)
+    end
+    makeArrow(80, 60, "▲", "up")
+    makeArrow(15, 125, "◀", "left")
+    makeArrow(145, 125, "▶", "right")
+    makeArrow(80, 190, "▼", "down")
+end
+
+local function stopFly()
+    if flyConn then flyConn:Disconnect(); flyConn = nil end
+    if flyBV then flyBV:Destroy(); flyBV = nil end
+    if flyAng then flyAng:Destroy(); flyAng = nil end
+    local char = LP.Character
+    local hum = char and char:FindFirstChildOfClass("Humanoid")
+    if hum then hum.PlatformStand = false end
+    for k in pairs(flyMove) do flyMove[k] = 0 end
+end
+
+local function startFly()
+    local char = LP.Character
+    local root = char and char:FindFirstChild("HumanoidRootPart")
+    local hum  = char and char:FindFirstChildOfClass("Humanoid")
+    if not root or not hum then return end
+    hum.PlatformStand = true
+    flyBV = Instance.new("BodyVelocity", root)
+    flyBV.MaxForce = Vector3.new(1e5, 1e5, 1e5)
+    flyBV.Velocity = Vector3.zero
+    flyAng = Instance.new("BodyAngularVelocity", root)
+    flyAng.MaxTorque = Vector3.new(1e5, 1e5, 1e5)
+    flyAng.AngularVelocity = Vector3.zero
+    flyConn = RunService.Heartbeat:Connect(function()
+        if not flyActive then return end
+        local c = LP.Character
+        local r = c and c:FindFirstChild("HumanoidRootPart")
+        if not r then return end
+        local cam = workspace.CurrentCamera
+        local speed = 90
+        local vel = Vector3.zero
+        vel += cam.CFrame.RightVector * (flyMove.right - flyMove.left) * speed
+        vel += cam.CFrame.LookVector * (flyMove.up - flyMove.down) * speed
+        if flyBV then flyBV.Velocity = vel end
+    end)
+end
+
+flyBtn.MouseButton1Click:Connect(function()
+    flyActive = not flyActive
+    flySet(flyActive)
+    notificar("Fly", flyActive and "Ativado" or "Desativado", COR_MAIN)
+    if flyActive then createFlyUI() startFly() else
+        if flyGUIRef then flyGUIRef:Destroy(); flyGUIRef = nil end
+        stopFly()
+    end
+end)
+
+-- BYPASS
+local bypassActive = false
+local bypassBtn, bypassSet = makeButton(pCombate, "Bypass", 1)
+
+local function ExecutarBypass()
+    local char = LP.Character or LP.CharacterAdded:Wait()
+    local root = char:WaitForChild("HumanoidRootPart", 5)
+    if not root then return false end
+    local sucesso = false
+    pcall(function()
+        local jogadores = Players:GetPlayers()
+        for i = #jogadores, 1, -1 do
+            if jogadores[i] == LP then table.remove(jogadores, i) end
+        end
+        if #jogadores > 0 then
+            local alvo = jogadores[math.random(1, #jogadores)]
+            if alvo and alvo.Character and alvo.Character:FindFirstChild("HumanoidRootPart") then
+                local posAlvo = alvo.Character.HumanoidRootPart.Position + Vector3.new(0, 3, 0)
+                root.CFrame = CFrame.new(posAlvo)
+                task.wait(0.5)
+                if (root.Position - posAlvo).Magnitude < 25 then sucesso = true end
+            end
+        end
+    end)
+    return sucesso
+end
+
+local function rotaDoVoid()
+    pcall(function()
         local char = LP.Character
         local root = char and char:FindFirstChild("HumanoidRootPart")
         local hum  = char and char:FindFirstChildOfClass("Humanoid")
         if not root or not hum then return end
         hum.PlatformStand = true
-        flyBV = Instance.new("BodyVelocity", root)
-        flyBV.MaxForce = Vector3.new(1e5, 1e5, 1e5)
-        flyBV.Velocity = Vector3.zero
-        flyAng = Instance.new("BodyAngularVelocity", root)
-        flyAng.MaxTorque = Vector3.new(1e5, 1e5, 1e5)
-        flyAng.AngularVelocity = Vector3.zero
-        flyConn = RunService.Heartbeat:Connect(function()
-            if not flyActive then return end
-            local c = LP.Character
-            local r = c and c:FindFirstChild("HumanoidRootPart")
-            if not r then return end
-            local cam = workspace.CurrentCamera
-            local speed = 90
-            local vel = Vector3.zero
-            vel += cam.CFrame.RightVector * (flyMove.right - flyMove.left) * speed
-            vel += cam.CFrame.LookVector * (flyMove.up - flyMove.down) * speed
-            if flyBV then flyBV.Velocity = vel end
-        end)
-    end
-
-    flyBtn.MouseButton1Click:Connect(function()
-        flyActive = not flyActive
-        flySet(flyActive)
-        notificar("🕊️ Fly", flyActive and "Ativado" or "Desativado", COR_MAIN)
-        if flyActive then createFlyUI() startFly() else
-            if flyGUIRef then flyGUIRef:Destroy(); flyGUIRef = nil end
-            stopFly()
-        end
+        local bv = Instance.new("BodyVelocity", root)
+        bv.MaxForce = Vector3.new(9e6, 9e6, 9e6)
+        bv.Velocity = Vector3.new(0, 150, 0)
+        task.wait(1.3)
+        bv.Velocity = Vector3.new(-300, 0, 0)
+        task.wait(2.4)
+        bv.Velocity = Vector3.zero
+        hum.PlatformStand = false
+        bv:Destroy()
     end)
+end
 
-    -- ═══ BYPASS ═══
-    local bypassActive = false
-    local bypassBtn, bypassSet = makeButton(pCombate, "🔥 Bypass", 1)
-
-    local function ExecutarBypass()
-        local char = LP.Character or LP.CharacterAdded:Wait()
-        local root = char:WaitForChild("HumanoidRootPart", 5)
-        if not root then return false end
-        local sucesso = false
-        pcall(function()
-            local jogadores = Players:GetPlayers()
-            for i = #jogadores, 1, -1 do
-                if jogadores[i] == LP then table.remove(jogadores, i) end
-            end
-            if #jogadores > 0 then
-                local alvo = jogadores[math.random(1, #jogadores)]
-                if alvo and alvo.Character and alvo.Character:FindFirstChild("HumanoidRootPart") then
-                    local posAlvo = alvo.Character.HumanoidRootPart.Position + Vector3.new(0, 3, 0)
-                    root.CFrame = CFrame.new(posAlvo)
-                    task.wait(0.5)
-                    if (root.Position - posAlvo).Magnitude < 25 then sucesso = true end
+bypassBtn.MouseButton1Click:Connect(function()
+    bypassActive = not bypassActive
+    bypassSet(bypassActive)
+    notificar("Bypass", bypassActive and "Ativado" or "Desativado", COR_MAIN)
+    if bypassActive then
+        task.spawn(function()
+            while bypassActive do
+                if ExecutarBypass() then
+                    bypassActive = false
+                    bypassSet(false)
+                    notificar("Bypass", "Completado!", Color3.fromRGB(60, 220, 120))
+                    break
+                else
+                    rotaDoVoid()
+                    task.wait(3)
                 end
             end
         end)
-        return sucesso
     end
+end)
 
-    local function rotaDoVoid()
-        pcall(function()
-            local char = LP.Character
-            local root = char and char:FindFirstChild("HumanoidRootPart")
-            local hum  = char and char:FindFirstChildOfClass("Humanoid")
-            if not root or not hum then return end
-            hum.PlatformStand = true
-            local bv = Instance.new("BodyVelocity", root)
-            bv.MaxForce = Vector3.new(9e6, 9e6, 9e6)
-            bv.Velocity = Vector3.new(0, 150, 0)
-            task.wait(1.3)
-            bv.Velocity = Vector3.new(-300, 0, 0)
-            task.wait(2.4)
-            bv.Velocity = Vector3.zero
-            hum.PlatformStand = false
-            bv:Destroy()
-        end)
-    end
+-- FOCUS
+local focusActive = false
+local focusBtn, focusSet = makeButton(pCombate, "Focus", 2)
+local focusConn, focusTarget
 
-    bypassBtn.MouseButton1Click:Connect(function()
-        bypassActive = not bypassActive
-        bypassSet(bypassActive)
-        notificar("🔥 Bypass", bypassActive and "Ativado" or "Desativado", COR_MAIN)
-        if bypassActive then
-            task.spawn(function()
-                while bypassActive do
-                    if ExecutarBypass() then
-                        bypassActive = false
-                        bypassSet(false)
-                        notificar("🔥 Bypass", "✅ Completado!", Color3.fromRGB(60, 220, 120))
-                        break
-                    else
-                        rotaDoVoid()
-                        task.wait(3)
-                    end
-                end
-            end)
-        end
-    end)
-
-    -- ═══ FOCUS ═══
-    local focusActive = false
-    local focusBtn, focusSet = makeButton(pCombate, "🎯 Focus", 2)
-    local focusConn, focusTarget
-
-    local function findNearest()
-        local c = LP.Character
-        local r = c and c:FindFirstChild("HumanoidRootPart")
-        if not r then return nil end
-        local best, bestD = nil, math.huge
-        for _, p in ipairs(Players:GetPlayers()) do
-            if p ~= LP and p.Character then
-                local tr = p.Character:FindFirstChild("HumanoidRootPart")
-                local hum = p.Character:FindFirstChildOfClass("Humanoid")
-                if tr and hum and hum.Health > 0 then
-                    local d = (tr.Position - r.Position).Magnitude
-                    if d < bestD then bestD = d; best = p end
-                end
+local function findNearest()
+    local c = LP.Character
+    local r = c and c:FindFirstChild("HumanoidRootPart")
+    if not r then return nil end
+    local best, bestD = nil, math.huge
+    for _, p in ipairs(Players:GetPlayers()) do
+        if p ~= LP and p.Character then
+            local tr = p.Character:FindFirstChild("HumanoidRootPart")
+            local hum = p.Character:FindFirstChildOfClass("Humanoid")
+            if tr and hum and hum.Health > 0 then
+                local d = (tr.Position - r.Position).Magnitude
+                if d < bestD then bestD = d; best = p end
             end
         end
-        return best
     end
+    return best
+end
 
-    local function stopFocus()
-        if focusConn then focusConn:Disconnect(); focusConn = nil end
+local function stopFocus()
+    if focusConn then focusConn:Disconnect(); focusConn = nil end
+    local char = LP.Character
+    local hum = char and char:FindFirstChildOfClass("Humanoid")
+    if hum then hum.PlatformStand = false end
+    focusTarget = nil
+end
+
+local function startFocus()
+    focusTarget = findNearest()
+    if not focusTarget then focusActive = false focusSet(false) return end
+    local angle = 0
+    focusConn = RunService.Heartbeat:Connect(function(dt)
+        if not focusActive then return end
+        if not focusTarget or not focusTarget.Character or not focusTarget.Character.Parent then
+            focusTarget = findNearest()
+            if not focusTarget then return end
+        end
         local char = LP.Character
-        local hum = char and char:FindFirstChildOfClass("Humanoid")
-        if hum then hum.PlatformStand = false end
-        focusTarget = nil
-    end
-
-    local function startFocus()
-        focusTarget = findNearest()
-        if not focusTarget then focusActive = false focusSet(false) return end
-        local angle = 0
-        focusConn = RunService.Heartbeat:Connect(function(dt)
-            if not focusActive then return end
-            if not focusTarget or not focusTarget.Character or not focusTarget.Character.Parent then
-                focusTarget = findNearest()
-                if not focusTarget then return end
-            end
-            local char = LP.Character
-            local root = char and char:FindFirstChild("HumanoidRootPart")
-            local hum  = char and char:FindFirstChildOfClass("Humanoid")
-            local tr   = focusTarget.Character:FindFirstChild("HumanoidRootPart")
-            if not root or not hum or not tr then return end
-            hum.PlatformStand = true
-            angle += dt * 5
-            local offset = Vector3.new(math.cos(angle) * 6, 3, math.sin(angle) * 6)
-            root.CFrame = CFrame.new(tr.Position + offset, tr.Position)
-            root.Velocity = Vector3.zero
-        end)
-    end
-
-    focusBtn.MouseButton1Click:Connect(function()
-        focusActive = not focusActive
-        focusSet(focusActive)
-        notificar("🎯 Focus", focusActive and "Ativado" or "Desativado", COR_MAIN)
-        if focusActive then startFocus() else stopFocus() end
+        local root = char and char:FindFirstChild("HumanoidRootPart")
+        local hum  = char and char:FindFirstChildOfClass("Humanoid")
+        local tr   = focusTarget.Character:FindFirstChild("HumanoidRootPart")
+        if not root or not hum or not tr then return end
+        hum.PlatformStand = true
+        angle += dt * 5
+        local offset = Vector3.new(math.cos(angle) * 6, 3, math.sin(angle) * 6)
+        root.CFrame = CFrame.new(tr.Position + offset, tr.Position)
+        root.Velocity = Vector3.zero
     end)
+end
 
-    -- ═══ ESP ═══
+focusBtn.MouseButton1Click:Connect(function()
+    focusActive = not focusActive
+    focusSet(focusActive)
+    notificar("Focus", focusActive and "Ativado" or "Desativado", COR_MAIN)
+    if focusActive then startFocus() else stopFocus() end
+end)    -- ESP
     local espActive = false
     local espFolder = Instance.new("Folder", ScreenGui)
     espFolder.Name = "AetherESP"
-    local espBtn, espSet = makeButton(pVisual, "👁️ ESP", 1)
+    local espBtn, espSet = makeButton(pVisual, "ESP", 1)
     espBtn.MouseButton1Click:Connect(function()
         espActive = not espActive
         espSet(espActive)
-        notificar("👁️ ESP", espActive and "Ativado" or "Desativado", COR_MAIN)
+        notificar("ESP", espActive and "Ativado" or "Desativado", COR_MAIN)
         if espActive then
             task.spawn(function()
                 while espActive do
@@ -784,13 +768,13 @@ mostrarPagina("Principal")    -- ═══ GOJO KILL ALL ═══
         end
     end)
 
-    -- ═══ FPS BOOSTER ═══
+    -- FPS BOOSTER
     local fpsActive = false
-    local fpsBtn, fpsSet = makeButton(pVisual, "🚀 FPS Booster", 2)
+    local fpsBtn, fpsSet = makeButton(pVisual, "FPS Booster", 2)
     fpsBtn.MouseButton1Click:Connect(function()
         fpsActive = not fpsActive
         fpsSet(fpsActive)
-        notificar("🚀 FPS", fpsActive and "Ativado" or "Desativado", COR_MAIN)
+        notificar("FPS Booster", fpsActive and "Ativado" or "Desativado", COR_MAIN)
         if fpsActive then
             task.spawn(function()
                 for _, v in ipairs(game:GetDescendants()) do
@@ -806,6 +790,11 @@ mostrarPagina("Principal")    -- ═══ GOJO KILL ALL ═══
             workspace.GlobalShadows = true
         end
     end)
+
+    -- FECHAR HUB
+    MinButton.MouseButton1Click:Connect(function()
+        MainFrame.Visible = false
+    end)
 end
 
 -- BOOT
@@ -815,4 +804,4 @@ else
     createKeyGui()
 end
 
-print("🌌 Aether Hub | Key: AETHER-X | by: atsu")
+print("Aether Hub | Key: AETHER-X | by: atsu")
