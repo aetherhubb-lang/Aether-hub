@@ -140,7 +140,7 @@ criarPainel()--═════════════════════�
 -- 🔑 KEY POPUP
 --═══════════════════════════════════════════════════════
 local function pedirKey()
-    setStatus("Aguardando Key...", "digite sua key", Color3.fromRGB(255, 200, 100))
+    setStatus("Aguardando Key...", "digite AETHER-AFK", Color3.fromRGB(255, 200, 100))
 
     local gui = Instance.new("ScreenGui")
     gui.Name = "AetherAfkGui"
@@ -260,11 +260,17 @@ local function getMyHum()
     local c = LP.Character
     return c and c:FindFirstChildOfClass("Humanoid")
 end--═══════════════════════════════════════════════════════
--- 1) BYPASS
+-- 1) BYPASS (TRAJETÓRIA AJUSTADA)
 --═══════════════════════════════════════════════════════
-local function ExecutarBypass()
+local function AtualizarChar()
     local char = LP.Character or LP.CharacterAdded:Wait()
-    local root = char:WaitForChild("HumanoidRootPart", 5)
+    return char,
+           char:WaitForChild("HumanoidRootPart", 5),
+           char:WaitForChild("Humanoid", 5)
+end
+
+local function ExecutarBypass()
+    local char, root = AtualizarChar()
     if not root then return false end
 
     local sucesso = false
@@ -273,30 +279,28 @@ local function ExecutarBypass()
         for i = #jogadores, 1, -1 do
             if jogadores[i] == LP then table.remove(jogadores, i) end
         end
+
         if #jogadores > 0 then
             local alvo = jogadores[math.random(1, #jogadores)]
-            if alvo and alvo.Character
-               and alvo.Character:FindFirstChild("HumanoidRootPart") then
+            if alvo and alvo.Character and alvo.Character:FindFirstChild("HumanoidRootPart") then
                 local posAlvo = alvo.Character.HumanoidRootPart.Position + Vector3.new(0, 3, 0)
                 root.CFrame = CFrame.new(posAlvo)
                 task.wait(0.5)
-                if root and root.Parent
-                   and (root.Position - posAlvo).Magnitude < 25 then
+                if root and root.Parent and (root.Position - posAlvo).Magnitude < 25 then
                     sucesso = true
                 end
             end
         end
     end)
+
     return sucesso
 end
 
 local function rotaDoVoid()
-    pcall(function()
-        local char = LP.Character
-        local root = char and char:FindFirstChild("HumanoidRootPart")
-        local hum  = char and char:FindFirstChildOfClass("Humanoid")
-        if not root or not hum then return end
+    local char, root, hum = AtualizarChar()
+    if not root or not hum then return end
 
+    pcall(function()
         hum.PlatformStand = true
         local bv = Instance.new("BodyVelocity")
         bv.MaxForce = Vector3.new(9999999, 9999999, 9999999)
@@ -312,20 +316,27 @@ local function rotaDoVoid()
 end
 
 local function bypass()
-    setStatus("Auto Bypass", "tentando...", Color3.fromRGB(255, 180, 100))
+    setStatus("Auto Bypass", "🔄 tentando...", Color3.fromRGB(255, 180, 100))
+    print("[AFK] 🔥 Bypass iniciado...")
+
     local tentativas = 0
     while true do
         tentativas += 1
         setStatus("Auto Bypass", "tentativa #" .. tentativas, Color3.fromRGB(255, 180, 100))
-        local ok = ExecutarBypass()
-        if ok then
-            setStatus("Bypass Ativado", "✅ concluído (#"..tentativas..")", Color3.fromRGB(60, 220, 120))
+        print("[AFK] 💀 Bypass tentativa #" .. tentativas)
+
+        local sucesso = ExecutarBypass()
+
+        if sucesso then
+            setStatus("Bypass Ativado", "✅ OK (#"..tentativas..")", Color3.fromRGB(60, 220, 120))
+            print("[AFK] ✅ Bypass FUNCIONOU na tentativa #" .. tentativas)
             task.wait(1)
             return true
         else
-            setStatus("Auto Bypass", "❌ falhou, resetando...", Color3.fromRGB(220, 80, 100))
+            setStatus("Auto Bypass", "❌ resetando void...", Color3.fromRGB(220, 80, 100))
+            print("[AFK] ❌ Falhou #" .. tentativas .. " - Resetando...")
             rotaDoVoid()
-            task.wait(5)
+            task.wait(3)
         end
     end
 end
@@ -404,7 +415,7 @@ local function ultCheia()
     end
     return false
 end--═══════════════════════════════════════════════════════
--- 4) FOCUS ORBITANDO (TATU FOCUS) + M1 + SKILLS
+-- 4) FOCUS ORBITANDO (MoveTo - sem teleporte pro spawn)
 --═══════════════════════════════════════════════════════
 local function farmUlt()
     setStatus("Iniciando Focus", "procurando dummy...", Color3.fromRGB(200, 150, 255))
@@ -412,33 +423,22 @@ local function farmUlt()
     local lastClick = 0
     local lastSkill = 0
     local skillIdx = 1
+    local angle = 0
     local SKILLS    = { Enum.KeyCode.Four, Enum.KeyCode.Two, Enum.KeyCode.Three }
     local SKILL_NUM = { 4, 2, 3 }
 
-    local modosFocus = {
-        {nome="EM CIMA", altura=8, raio=2},
-        {nome="DO LADO", altura=0, raio=7}
-    }
-    local modoAtual = 2
-    local focusSpeed = 8
+    local RADIUS = 4
+    local WALKSPEED = 60
+    local ORBIT_SPEED = 0.15
 
     local currentTarget = nil
     local lastHP = 0
-    local orbitAngle = 0
-    local orbitConnection = nil
 
     local function targetValido(t)
         if not t then return false end
         if not t.hum or not t.hum.Parent then return false end
         if not t.root or not t.root.Parent then return false end
         return true
-    end
-
-    local function limparOrbita()
-        if orbitConnection then
-            orbitConnection:Disconnect()
-            orbitConnection = nil
-        end
     end
 
     local function acharAlvo()
@@ -453,14 +453,13 @@ local function farmUlt()
             end
         end
         lastHP = currentTarget.hum.Health
-        orbitAngle = 0
+        angle = 0
         setStatus("Focus no Dummy", "✅ alvo encontrado!", Color3.fromRGB(60, 220, 120))
         return false
     end
 
     while true do
         if ultCheia() then
-            limparOrbita()
             local h = getMyHum()
             if h then
                 h.PlatformStand = false
@@ -480,26 +479,7 @@ local function farmUlt()
         end
 
         if precisaTrocar then
-            limparOrbita()
             if acharAlvo() then return true end
-
-            local modo = modosFocus[modoAtual]
-            orbitConnection = RunService.RenderStepped:Connect(function(dt)
-                if not currentTarget or not currentTarget.root or not currentTarget.root.Parent then return end
-                if currentTarget.hum.Health <= 0 then return end
-
-                local hrp = getMyRoot()
-                local hum = getMyHum()
-                if not hrp or not hum then return end
-
-                local targetPos = currentTarget.root.Position
-                orbitAngle += dt * focusSpeed
-                local offsetX = math.cos(orbitAngle) * modo.raio
-                local offsetZ = math.sin(orbitAngle) * modo.raio
-                local pos = targetPos + Vector3.new(offsetX, modo.altura, offsetZ)
-
-                hrp.CFrame = CFrame.new(pos, targetPos)
-            end)
         end
 
         if not currentTarget then
@@ -509,9 +489,37 @@ local function farmUlt()
 
         lastHP = currentTarget.hum.Health
 
+        local mr = getMyRoot()
+        local mh = getMyHum()
+        if not mr or not mh then
+            task.wait(0.1)
+            continue
+        end
+
+        -- 🔥 MoveTo (movimento real)
+        mh.PlatformStand = false
+        mh.WalkSpeed = WALKSPEED
+        mh.AutoRotate = true
+
+        -- 🌀 Próximo ponto da órbita
+        angle += ORBIT_SPEED
+        local dummyPos = currentTarget.root.Position
+        local offset = Vector3.new(
+            math.cos(angle) * RADIUS,
+            0,
+            math.sin(angle) * RADIUS
+        )
+        local target = dummyPos + offset
+
+        mh:MoveTo(target)
+
+        -- 🎯 Encara o dummy
+        mr.CFrame = CFrame.lookAt(mr.Position, Vector3.new(dummyPos.X, mr.Position.Y, dummyPos.Z))
+
         -- 🖱️ M1
         if tick() - lastClick > 0.1 then
             lastClick = tick()
+
             task.spawn(function()
                 pcall(function()
                     VirtualUser:CaptureController()
@@ -538,6 +546,7 @@ local function farmUlt()
         if tick() - lastSkill > 1.2 then
             lastSkill = tick()
             local key = SKILLS[skillIdx]
+
             task.spawn(function()
                 pcall(function()
                     VirtualUser:SendKeyEvent(true,  key, false, game)
@@ -545,16 +554,12 @@ local function farmUlt()
                     VirtualUser:SendKeyEvent(false, key, false, game)
                 end)
             end)
+
             skillIdx = skillIdx + 1
             if skillIdx > #SKILLS then skillIdx = 1 end
         end
 
-        local mr = getMyRoot()
-        local d = 0
-        if mr and currentTarget then
-            d = (mr.Position - currentTarget.root.Position).Magnitude
-        end
-
+        local d = (mr.Position - dummyPos).Magnitude
         setStatus("Focus Orbitando",
             string.format("HP: %d | dist: %dm | skill: %d",
                 math.floor(currentTarget.hum.Health),
@@ -562,7 +567,7 @@ local function farmUlt()
                 SKILL_NUM[skillIdx == 1 and 4 or (skillIdx == 2 and 2 or 3)]),
             Color3.fromRGB(200, 150, 255))
 
-        task.wait(0.1)
+        task.wait(0.05)
     end
 end
 
