@@ -1,0 +1,855 @@
+-- ============================================================
+-- PARTE 1: SETUP
+-- Serviços, configurações, detecção de ult, server hop e helpers
+-- ============================================================
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local VirtualInputManager = game:GetService("VirtualInputManager")
+local TeleportService = game:GetService("TeleportService")
+local HttpService = game:GetService("HttpService")
+local LP = Players.LocalPlayer
+
+-- Detecta mobile
+local IS_MOBILE = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
+
+-- ==================== CONFIGURAÇÕES ====================
+local KEY_VALIDA = "AETHER-AFK"
+
+local COR_ROXO_CLARO   = Color3.fromRGB(168, 124, 255)
+local COR_FUNDO_ESCURO = Color3.fromRGB(15, 10, 25)
+local COR_TEXTO        = Color3.fromRGB(240, 235, 255)
+local COR_VERDE        = Color3.fromRGB(80, 255, 120)
+local COR_VERMELHO     = Color3.fromRGB(255, 100, 100)
+local COR_AMARELO      = Color3.fromRGB(255, 220, 100)
+local COR_CINZA        = Color3.fromRGB(180, 170, 200)
+
+-- Teclas do JJS
+local TECLA_ULT = Enum.KeyCode.G
+local TECLA_0_2 = Enum.KeyCode.R
+
+-- Canto do mapa
+local CANTO_MAPA = Vector3.new(5000, 500, 5000)
+
+-- Timings
+local T_POS_02      = 3
+local T_POS_KILL    = 15
+local T_POS_ULT     = 1
+local T_ULT_TIMEOUT = 120
+
+-- ==================== HELPERS DE INPUT ====================
+local function pressKey(keyCode, holdTime)
+    pcall(function()
+        VirtualInputManager:SendKeyEvent(true, keyCode, false, game)
+        task.wait(holdTime or 0.05)
+        VirtualInputManager:SendKeyEvent(false, keyCode, false, game)
+    end)
+end
+
+local function clickMouse()
+    pcall(function()
+        VirtualInputManager:SendMouseButtonEvent(0, 0, 0, true, game, 0)
+        task.wait(0.05)
+        VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 0)
+    end)
+end
+
+-- ==================== DETECÇÃO DE ULT ====================
+local function ultEstaCheia()
+    local pg = LP:FindFirstChild("PlayerGui")
+    if pg then
+        for _, obj in ipairs(pg:GetDescendants()) do
+            local nome = obj.Name:lower()
+            if nome:find("awaken") or nome:find("ultimate") 
+               or nome:find("special") or nome:find("meter") then
+                if obj:IsA("Frame") and obj.Size.X.Scale >= 0.98 then
+                    return true
+                end
+            end
+        end
+    end
+    for _, obj in ipairs(LP:GetDescendants()) do
+        if obj:IsA("NumberValue") or obj:IsA("IntValue") or obj:IsA("FloatValue") then
+            local nome = obj.Name:lower()
+            if nome:find("awaken") or nome:find("ultimate") 
+               or nome:find("special") or nome:find("meter") then
+                if obj.Value >= 100 then return true end
+            end
+        end
+    end
+    return false
+end
+
+-- ==================== SERVER HOP ====================
+local function serverHop()
+    local ok = pcall(function()
+        local url = "https://games.roblox.com/v1/games/" .. game.PlaceId ..
+                    "/servers/Public?sortOrder=Asc&limit=100"
+        local resp = game:HttpGet(url)
+        local data = HttpService:JSONDecode(resp)
+        for _, srv in ipairs(data.data) do
+            if srv.id ~= game.JobId and srv.playing < srv.maxPlayers then
+                TeleportService:TeleportToPlaceInstance(game.PlaceId, srv.id, LP)
+                return
+            end
+        end
+    end)
+    if not ok then
+        pcall(function()
+            TeleportService:Teleport(game.PlaceId, LP)
+        end)
+    end
+end-- ============================================================
+-- PARTE 2: SISTEMA DE KEY + UI PRINCIPAL
+-- ============================================================
+
+local function verificarKey()
+    local keyGui = Instance.new("ScreenGui")
+    keyGui.Name = "AetherKeyGui"
+    keyGui.ResetOnSpawn = false
+    keyGui.IgnoreGuiInset = true
+    keyGui.Parent = LP:WaitForChild("PlayerGui")
+
+    local largura = IS_MOBILE and 300 or 360
+    local altura  = IS_MOBILE and 280 or 260
+
+    -- ===== Mini widget (canto superior esquerdo) =====
+    local miniFrame = Instance.new("Frame")
+    miniFrame.Size = UDim2.new(0, 240, 0, 80)
+    miniFrame.Position = UDim2.new(0, 15, 0, 15)
+    miniFrame.BackgroundColor3 = COR_FUNDO_ESCURO
+    miniFrame.BorderSizePixel = 0
+    miniFrame.Parent = keyGui
+
+    local miniCorner = Instance.new("UICorner")
+    miniCorner.CornerRadius = UDim.new(0, 12)
+    miniCorner.Parent = miniFrame
+
+    local miniStroke = Instance.new("UIStroke")
+    miniStroke.Thickness = 2
+    miniStroke.Color = COR_ROXO_CLARO
+    miniStroke.Parent = miniFrame
+
+    local miniTitulo = Instance.new("TextLabel")
+    miniTitulo.Size = UDim2.new(1, -20, 0, 25)
+    miniTitulo.Position = UDim2.new(0, 10, 0, 5)
+    miniTitulo.BackgroundTransparency = 1
+    miniTitulo.Text = "💤 AETHER AFK"
+    miniTitulo.Font = Enum.Font.GothamBold
+    miniTitulo.TextSize = 14
+    miniTitulo.TextColor3 = COR_TEXTO
+    miniTitulo.TextXAlignment = Enum.TextXAlignment.Left
+    miniTitulo.Parent = miniFrame
+
+    local miniLinha = Instance.new("Frame")
+    miniLinha.Size = UDim2.new(1, -20, 0, 1)
+    miniLinha.Position = UDim2.new(0, 10, 0, 30)
+    miniLinha.BackgroundColor3 = COR_ROXO_CLARO
+    miniLinha.BackgroundTransparency = 0.5
+    miniLinha.BorderSizePixel = 0
+    miniLinha.Parent = miniFrame
+
+    local miniStatus = Instance.new("TextLabel")
+    miniStatus.Size = UDim2.new(1, -20, 0, 20)
+    miniStatus.Position = UDim2.new(0, 10, 0, 35)
+    miniStatus.BackgroundTransparency = 1
+    miniStatus.Text = "• Aguardando Key..."
+    miniStatus.Font = Enum.Font.Gotham
+    miniStatus.TextSize = 12
+    miniStatus.TextColor3 = COR_AMARELO
+    miniStatus.TextXAlignment = Enum.TextXAlignment.Left
+    miniStatus.Parent = miniFrame
+
+    local miniInstrucao = Instance.new("TextLabel")
+    miniInstrucao.Size = UDim2.new(1, -20, 0, 20)
+    miniInstrucao.Position = UDim2.new(0, 10, 0, 55)
+    miniInstrucao.BackgroundTransparency = 1
+    miniInstrucao.Text = "digite AETHER-AFK"
+    miniInstrucao.Font = Enum.Font.Gotham
+    miniInstrucao.TextSize = 11
+    miniInstrucao.TextColor3 = COR_CINZA
+    miniInstrucao.TextXAlignment = Enum.TextXAlignment.Left
+    miniInstrucao.Parent = miniFrame
+
+    -- ===== Janela central =====
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(0, largura, 0, altura)
+    frame.Position = UDim2.new(0.5, -largura/2, 0.5, -altura/2)
+    frame.BackgroundColor3 = COR_FUNDO_ESCURO
+    frame.BorderSizePixel = 0
+    frame.Parent = keyGui
+
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 16)
+    corner.Parent = frame
+
+    local stroke = Instance.new("UIStroke")
+    stroke.Thickness = 2.5
+    stroke.Color = COR_ROXO_CLARO
+    stroke.Parent = frame
+
+    local titulo = Instance.new("TextLabel")
+    titulo.Size = UDim2.new(1, 0, 0, 40)
+    titulo.Position = UDim2.new(0, 0, 0, 15)
+    titulo.BackgroundTransparency = 1
+    titulo.Text = "💤 AETHER AFK"
+    titulo.Font = Enum.Font.GothamBold
+    titulo.TextSize = IS_MOBILE and 22 or 24
+    titulo.TextColor3 = COR_TEXTO
+    titulo.Parent = frame
+
+    local subtitulo = Instance.new("TextLabel")
+    subtitulo.Size = UDim2.new(1, 0, 0, 20)
+    subtitulo.Position = UDim2.new(0, 0, 0, 58)
+    subtitulo.BackgroundTransparency = 1
+    subtitulo.Text = "Digite a key do AFK"
+    subtitulo.Font = Enum.Font.Gotham
+    subtitulo.TextSize = 14
+    subtitulo.TextColor3 = COR_CINZA
+    subtitulo.Parent = frame
+
+    local inputFrame = Instance.new("Frame")
+    inputFrame.Size = UDim2.new(1, -50, 0, IS_MOBILE and 50 or 45)
+    inputFrame.Position = UDim2.new(0, 25, 0, 95)
+    inputFrame.BackgroundColor3 = Color3.fromRGB(30, 22, 45)
+    inputFrame.BorderSizePixel = 0
+    inputFrame.Parent = frame
+
+    local inputCorner = Instance.new("UICorner")
+    inputCorner.CornerRadius = UDim.new(0, 10)
+    inputCorner.Parent = inputFrame
+
+    local inputStroke = Instance.new("UIStroke")
+    inputStroke.Thickness = 1.5
+    inputStroke.Color = COR_ROXO_CLARO
+    inputStroke.Transparency = 0.5
+    inputStroke.Parent = inputFrame
+
+    local input = Instance.new("TextBox")
+    input.Size = UDim2.new(1, -20, 1, -10)
+    input.Position = UDim2.new(0, 10, 0, 5)
+    input.BackgroundTransparency = 1
+    input.Text = ""
+    input.PlaceholderText = "AETHER-AFK"
+    input.Font = Enum.Font.Gotham
+    input.TextSize = IS_MOBILE and 18 or 16
+    input.TextColor3 = COR_TEXTO
+    input.PlaceholderColor3 = Color3.fromRGB(120, 110, 140)
+    input.ClearTextOnFocus = false
+    input.Parent = inputFrame
+
+    local botao = Instance.new("TextButton")
+    botao.Size = UDim2.new(1, -50, 0, IS_MOBILE and 52 or 45)
+    botao.Position = UDim2.new(0, 25, 0, 165)
+    botao.BackgroundColor3 = COR_ROXO_CLARO
+    botao.BorderSizePixel = 0
+    botao.Text = "Verificar"
+    botao.Font = Enum.Font.GothamBold
+    botao.TextSize = IS_MOBILE and 18 or 16
+    botao.TextColor3 = Color3.fromRGB(255, 255, 255)
+    botao.Parent = frame
+
+    local botaoCorner = Instance.new("UICorner")
+    botaoCorner.CornerRadius = UDim.new(0, 10)
+    botaoCorner.Parent = botao
+
+    local botaoStroke = Instance.new("UIStroke")
+    botaoStroke.Thickness = 1.5
+    botaoStroke.Color = Color3.fromRGB(200, 160, 255)
+    botaoStroke.Transparency = 0.3
+    botaoStroke.Parent = botao
+
+    local erro = Instance.new("TextLabel")
+    erro.Size = UDim2.new(1, -40, 0, 20)
+    erro.Position = UDim2.new(0, 20, 0, altura - 30)
+    erro.BackgroundTransparency = 1
+    erro.Text = ""
+    erro.Font = Enum.Font.Gotham
+    erro.TextSize = 12
+    erro.TextColor3 = COR_VERMELHO
+    erro.Parent = frame
+
+    local autenticado = false
+
+    local function tentarVerificar()
+        if input.Text == KEY_VALIDA then
+            autenticado = true
+            erro.Text = "✔ Key correta! Carregando hub..."
+            erro.TextColor3 = COR_VERDE
+            miniStatus.Text = "• Autenticado!"
+            miniStatus.TextColor3 = COR_VERDE
+            miniInstrucao.Text = "carregando..."
+            task.wait(1)
+            keyGui:Destroy()
+        else
+            erro.Text = "✖ Key inválida. Tente novamente."
+            erro.TextColor3 = COR_VERMELHO
+            miniStatus.Text = "• Key incorreta!"
+            miniStatus.TextColor3 = COR_VERMELHO
+            input.Text = ""
+        end
+    end
+
+    botao.MouseButton1Click:Connect(tentarVerificar)
+    botao.TouchTap:Connect(tentarVerificar)
+
+    repeat task.wait(0.1) until autenticado
+    return true
+end
+
+if not verificarKey() then return end
+
+-- ============================================================
+-- UI PRINCIPAL DO HUB
+-- ============================================================
+local gui = Instance.new("ScreenGui")
+gui.Name = "AetherAfkHub"
+gui.ResetOnSpawn = false
+gui.IgnoreGuiInset = true
+gui.DisplayOrder = 999
+gui.Parent = LP:WaitForChild("PlayerGui")
+
+local MAIN_W = IS_MOBILE and 260 or 280
+local MAIN_H = IS_MOBILE and 500 or 480
+
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, MAIN_W, 0, MAIN_H)
+mainFrame.Position = UDim2.new(0, 15, 0, 15)
+mainFrame.BackgroundColor3 = COR_FUNDO_ESCURO
+mainFrame.BorderSizePixel = 0
+mainFrame.Active = true
+mainFrame.Parent = gui
+
+local mainCorner = Instance.new("UICorner")
+mainCorner.CornerRadius = UDim.new(0, 12)
+mainCorner.Parent = mainFrame
+
+local mainStroke = Instance.new("UIStroke")
+mainStroke.Thickness = 2
+mainStroke.Color = COR_ROXO_CLARO
+mainStroke.Parent = mainFrame
+
+local tituloHub = Instance.new("TextLabel")
+tituloHub.Size = UDim2.new(1, -20, 0, 25)
+tituloHub.Position = UDim2.new(0, 10, 0, 5)
+tituloHub.BackgroundTransparency = 1
+tituloHub.Text = "💤 AETHER AFK"
+tituloHub.Font = Enum.Font.GothamBold
+tituloHub.TextSize = IS_MOBILE and 15 or 14
+tituloHub.TextColor3 = COR_TEXTO
+tituloHub.TextXAlignment = Enum.TextXAlignment.Left
+tituloHub.Parent = mainFrame
+
+local linha = Instance.new("Frame")
+linha.Size = UDim2.new(1, -20, 0, 1)
+linha.Position = UDim2.new(0, 10, 0, 30)
+linha.BackgroundColor3 = COR_ROXO_CLARO
+linha.BackgroundTransparency = 0.5
+linha.BorderSizePixel = 0
+linha.Parent = mainFrame
+
+-- ===== Painel de Status =====
+local statusContainer = Instance.new("Frame")
+statusContainer.Size = UDim2.new(1, -20, 0, IS_MOBILE and 150 or 140)
+statusContainer.Position = UDim2.new(0, 10, 0, 40)
+statusContainer.BackgroundTransparency = 1
+statusContainer.Parent = mainFrame
+
+local statusLayout = Instance.new("UIListLayout")
+statusLayout.Padding = UDim.new(0, IS_MOBILE and 4 or 2)
+statusLayout.SortOrder = Enum.SortOrder.LayoutOrder
+statusLayout.Parent = statusContainer
+
+local statusLabels = {}
+
+local function criarStatusLabel(nome, texto)
+    local l = Instance.new("TextLabel")
+    l.Size = UDim2.new(1, 0, 0, IS_MOBILE and 22 or 20)
+    l.BackgroundTransparency = 1
+    l.Text = texto
+    l.Font = Enum.Font.Gotham
+    l.TextSize = IS_MOBILE and 13 or 12
+    l.TextColor3 = COR_AMARELO
+    l.TextXAlignment = Enum.TextXAlignment.Left
+    l.Parent = statusContainer
+    statusLabels[nome] = l
+end
+
+criarStatusLabel("Bypass", "• Bypass: OFF")
+criarStatusLabel("Focus",  "• Focus: OFF")
+criarStatusLabel("Gojo",   "• Gojo: OFF")
+criarStatusLabel("Dummy",  "• Dummy: N/A")
+criarStatusLabel("Ult",    "• Ult: 0%")
+criarStatusLabel("Combo",  "• Combo: OFF")
+
+local function atualizarStatus(nome, valor)
+    if not statusLabels[nome] then return end
+    local l = statusLabels[nome]
+    if nome == "Dummy" then
+        if valor == "vivo" then l.Text = "• Dummy VIVO"; l.TextColor3 = COR_VERDE
+        elseif valor == "morto" then l.Text = "• Dummy MORTO"; l.TextColor3 = COR_VERMELHO
+        else l.Text = "• Dummy N/A"; l.TextColor3 = COR_AMARELO end
+    elseif nome == "Ult" then
+        l.Text = "• Ult: " .. tostring(valor)
+        l.TextColor3 = (valor == "CHEIA") and COR_VERDE or COR_AMARELO
+    else
+        if valor then l.Text = "• " .. nome .. ": ON"; l.TextColor3 = COR_VERDE
+        else l.Text = "• " .. nome .. ": OFF"; l.TextColor3 = COR_VERMELHO end
+    end
+end
+
+-- ===== Container de Botões =====
+local containerBotoes = Instance.new("Frame")
+containerBotoes.Size = UDim2.new(1, -20, 0, IS_MOBILE and 290 or 260)
+containerBotoes.Position = UDim2.new(0, 10, 0, IS_MOBILE and 195 or 190)
+containerBotoes.BackgroundTransparency = 1
+containerBotoes.Parent = mainFrame
+
+local layoutBotoes = Instance.new("UIListLayout")
+layoutBotoes.Padding = UDim.new(0, IS_MOBILE and 8 or 6)
+layoutBotoes.SortOrder = Enum.SortOrder.LayoutOrder
+layoutBotoes.Parent = containerBotoes
+
+local function criarBotao(texto, callback)
+    local b = Instance.new("TextButton")
+    b.Size = UDim2.new(1, 0, 0, IS_MOBILE and 46 or 38)
+    b.BackgroundColor3 = Color3.fromRGB(30, 22, 45)
+    b.BorderSizePixel = 0
+    b.Text = texto
+    b.Font = Enum.Font.GothamBold
+    b.TextSize = IS_MOBILE and 15 or 13
+    b.TextColor3 = COR_TEXTO
+    b.AutoButtonColor = false
+    b.Parent = containerBotoes
+
+    local c = Instance.new("UICorner")
+    c.CornerRadius = UDim.new(0, 8)
+    c.Parent = b
+
+    local s = Instance.new("UIStroke")
+    s.Thickness = 1.5
+    s.Color = COR_ROXO_CLARO
+    s.Transparency = 0.4
+    s.Parent = b
+
+    local function onPress()
+        b.BackgroundColor3 = Color3.fromRGB(50, 40, 70)
+        task.wait(0.1)
+        b.BackgroundColor3 = Color3.fromRGB(30, 22, 45)
+        callback()
+    end
+
+    b.MouseButton1Click:Connect(onPress)
+    b.TouchTap:Connect(onPress)
+    return b
+end-- ============================================================
+-- PARTE 3: FUNÇÕES PRINCIPAIS
+-- Dummy, Bypass, Focus, Gojo Kill All, Combo
+-- ============================================================
+
+-- ==================== DETECÇÃO DE DUMMY ====================
+local dummyAtual = nil
+local dummyAnterior = nil
+
+local function encontrarDummy()
+    for _, obj in ipairs(workspace:GetDescendants()) do
+        if obj:IsA("Model") then
+            local n = obj.Name:lower()
+            if n:find("dummy") or n:find("boneco") or n:find("alvo") 
+               or n:find("target") or n:find("low hp") 
+               or n:find("immortal") or n:find("attacking") then
+                local hum = obj:FindFirstChildOfClass("Humanoid")
+                local hrp = obj:FindFirstChild("HumanoidRootPart")
+                if hum and hrp then return obj, hum end
+            end
+        end
+    end
+    return nil, nil
+end
+
+local function monitorarDummy()
+    task.spawn(function()
+        while true do
+            local d, hum = encontrarDummy()
+            dummyAtual = d
+            if d and hum then
+                local vivo = hum.Health > 0
+                if vivo ~= dummyAnterior then
+                    dummyAnterior = vivo
+                    atualizarStatus("Dummy", vivo and "vivo" or "morto")
+                end
+            else
+                if dummyAnterior ~= "sem" then
+                    dummyAnterior = "sem"
+                    atualizarStatus("Dummy", "n/a")
+                end
+            end
+            task.wait(0.5)
+        end
+    end)
+end
+monitorarDummy()
+
+-- ==================== BYPASS ====================
+local bypassAtivo = false
+local bypassThread = nil
+
+local function AtualizarChar()
+    local char = LP.Character or LP.CharacterAdded:Wait()
+    return char, char:WaitForChild("HumanoidRootPart", 5), char:WaitForChild("Humanoid", 5)
+end
+
+local function ExecutarBypass()
+    local char, root = AtualizarChar()
+    if not root then return false end
+    local ok = false
+    pcall(function()
+        local js = Players:GetPlayers()
+        for i = #js, 1, -1 do
+            if js[i] == LP then table.remove(js, i) end
+        end
+        if #js > 0 then
+            local alvo = js[math.random(1, #js)]
+            if alvo and alvo.Character and alvo.Character:FindFirstChild("HumanoidRootPart") then
+                local pos = alvo.Character.HumanoidRootPart.Position + Vector3.new(0, 3, 0)
+                root.CFrame = CFrame.new(pos)
+                task.wait(0.5)
+                if root and root.Parent and (root.Position - pos).Magnitude < 25 then
+                    ok = true
+                end
+            end
+        end
+    end)
+    return ok
+end
+
+local function rotaDoVoid()
+    local char, root, hum = AtualizarChar()
+    if not root or not hum then return end
+    pcall(function()
+        hum.PlatformStand = true
+        local bv = Instance.new("BodyVelocity")
+        bv.MaxForce = Vector3.new(9999999, 9999999, 9999999)
+        bv.Velocity = Vector3.new(0, 100, 0)
+        bv.Parent = root
+        task.wait(1.5)
+        bv.Velocity = Vector3.new(-700, 0, 0)
+        task.wait(2)
+        bv.Velocity = Vector3.zero
+        hum.PlatformStand = false
+        bv:Destroy()
+    end)
+end
+
+local function iniciarBypass()
+    if bypassAtivo then return end
+    bypassAtivo = true
+    atualizarStatus("Bypass", true)
+    bypassThread = task.spawn(function()
+        local t = 0
+        while bypassAtivo do
+            t += 1
+            print("💀 Bypass tentativa #" .. t)
+            local ok = ExecutarBypass()
+            if ok then
+                print("✅ Bypass FUNCIONOU #" .. t)
+                break
+            else
+                print("❌ Falhou #" .. t)
+                rotaDoVoid()
+                task.wait(3)
+            end
+        end
+        if bypassAtivo then
+            bypassAtivo = false
+            atualizarStatus("Bypass", false)
+        end
+    end)
+end
+
+local function pararBypass()
+    if not bypassAtivo then return end
+    bypassAtivo = false
+    atualizarStatus("Bypass", false)
+    if bypassThread then task.cancel(bypassThread); bypassThread = nil end
+end
+
+-- ==================== FOCUS ====================
+local focusAtivo = false
+local focusThread = nil
+local focusModo = "player"
+
+local function iniciarFocus(modo)
+    if focusAtivo then return end
+    focusAtivo = true
+    focusModo = modo or "player"
+    atualizarStatus("Focus", true)
+
+    focusThread = task.spawn(function()
+        while focusAtivo do
+            local char = LP.Character
+            if char then
+                local hrp = char:FindFirstChild("HumanoidRootPart")
+                if hrp then
+                    local alvo = nil
+                    if focusModo == "dummy" and dummyAtual then
+                        local dummyHrp = dummyAtual:FindFirstChild("HumanoidRootPart")
+                        if dummyHrp then alvo = dummyHrp end
+                    end
+                    if not alvo then
+                        local distMin = math.huge
+                        for _, j in ipairs(Players:GetPlayers()) do
+                            if j ~= LP and j.Character then
+                                local h = j.Character:FindFirstChild("HumanoidRootPart")
+                                local hu = j.Character:FindFirstChildOfClass("Humanoid")
+                                if h and hu and hu.Health > 0 then
+                                    local d = (hrp.Position - h.Position).Magnitude
+                                    if d < distMin then distMin = d; alvo = h end
+                                end
+                            end
+                        end
+                    end
+                    if alvo then
+                        local ang = tick() * 10
+                        local raio = 3
+                        local offset = Vector3.new(math.cos(ang) * raio, 3, math.sin(ang) * raio)
+                        pcall(function()
+                            hrp.CFrame = CFrame.new(alvo.Position + offset, alvo.Position)
+                        end)
+                    end
+                end
+            end
+            task.wait(0.05)
+        end
+    end)
+end
+
+local function pararFocus()
+    if not focusAtivo then return end
+    focusAtivo = false
+    atualizarStatus("Focus", false)
+    if focusThread then task.cancel(focusThread); focusThread = nil end
+end
+
+-- ==================== GOJO KILL ALL ====================
+local gojoAtivo = false
+local gojoThread = nil
+
+local function iniciarGojo()
+    if gojoAtivo then return end
+    gojoAtivo = true
+    atualizarStatus("Gojo", true)
+
+    gojoThread = task.spawn(function()
+        while gojoAtivo do
+            local char = LP.Character
+            if not char then LP.CharacterAdded:Wait(); char = LP.Character end
+            local hrp = char and char:FindFirstChild("HumanoidRootPart")
+            if not hrp then task.wait(0.5); continue end
+
+            local alvos = {}
+            for _, j in ipairs(Players:GetPlayers()) do
+                if j ~= LP and j.Character then
+                    local h = j.Character:FindFirstChild("HumanoidRootPart")
+                    local hu = j.Character:FindFirstChildOfClass("Humanoid")
+                    if h and hu and hu.Health > 0 then table.insert(alvos, h) end
+                end
+            end
+
+            if #alvos > 0 then
+                for _, h in ipairs(alvos) do
+                    if not gojoAtivo then break end
+                    pcall(function()
+                        hrp.CFrame = CFrame.new(h.Position + Vector3.new(0, 3, 0))
+                    end)
+                    task.wait(0.05)
+                end
+            else
+                task.wait(0.2)
+            end
+        end
+    end)
+end
+
+local function pararGojo()
+    if not gojoAtivo then return end
+    gojoAtivo = false
+    atualizarStatus("Gojo", false)
+    if gojoThread then task.cancel(gojoThread); gojoThread = nil end
+end
+
+-- ==================== COMBO AUTOMATIZADO ====================
+local comboAtivo = false
+local comboThread = nil
+
+local function irParaCanto()
+    local char = LP.Character
+    if char then
+        local hrp = char:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            pcall(function()
+                hrp.CFrame = CFrame.new(CANTO_MAPA)
+            end)
+        end
+    end
+end
+
+local function baterNoDummy()
+    clickMouse()
+    task.wait(0.1)
+end
+
+local function executarCombo()
+    print("🎬 Iniciando combo (JJS)...")
+
+    -- 1. Focus no dummy
+    if not focusAtivo then
+        iniciarFocus("dummy")
+    end
+
+    -- 2. Farmar ult batendo no dummy
+    local tempoInicio = tick()
+    while comboAtivo and not ultEstaCheia() do
+        if (tick() - tempoInicio) > T_ULT_TIMEOUT then
+            print("⚠️ Timeout aguardando ult, continuando...")
+            break
+        end
+        baterNoDummy()
+        task.wait(0.1)
+    end
+
+    if not comboAtivo then return end
+    atualizarStatus("Ult", "CHEIA")
+    print("✨ Ult cheia!")
+
+    -- 3. Para Focus
+    pararFocus()
+
+    -- 4. Vai pro canto do mapa
+    irParaCanto()
+    task.wait(0.5)
+
+    -- 5. Ativa ult (G)
+    pressKey(TECLA_ULT, 0.1)
+    task.wait(T_POS_ULT)
+
+    -- 6. Gojo 0.2 (G + R)
+    print("🌀 Ativando Gojo 0.2 (G + R)...")
+    pressKey(TECLA_ULT, 0.1)
+    task.wait(0.2)
+    pressKey(TECLA_0_2, 0.1)
+
+    -- 7. Espera 3 segundos
+    task.wait(T_POS_02)
+
+    -- 8. Ativa Gojo Kill All
+    print("💥 Ativando Gojo Kill All...")
+    if not gojoAtivo then iniciarGojo() end
+
+    -- 9. Espera 15 segundos
+    task.wait(T_POS_KILL)
+
+    -- 10. Server hop
+    if comboAtivo then
+        print("🚪 Server hop...")
+        serverHop()
+    end
+end
+
+local function iniciarCombo()
+    if comboAtivo then return end
+    comboAtivo = true
+    atualizarStatus("Combo", true)
+    atualizarStatus("Ult", "0%")
+    if not bypassAtivo then iniciarBypass() end
+    comboThread = task.spawn(executarCombo)
+end
+
+local function pararCombo()
+    if not comboAtivo then return end
+    comboAtivo = false
+    atualizarStatus("Combo", false)
+    if comboThread then task.cancel(comboThread); comboThread = nil end
+    pararFocus()
+    pararGojo()
+end
+
+-- Monitor de ult
+task.spawn(function()
+    while true do
+        if comboAtivo and not ultEstaCheia() then
+            atualizarStatus("Ult", "...")
+        end
+        task.wait(0.5)
+    end
+end)-- ============================================================
+-- PARTE 4: BOTÕES, DRAG E INICIALIZAÇÃO AFK
+-- ============================================================
+
+-- ==================== BOTÕES ====================
+criarBotao("1. Bypass", function()
+    if bypassAtivo then pararBypass() else iniciarBypass() end
+end)
+
+criarBotao("2. Focus", function()
+    if focusAtivo then pararFocus() else iniciarFocus("player") end
+end)
+
+criarBotao("3. Gojo 0.2", function()
+    if gojoAtivo then pararGojo() else iniciarGojo() end
+end)
+
+criarBotao("4. Combo AFK", function()
+    if comboAtivo then pararCombo() else iniciarCombo() end
+end)
+
+criarBotao("Fechar Hub", function()
+    pararCombo(); pararGojo(); pararBypass(); pararFocus()
+    gui:Destroy()
+end)
+
+-- ==================== DRAG (Mobile + PC) ====================
+local dg, di, ds, sp
+mainFrame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 
+       or input.UserInputType == Enum.UserInputType.Touch then
+        dg = true; ds = input.Position; sp = mainFrame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then dg = false end
+        end)
+    end
+end)
+
+mainFrame.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement 
+       or input.UserInputType == Enum.UserInputType.Touch then
+        di = input
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if input == di and dg then
+        local delta = input.Position - ds
+        mainFrame.Position = UDim2.new(
+            sp.X.Scale, sp.X.Offset + delta.X,
+            sp.Y.Scale, sp.Y.Offset + delta.Y
+        )
+    end
+end)
+
+-- ==================== STATUS INICIAIS ====================
+atualizarStatus("Bypass", false)
+atualizarStatus("Focus", false)
+atualizarStatus("Gojo", false)
+atualizarStatus("Dummy", "n/a")
+atualizarStatus("Ult", "0%")
+atualizarStatus("Combo", false)
+
+-- ==================== MODO AFK ====================
+print("🤖 MODO AFK ATIVADO (JJS) - Iniciando combo...")
+task.wait(1.5)
+iniciarCombo()
+
+print("✅ Aether AFK Hub (JJS) carregado!")
+print("🔑 Key: AETHER-AFK")
