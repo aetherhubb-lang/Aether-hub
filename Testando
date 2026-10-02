@@ -1,0 +1,304 @@
+-- Aether Hub Script
+-- Key: AETHER-X
+
+local CoreGui = game:GetService("CoreGui")
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+
+-- Tentar usar gethui() para evitar detecção (padrão em executores)
+local parentGui = gethui and gethui() or CoreGui
+
+-- Criar ScreenGui principal
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "AetherHub"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ScreenGui.Parent = parentGui
+
+-- ==========================================
+-- SISTEMA DE KEY
+-- ==========================================
+local KeyFrame = Instance.new("Frame")
+KeyFrame.Size = UDim2.new(0, 300, 0, 160)
+KeyFrame.Position = UDim2.new(0.5, -150, 0.5, -80)
+KeyFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
+KeyFrame.Parent = ScreenGui
+KeyFrame.Active = true
+KeyFrame.Draggable = true
+
+local KCorner = Instance.new("UICorner", KeyFrame)
+KCorner.CornerRadius = UDim.new(0, 10)
+
+local KStroke = Instance.new("UIStroke", KeyFrame)
+KStroke.Color = Color3.fromRGB(180, 100, 255) -- Roxo claro
+KStroke.Thickness = 2
+
+local KTitle = Instance.new("TextLabel")
+KTitle.Size = UDim2.new(1, 0, 0, 40)
+KTitle.BackgroundTransparency = 1
+KTitle.Text = "Aether Hub - Key System"
+KTitle.TextColor3 = Color3.fromRGB(180, 100, 255)
+KTitle.Font = Enum.Font.GothamBold
+KTitle.TextSize = 16
+KTitle.Parent = KeyFrame
+
+local KBox = Instance.new("TextBox")
+KBox.Size = UDim2.new(0.8, 0, 0, 35)
+KBox.Position = UDim2.new(0.1, 0, 0.3, 0)
+KBox.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+KBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+KBox.PlaceholderText = "Digite a Key..."
+KBox.Text = ""
+KBox.Font = Enum.Font.Gotham
+KBox.TextSize = 14
+KBox.Parent = KeyFrame
+
+local KBoxCorner = Instance.new("UICorner", KBox)
+KBoxCorner.CornerRadius = UDim.new(0, 6)
+local KBoxStroke = Instance.new("UIStroke", KBox)
+KBoxStroke.Color = Color3.fromRGB(180, 100, 255)
+
+local KBtn = Instance.new("TextButton")
+KBtn.Size = UDim2.new(0.8, 0, 0, 35)
+KBtn.Position = UDim2.new(0.1, 0, 0.65, 0)
+KBtn.BackgroundColor3 = Color3.fromRGB(180, 100, 255)
+KBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+KBtn.Text = "Verificar"
+KBtn.Font = Enum.Font.GothamBold
+KBtn.TextSize = 14
+KBtn.Parent = KeyFrame
+
+local KBtnCorner = Instance.new("UICorner", KBtn)
+KBtnCorner.CornerRadius = UDim.new(0, 6)
+
+-- ==========================================
+-- HUB PRINCIPAL (Invisível até acertar a Key)
+-- ==========================================
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 450, 0, 300)
+MainFrame.Position = UDim2.new(0.5, -225, 0.5, -150)
+MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
+MainFrame.Visible = false
+MainFrame.Parent = ScreenGui
+
+local MFCorner = Instance.new("UICorner", MainFrame)
+MFCorner.CornerRadius = UDim.new(0, 12)
+
+local MFStroke = Instance.new("UIStroke", MainFrame)
+MFStroke.Color = Color3.fromRGB(180, 100, 255) -- Borda neon roxa clara
+MFStroke.Thickness = 2
+
+-- Título
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(0.5, 0, 0, 40)
+Title.Position = UDim2.new(0, 15, 0, 0)
+Title.BackgroundTransparency = 1
+Title.Text = "Aether Hub"
+Title.TextColor3 = Color3.fromRGB(180, 100, 255)
+Title.Font = Enum.Font.GothamBlack
+Title.TextSize = 20
+Title.TextXAlignment = Enum.TextXAlignment.Left
+Title.Parent = MainFrame
+
+-- Botão Minimizar (-) no canto esquerdo
+local MinBtn = Instance.new("TextButton")
+MinBtn.Size = UDim2.new(0, 30, 0, 30)
+MinBtn.Position = UDim2.new(1, -80, 0, 5) 
+MinBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+MinBtn.Text = "-"
+MinBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+MinBtn.Font = Enum.Font.GothamBold
+MinBtn.TextSize = 20
+MinBtn.Parent = MainFrame
+
+local MinBtnCorner = Instance.new("UICorner", MinBtn)
+MinBtnCorner.CornerRadius = UDim.new(0, 6)
+
+-- Botão de Cadeado (Lock) no canto direito
+local LockBtn = Instance.new("TextButton")
+LockBtn.Size = UDim2.new(0, 30, 0, 30)
+LockBtn.Position = UDim2.new(1, -40, 0, 5) 
+LockBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+LockBtn.Text = "🔓" -- Destrancado por padrão (Com drag)
+LockBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+LockBtn.Font = Enum.Font.GothamBold
+LockBtn.TextSize = 16
+LockBtn.Parent = MainFrame
+
+local LockBtnCorner = Instance.new("UICorner", LockBtn)
+LockBtnCorner.CornerRadius = UDim.new(0, 6)
+
+-- Botão Flutuante (+) para quando minimizado
+local OpenBtn = Instance.new("TextButton")
+OpenBtn.Size = UDim2.new(0, 40, 0, 40)
+OpenBtn.Position = UDim2.new(0, 20, 0.5, -20) 
+OpenBtn.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
+OpenBtn.Text = "+"
+OpenBtn.TextColor3 = Color3.fromRGB(180, 100, 255)
+OpenBtn.Font = Enum.Font.GothamBold
+OpenBtn.TextSize = 24
+OpenBtn.Visible = false
+OpenBtn.Parent = ScreenGui
+
+local OpenBtnCorner = Instance.new("UICorner", OpenBtn)
+OpenBtnCorner.CornerRadius = UDim.new(0, 8)
+local OpenBtnStroke = Instance.new("UIStroke", OpenBtn)
+OpenBtnStroke.Color = Color3.fromRGB(180, 100, 255)
+
+-- ==========================================
+-- LÓGICA DE DRAG (Arrastar)
+-- ==========================================
+local dragging = false
+local dragInput, mousePos, framePos
+local canDrag = true -- Começa com drag ativado
+
+local function update(input)
+    local delta = input.Position - mousePos
+    MainFrame.Position = UDim2.new(framePos.X.Scale, framePos.X.Offset + delta.X, framePos.Y.Scale, framePos.Y.Offset + delta.Y)
+end
+
+Title.InputBegan:Connect(function(input)
+    if canDrag and (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
+        dragging = true
+        mousePos = input.Position
+        framePos = MainFrame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+Title.InputChanged:Connect(function(input)
+    if canDrag and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        if dragging then update(input) end
+    end
+end)
+
+-- Lógica do Cadeado
+local isLocked = false
+LockBtn.MouseButton1Click:Connect(function()
+    isLocked = not isLocked
+    if isLocked then
+        canDrag = false
+        LockBtn.Text = "🔒"
+        LockBtn.TextColor3 = Color3.fromRGB(255, 50, 50) -- Vermelho quando trancado
+    else
+        canDrag = true
+        LockBtn.Text = "🔓"
+        LockBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    end
+end)
+
+-- Lógica de Minimizar
+MinBtn.MouseButton1Click:Connect(function()
+    MainFrame.Visible = false
+    OpenBtn.Visible = true
+end)
+
+OpenBtn.MouseButton1Click:Connect(function()
+    MainFrame.Visible = true
+    OpenBtn.Visible = false
+end)
+
+-- ==========================================
+-- CONTEÚDO DO HUB (Botões estilo 2ª imagem)
+-- ==========================================
+local ContentFrame = Instance.new("Frame")
+ContentFrame.Size = UDim2.new(1, -30, 1, -60)
+ContentFrame.Position = UDim2.new(0, 15, 0, 50)
+ContentFrame.BackgroundTransparency = 1
+ContentFrame.Parent = MainFrame
+
+local UIList = Instance.new("UIListLayout", ContentFrame)
+UIList.SortOrder = Enum.SortOrder.LayoutOrder
+UIList.Padding = UDim.new(0, 10)
+
+-- Função para criar os Toggles estilo Imagem 2
+local function CreateToggle(text)
+    local ToggleFrame = Instance.new("Frame")
+    ToggleFrame.Size = UDim2.new(1, 0, 0, 40)
+    ToggleFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+    ToggleFrame.Parent = ContentFrame
+    
+    local TFCorner = Instance.new("UICorner", ToggleFrame)
+    TFCorner.CornerRadius = UDim.new(0, 8)
+
+    -- Borda vermelha como na Imagem 2
+    local TFStroke = Instance.new("UIStroke", ToggleFrame)
+    TFStroke.Color = Color3.fromRGB(200, 50, 50) 
+    TFStroke.Thickness = 1.5
+
+    local TLabel = Instance.new("TextLabel")
+    TLabel.Size = UDim2.new(0.7, 0, 1, 0)
+    TLabel.Position = UDim2.new(0, 10, 0, 0)
+    TLabel.BackgroundTransparency = 1
+    TLabel.Text = text
+    TLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    TLabel.Font = Enum.Font.Gotham
+    TLabel.TextSize = 14
+    TLabel.TextXAlignment = Enum.TextXAlignment.Left
+    TLabel.Parent = ToggleFrame
+
+    local ToggleBtn = Instance.new("TextButton")
+    ToggleBtn.Size = UDim2.new(0, 40, 0, 20)
+    ToggleBtn.Position = UDim2.new(1, -50, 0.5, -10)
+    ToggleBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 60)
+    ToggleBtn.Text = ""
+    ToggleBtn.Parent = ToggleFrame
+    
+    local TBCorner = Instance.new("UICorner", ToggleBtn)
+    TBCorner.CornerRadius = UDim.new(1, 0) -- Formato de pílula
+
+    local Circle = Instance.new("Frame")
+    Circle.Size = UDim2.new(0, 16, 0, 16)
+    Circle.Position = UDim2.new(0, 2, 0.5, -8)
+    Circle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    Circle.Parent = ToggleBtn
+    
+    local CC = Instance.new("UICorner", Circle)
+    CC.CornerRadius = UDim.new(1, 0)
+
+    local toggled = false
+    ToggleBtn.MouseButton1Click:Connect(function()
+        toggled = not toggled
+        if toggled then
+            ToggleBtn.BackgroundColor3 = Color3.fromRGB(180, 100, 255) -- Roxo quando ligado
+            Circle.Position = UDim2.new(1, -18, 0.5, -8)
+            -- ADICIONE A FUNÇÃO DO HACK AQUI SE QUISER
+        else
+            ToggleBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 60)
+            Circle.Position = UDim2.new(0, 2, 0.5, -8)
+            -- DESLIGAR HACK AQUI
+        end
+    end)
+end
+
+-- Criando os botões de exemplo (Você pode mudar os nomes)
+CreateToggle("Aimbot Silencioso")
+CreateToggle("ESP Jogadores")
+CreateToggle("Speed Hack")
+CreateToggle("Infinite Jump")
+
+-- ==========================================
+-- VERIFICAÇÃO DA KEY
+-- ==========================================
+local function CheckKey()
+    if KBox.Text == "AETHER-X" then
+        KeyFrame:Destroy()
+        MainFrame.Visible = true
+    else
+        KBox.Text = ""
+        KBox.PlaceholderText = "Key Incorreta!"
+        KBox.PlaceholderColor3 = Color3.fromRGB(255, 50, 50)
+    end
+end
+
+KBtn.MouseButton1Click:Connect(CheckKey)
+
+KBox.FocusLost:Connect(function(enterPressed)
+    if enterPressed then
+        CheckKey()
+    end
+end)
