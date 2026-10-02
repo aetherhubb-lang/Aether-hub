@@ -1,0 +1,281 @@
+-- ==========================================
+-- SISTEMA DE KEY DO AETHER HUB
+-- ==========================================
+
+local KeyGui = Instance.new("ScreenGui")
+local KeyFrame = Instance.new("Frame")
+local KeyTitle = Instance.new("TextLabel")
+local KeyInput = Instance.new("TextBox")
+local KeySubmit = Instance.new("TextButton")
+local ErrorLabel = Instance.new("TextLabel")
+
+-- Configuração da Tela de Key
+KeyGui.Parent = game.CoreGui
+KeyGui.Name = "AetherKeySystem"
+
+KeyFrame.Parent = KeyGui
+KeyFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+KeyFrame.Position = UDim2.new(0.5, -200, 0.5, -100)
+KeyFrame.Size = UDim2.new(0, 400, 0, 200)
+KeyFrame.BorderSizePixel = 0
+KeyFrame.Active = true
+KeyFrame.Draggable = true
+
+local KeyCorner = Instance.new("UICorner", KeyFrame)
+KeyCorner.CornerRadius = UDim.new(0, 10)
+
+local KeyStroke = Instance.new("UIStroke", KeyFrame)
+KeyStroke.Color = Color3.fromRGB(150, 0, 255) -- Roxo
+KeyStroke.Thickness = 2
+
+KeyTitle.Parent = KeyFrame
+KeyTitle.BackgroundTransparency = 1
+KeyTitle.Position = UDim2.new(0, 0, 0, 20)
+KeyTitle.Size = UDim2.new(1, 0, 0, 30)
+KeyTitle.Font = Enum.Font.GothamBold
+KeyTitle.Text = "Aether Hub - Autenticação"
+KeyTitle.TextColor3 = Color3.fromRGB(150, 0, 255)
+KeyTitle.TextSize = 20
+
+KeyInput.Parent = KeyFrame
+KeyInput.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+KeyInput.Position = UDim2.new(0, 50, 0, 70)
+KeyInput.Size = UDim2.new(1, -100, 0, 40)
+KeyInput.Font = Enum.Font.Gotham
+KeyInput.PlaceholderText = "Digite a Key aqui..."
+KeyInput.Text = ""
+KeyInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+KeyInput.TextSize = 14
+KeyInput.BorderSizePixel = 0
+local InputCorner = Instance.new("UICorner", KeyInput)
+InputCorner.CornerRadius = UDim.new(0, 6)
+
+KeySubmit.Parent = KeyFrame
+KeySubmit.BackgroundColor3 = Color3.fromRGB(150, 0, 255) -- Roxo
+KeySubmit.Position = UDim2.new(0, 50, 0, 125)
+KeySubmit.Size = UDim2.new(1, -100, 0, 35)
+KeySubmit.Font = Enum.Font.GothamBold
+KeySubmit.Text = "Verificar Key"
+KeySubmit.TextColor3 = Color3.fromRGB(255, 255, 255)
+KeySubmit.TextSize = 14
+KeySubmit.BorderSizePixel = 0
+local BtnCorner = Instance.new("UICorner", KeySubmit)
+BtnCorner.CornerRadius = UDim.new(0, 6)
+
+ErrorLabel.Parent = KeyFrame
+ErrorLabel.BackgroundTransparency = 1
+ErrorLabel.Position = UDim2.new(0, 0, 1, -25)
+ErrorLabel.Size = UDim2.new(1, 0, 0, 20)
+ErrorLabel.Font = Enum.Font.Gotham
+ErrorLabel.Text = ""
+ErrorLabel.TextColor3 = Color3.fromRGB(255, 50, 50)
+ErrorLabel.TextSize = 12
+ErrorLabel.Visible = false
+
+-- ==========================================
+-- FUNÇÃO DA UI PRINCIPAL (AETHER HUB)
+-- ==========================================
+local function LoadAetherHub()
+    -- Aether Hub - Versão Roxa
+    local ScreenGui = Instance.new("ScreenGui")
+    local MainFrame = Instance.new("Frame")
+    local Title = Instance.new("TextLabel")
+    local CloseBtn = Instance.new("TextButton")
+    local Sidebar = Instance.new("Frame")
+    local BtnPrincipal = Instance.new("TextButton")
+    local BtnACBypass = Instance.new("TextButton")
+    local BtnExtras = Instance.new("TextButton")
+    local BtnTeleporte = Instance.new("TextButton")
+    local BtnBasico = Instance.new("TextButton")
+    local BtnCreditos = Instance.new("TextButton")
+    local ContentArea = Instance.new("Frame")
+
+    -- Propriedades da UI
+    ScreenGui.Parent = game.CoreGui
+    ScreenGui.Name = "AetherHub"
+
+    MainFrame.Parent = ScreenGui
+    MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    MainFrame.Position = UDim2.new(0.5, -300, 0.5, -200)
+    MainFrame.Size = UDim2.new(0, 600, 0, 400)
+    MainFrame.BorderSizePixel = 0
+    MainFrame.Active = true
+    MainFrame.Draggable = true
+    
+    local UICorner = Instance.new("UICorner", MainFrame)
+    UICorner.CornerRadius = UDim.new(0, 10)
+    local UIStroke = Instance.new("UIStroke", MainFrame)
+    UIStroke.Color = Color3.fromRGB(150, 0, 255)
+    UIStroke.Thickness = 2
+
+    -- Título
+    Title.Parent = MainFrame
+    Title.BackgroundTransparency = 1
+    Title.Position = UDim2.new(0, 20, 0, 10)
+    Title.Size = UDim2.new(0, 200, 0, 30)
+    Title.Font = Enum.Font.GothamBold
+    Title.Text = "Aether Hub"
+    Title.TextColor3 = Color3.fromRGB(150, 0, 255)
+    Title.TextSize = 24
+    Title.TextXAlignment = Enum.TextXAlignment.Left
+
+    -- Botão Fechar (X)
+    CloseBtn.Parent = MainFrame
+    CloseBtn.BackgroundTransparency = 1
+    CloseBtn.Position = UDim2.new(1, -40, 0, 10)
+    CloseBtn.Size = UDim2.new(0, 30, 0, 30)
+    CloseBtn.Font = Enum.Font.GothamBold
+    CloseBtn.Text = "X"
+    CloseBtn.TextColor3 = Color3.fromRGB(255, 50, 50)
+    CloseBtn.TextSize = 18
+    CloseBtn.MouseButton1Click:Connect(function()
+        ScreenGui:Destroy()
+    end)
+
+    -- Barra Lateral (Sidebar)
+    Sidebar.Parent = MainFrame
+    Sidebar.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    Sidebar.Position = UDim2.new(0, 10, 0, 50)
+    Sidebar.Size = UDim2.new(0, 150, 1, -60)
+    Sidebar.BorderSizePixel = 0
+    local SidebarCorner = Instance.new("UICorner", Sidebar)
+    SidebarCorner.CornerRadius = UDim.new(0, 8)
+
+    -- Função para criar os botões da sidebar
+    local function createSideButton(name, text, yPos)
+        local btn = Instance.new("TextButton")
+        btn.Name = name
+        btn.Parent = Sidebar
+        btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+        btn.Position = UDim2.new(0, 10, 0, yPos)
+        btn.Size = UDim2.new(1, -20, 0, 35)
+        btn.Font = Enum.Font.Gotham
+        btn.Text = text
+        btn.TextColor3 = Color3.fromRGB(200, 200, 200)
+        btn.TextSize = 14
+        btn.BorderSizePixel = 0
+        local corner = Instance.new("UICorner", btn)
+        corner.CornerRadius = UDim.new(0, 6)
+        return btn
+    end
+
+    BtnPrincipal = createSideButton("BtnPrincipal", "Principal", 10)
+    BtnACBypass = createSideButton("BtnACBypass", "AC Bypass", 55)
+    BtnExtras = createSideButton("BtnExtras", "Extras", 100)
+    BtnTeleporte = createSideButton("BtnTeleporte", "Teleporte", 145)
+    BtnBasico = createSideButton("BtnBasico", "Básico", 190)
+    BtnCreditos = createSideButton("BtnCreditos", "Créditos", 235)
+
+    -- Área de Conteúdo
+    ContentArea.Parent = MainFrame
+    ContentArea.BackgroundTransparency = 1
+    ContentArea.Position = UDim2.new(0, 170, 0, 50)
+    ContentArea.Size = UDim2.new(1, -180, 1, -60)
+
+    -- Função para criar os Toggles
+    local function createToggle(name, text, yPos)
+        local container = Instance.new("Frame")
+        container.Name = name .. "Container"
+        container.Parent = ContentArea
+        container.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+        container.Position = UDim2.new(0, 0, 0, yPos)
+        container.Size = UDim2.new(1, 0, 0, 45)
+        container.BorderSizePixel = 0
+        local corner = Instance.new("UICorner", container)
+        corner.CornerRadius = UDim.new(0, 8)
+        
+        local label = Instance.new("TextLabel")
+        label.Parent = container
+        label.BackgroundTransparency = 1
+        label.Position = UDim2.new(0, 15, 0, 0)
+        label.Size = UDim2.new(0.6, 0, 1, 0)
+        label.Font = Enum.Font.Gotham
+        label.Text = text
+        label.TextColor3 = Color3.fromRGB(255, 255, 255)
+        label.TextSize = 14
+        label.TextXAlignment = Enum.TextXAlignment.Left
+        
+        local toggleBtn = Instance.new("TextButton")
+        toggleBtn.Parent = container
+        toggleBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+        toggleBtn.Position = UDim2.new(1, -60, 0.5, -12)
+        toggleBtn.Size = UDim2.new(0, 45, 0, 24)
+        toggleBtn.Text = ""
+        toggleBtn.BorderSizePixel = 0
+        local btnCorner = Instance.new("UICorner", toggleBtn)
+        btnCorner.CornerRadius = UDim.new(1, 0)
+        
+        local indicator = Instance.new("Frame")
+        indicator.Parent = toggleBtn
+        indicator.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+        indicator.Position = UDim2.new(0, 2, 0.5, -10)
+        indicator.Size = UDim2.new(0, 20, 0, 20)
+        indicator.BorderSizePixel = 0
+        local indCorner = Instance.new("UICorner", indicator)
+        indCorner.CornerRadius = UDim.new(1, 0)
+        
+        local isToggled = false
+        
+        toggleBtn.MouseButton1Click:Connect(function()
+            isToggled = not isToggled
+            if isToggled then
+                toggleBtn.BackgroundColor3 = Color3.fromRGB(150, 0, 255)
+                indicator.Position = UDim2.new(1, -22, 0.5, -10)
+                
+                -- ==========================================
+                -- COLE A FUNÇÃO DO AETHER HUB AQUI (QUANDO LIGAR)
+                -- Exemplo: loadstring(game:HttpGet("SUA_URL_AQUI"))()
+                -- ==========================================
+                print(text .. " Ativado")
+                
+            else
+                toggleBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+                indicator.Position = UDim2.new(0, 2, 0.5, -10)
+                
+                -- ==========================================
+                -- COLE A FUNÇÃO DE DESLIGAR AQUI (SE HOUVER)
+                -- ==========================================
+                print(text .. " Desativado")
+            end
+        end)
+        
+        return toggleBtn
+    end
+
+    -- Criando os botões da aba Principal (conforme a imagem)
+    createToggle("GojoKillAll", "Gojo Kill All", 10)
+    createToggle("MahitoUlt", "Mahito Ult Inf", 65)
+    createToggle("HakariUlt", "Hakari 60% ult", 120)
+
+    -- Lógica dos botões da Sidebar (Mudar de aba - Apenas visual por enquanto)
+    BtnPrincipal.MouseButton1Click:Connect(function()
+        print("Aba Principal clicada")
+    end)
+
+    BtnACBypass.MouseButton1Click:Connect(function()
+        print("Aba AC Bypass clicada")
+    end)
+end
+
+-- ==========================================
+-- LÓGICA DE VERIFICAÇÃO DA KEY
+-- ==========================================
+KeySubmit.MouseButton1Click:Connect(function()
+    if KeyInput.Text == "AETHER-X" then
+        -- Key correta
+        KeyGui:Destroy() -- Destroi a tela de key
+        LoadAetherHub()  -- Carrega a UI principal
+    else
+        -- Key incorreta
+        ErrorLabel.Text = "Key incorreta. Tente novamente."
+        ErrorLabel.Visible = true
+        KeyInput.Text = "" -- Limpa o campo
+    end
+end)
+
+-- Permite apertar "Enter" no teclado para enviar
+KeyInput.FocusLost:Connect(function(enterPressed)
+    if enterPressed then
+        KeySubmit:Click()
+    end
+end)
