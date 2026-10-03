@@ -160,7 +160,6 @@ local function createKeyGui()
         status.TextColor3 = Color3.fromRGB(200, 180, 255)
 
         task.spawn(function()
-            -- Requisição compatível com executores mobile
             local sucesso, resposta = pcall(function()
                 local req = request or http_request or (syn and syn.request) or (http and http.request)
                 local url = KEY_BIN_ID .. "/latest"
