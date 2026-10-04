@@ -19,7 +19,7 @@ local LP          = Players.LocalPlayer
 --═══════════════════════════════════════════════════════
 -- 🔑 CONFIGURAÇÃO DO SERVIDOR DE KEYS (JSONBin)
 --═══════════════════════════════════════════════════════
-local KEY_BIN_ID = "https://api.jsonbin.io/v3/b/6ac18cdaffd5d160534a9beb"
+local KEY_BIN_ID = "https://api.jsonbin.io/v3/b/6ac19549ffd5d160534aaaa4a"
 local KEY_MASTER = "$2a$10$9wz0RNlqNcPwt4WWl9KRqOS0UITHht1eUdGfLrV0P7swilDFflD0W"
 
 for _, n in ipairs({"AetherKey", "AetherHub", "AetherFlyUI"}) do
