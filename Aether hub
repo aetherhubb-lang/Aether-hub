@@ -1,22 +1,12 @@
---[[
-    ═══════════════════════════════════════════════════════
-    🌌 AETHER HUB | UI PREMIUM
-    by: atsu
-    ═══════════════════════════════════════════════════════
-]]
-
-local CoreGui     = game:GetService("CoreGui")
-local Players     = game:GetService("Players")
-local UIS         = game:GetService("UserInputService")
-local RunService  = game:GetService("RunService")
+local CoreGui = game:GetService("CoreGui")
+local Players = game:GetService("Players")
+local UIS = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
-local Lighting    = game:GetService("Lighting")
+local Lighting = game:GetService("Lighting")
 local VirtualUser = game:GetService("VirtualUser")
-local LP          = Players.LocalPlayer
+local LP = Players.LocalPlayer
 
---═══════════════════════════════════════════════════════
--- 🔑 KEY SYSTEM
---═══════════════════════════════════════════════════════
 local KeysAutorizadas = {
     ["staff"] = 11332248347,
 }
@@ -30,9 +20,6 @@ end
 
 local loadMainHub
 
---═══════════════════════════════════════════════════════
--- 🔑 KEY GUI
---═══════════════════════════════════════════════════════
 local function createKeyGui()
     local gui = Instance.new("ScreenGui")
     gui.Name = "AetherKey"
@@ -118,6 +105,7 @@ local function createKeyGui()
         TweenService:Create(boxStroke, TweenInfo.new(0.2), {Transparency = 0}):Play()
         TweenService:Create(boxStroke, TweenInfo.new(0.2), {Color = Color3.fromRGB(180, 120, 255)}):Play()
     end)
+
     box.FocusLost:Connect(function()
         TweenService:Create(boxStroke, TweenInfo.new(0.2), {Transparency = 0.5}):Play()
         TweenService:Create(boxStroke, TweenInfo.new(0.2), {Color = Color3.fromRGB(120, 80, 200)}):Play()
@@ -147,6 +135,7 @@ local function createKeyGui()
     btn.MouseEnter:Connect(function()
         TweenService:Create(btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(160, 100, 245)}):Play()
     end)
+
     btn.MouseLeave:Connect(function()
         TweenService:Create(btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(130, 70, 220)}):Play()
     end)
@@ -189,10 +178,7 @@ local function createKeyGui()
     box.FocusLost:Connect(function(enter)
         if enter then tryVerify() end
     end)
-end--═══════════════════════════════════════════════════════
--- 🌌 MAIN HUB
---═══════════════════════════════════════════════════════
-loadMainHub = function()
+endloadMainHub = function()
     local COR_FUNDO_1    = Color3.fromRGB(30, 18, 50)
     local COR_FUNDO_2    = Color3.fromRGB(12, 8, 20)
     local COR_PAINEL     = Color3.fromRGB(22, 14, 38)
@@ -490,6 +476,7 @@ loadMainHub = function()
     MinBtn.MouseEnter:Connect(function()
         TweenService:Create(MinBtn, TweenInfo.new(0.15), {BackgroundColor3 = COR_ROXO}):Play()
     end)
+
     MinBtn.MouseLeave:Connect(function()
         TweenService:Create(MinBtn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(40, 28, 60)}):Play()
     end)local Abas = {}
@@ -674,6 +661,7 @@ local function criarBotao(parent, texto, ordem, callback)
         TweenService:Create(b, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(90, 55, 145)}):Play()
         TweenService:Create(s, TweenInfo.new(0.15), {Transparency = 0.2}):Play()
     end)
+
     b.MouseLeave:Connect(function()
         TweenService:Create(b, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(60, 38, 95)}):Play()
         TweenService:Create(s, TweenInfo.new(0.15), {Transparency = 0.5}):Play()
@@ -996,9 +984,6 @@ end)    criarBotao(AbaTeleporte, "🎲 TP Jogador Aleatório", 1, function()
     creditosTxt.Parent = creditosFrame
 end
 
---═══════════════════════════════════════════════════════
--- BOOT
---═══════════════════════════════════════════════════════
 if _G.AetherAuthenticated then
     loadMainHub()
 else
