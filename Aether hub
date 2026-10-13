@@ -49,7 +49,6 @@ local function createKeyGui()
     frame.Parent = gui
     Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 18)
 
-    -- Gradiente de fundo
     local grad = Instance.new("UIGradient")
     grad.Color = ColorSequence.new({
         ColorSequenceKeypoint.new(0, Color3.fromRGB(35, 20, 60)),
@@ -64,7 +63,6 @@ local function createKeyGui()
     stroke.Transparency = 0.2
     stroke.Parent = frame
 
-    -- Brilho da borda (animação)
     task.spawn(function()
         while frame.Parent do
             for i = 0, 1, 0.05 do
@@ -191,21 +189,16 @@ local function createKeyGui()
     box.FocusLost:Connect(function(enter)
         if enter then tryVerify() end
     end)
-end
-
---═══════════════════════════════════════════════════════
+end--═══════════════════════════════════════════════════════
 -- 🌌 MAIN HUB
 --═══════════════════════════════════════════════════════
 loadMainHub = function()
-    -- 🎨 PALETA DE CORES
-    local COR_FUNDO_1    = Color3.fromRGB(30, 18, 50)   -- topo do gradiente
-    local COR_FUNDO_2    = Color3.fromRGB(12, 8, 20)    -- base do gradiente
+    local COR_FUNDO_1    = Color3.fromRGB(30, 18, 50)
+    local COR_FUNDO_2    = Color3.fromRGB(12, 8, 20)
     local COR_PAINEL     = Color3.fromRGB(22, 14, 38)
     local COR_ROXO       = Color3.fromRGB(170, 100, 255)
-    local COR_ROXO_ESC   = Color3.fromRGB(110, 60, 200)
     local COR_ABA_ATIVA  = Color3.fromRGB(170, 100, 255)
     local COR_ABA_OFF    = Color3.fromRGB(32, 22, 48)
-    local COR_TEXTO_ON   = Color3.fromRGB(255, 255, 255)
     local COR_TEXTO_OFF  = Color3.fromRGB(140, 120, 180)
     local COR_TOGGLE_ON  = Color3.fromRGB(170, 100, 255)
     local COR_TOGGLE_OFF = Color3.fromRGB(60, 45, 90)
@@ -220,17 +213,14 @@ loadMainHub = function()
     ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     ScreenGui.Parent = CoreGui
 
-    -- SOMBRA EXTERNA (efeito de brilho)
     local ShadowFrame = Instance.new("Frame")
-    ShadowFrame.Size = UDim2.new(1, 8, 1, 8)
-    ShadowFrame.Position = UDim2.new(0, -4, 0, -4)
+    ShadowFrame.Size = NORMAL_SIZE
+    ShadowFrame.Position = NORMAL_POS
     ShadowFrame.BackgroundColor3 = COR_ROXO
     ShadowFrame.BackgroundTransparency = 0.75
     ShadowFrame.BorderSizePixel = 0
     ShadowFrame.ZIndex = 0
     ShadowFrame.Parent = ScreenGui
-    ShadowFrame.Size = NORMAL_SIZE
-    ShadowFrame.Position = NORMAL_POS
     Instance.new("UICorner", ShadowFrame).CornerRadius = UDim.new(0, 18)
 
     local MainFrame = Instance.new("Frame")
@@ -245,7 +235,6 @@ loadMainHub = function()
     MainFrame.Parent = ScreenGui
     Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 16)
 
-    -- Gradiente de fundo
     local mainGrad = Instance.new("UIGradient")
     mainGrad.Color = ColorSequence.new({
         ColorSequenceKeypoint.new(0, COR_FUNDO_1),
@@ -254,14 +243,12 @@ loadMainHub = function()
     mainGrad.Rotation = 135
     mainGrad.Parent = MainFrame
 
-    -- Borda brilhante
     local MainStroke = Instance.new("UIStroke")
     MainStroke.Color = COR_ROXO
     MainStroke.Thickness = 1.5
     MainStroke.Transparency = 0.3
     MainStroke.Parent = MainFrame
 
-    -- Animação do brilho da borda
     task.spawn(function()
         while MainFrame.Parent do
             for i = 0, 1, 0.06 do
@@ -273,16 +260,12 @@ loadMainHub = function()
         end
     end)
 
-    -- ═══════════════════════════════════════
-    -- TOPBAR
-    -- ═══════════════════════════════════════
     local TopBar = Instance.new("Frame")
     TopBar.Size = UDim2.new(1, 0, 0, 42)
     TopBar.BackgroundTransparency = 1
     TopBar.ZIndex = 2
     TopBar.Parent = MainFrame
 
-    -- Logotipo circular
     local LogoCircle = Instance.new("Frame")
     LogoCircle.Size = UDim2.new(0, 26, 0, 26)
     LogoCircle.Position = UDim2.new(0, 14, 0.5, -13)
@@ -346,9 +329,6 @@ loadMainHub = function()
     MinBtnStroke.Transparency = 0.5
     MinBtnStroke.Parent = MinBtn
 
-    -- ═══════════════════════════════════════
-    -- SIDEBAR
-    -- ═══════════════════════════════════════
     local Sidebar = Instance.new("Frame")
     Sidebar.Size = UDim2.new(0, 130, 1, -54)
     Sidebar.Position = UDim2.new(0, 12, 0, 46)
@@ -377,9 +357,6 @@ loadMainHub = function()
     TabLayout.SortOrder = Enum.SortOrder.LayoutOrder
     TabLayout.Parent = TabList
 
-    -- ═══════════════════════════════════════
-    -- ÁREA DE CONTEÚDO
-    -- ═══════════════════════════════════════
     local ContentArea = Instance.new("Frame")
     ContentArea.Size = UDim2.new(1, -166, 1, -54)
     ContentArea.Position = UDim2.new(0, 154, 0, 46)
@@ -396,7 +373,6 @@ loadMainHub = function()
     ContentStroke.Transparency = 0.75
     ContentStroke.Parent = ContentArea
 
-    -- Título da aba (grande, com efeito)
     local ContentTitle = Instance.new("TextLabel")
     ContentTitle.Size = UDim2.new(1, 0, 0, 36)
     ContentTitle.Position = UDim2.new(0, 0, 0, 10)
@@ -408,7 +384,6 @@ loadMainHub = function()
     ContentTitle.ZIndex = 3
     ContentTitle.Parent = ContentArea
 
-    -- ⚡ LISTA COM ROLAGEM
     local FunctionList = Instance.new("ScrollingFrame")
     FunctionList.Size = UDim2.new(1, -24, 1, -58)
     FunctionList.Position = UDim2.new(0, 12, 0, 50)
@@ -432,9 +407,6 @@ loadMainHub = function()
         FunctionList.CanvasSize = UDim2.new(0, 0, 0, FuncLayout.AbsoluteContentSize.Y + 10)
     end)
 
-    -- ═══════════════════════════════════════
-    -- MINI PAINEL FLUTUANTE
-    -- ═══════════════════════════════════════
     local MiniPanel = Instance.new("TextButton")
     MiniPanel.Size = UDim2.new(0, 50, 0, 50)
     MiniPanel.Position = UDim2.new(0, 20, 0.5, -25)
@@ -459,7 +431,6 @@ loadMainHub = function()
     MiniGrad.Rotation = 45
     MiniGrad.Parent = MiniPanel
 
-    -- Animação de pulsar no mini painel
     task.spawn(function()
         while MiniPanel.Parent do
             if MiniPanel.Visible then
@@ -521,10 +492,7 @@ loadMainHub = function()
     end)
     MinBtn.MouseLeave:Connect(function()
         TweenService:Create(MinBtn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(40, 28, 60)}):Play()
-    end)--════════════════════════════════════════════════
--- 🛠️ FUNÇÕES AUXILIARES
---════════════════════════════════════════════════
-local Abas = {}
+    end)local Abas = {}
 local AbaAtual = nil
 
 local function trocarAba(nomeAba)
@@ -591,7 +559,6 @@ local function criarAba(nome, ordem)
     return abaFrame
 end
 
--- ═══ TOGGLE BONITO ═══
 local function criarToggle(parent, texto, ordem, callback)
     local row = Instance.new("Frame")
     row.Size = UDim2.new(1, 0, 0, 46)
@@ -644,13 +611,6 @@ local function criarToggle(parent, texto, ordem, callback)
     circle.Parent = toggleBg
     Instance.new("UICorner", circle).CornerRadius = UDim.new(1, 0)
 
-    -- Brilho no círculo quando ativo
-    local circleGlow = Instance.new("UIStroke")
-    circleGlow.Color = Color3.fromRGB(255, 255, 255)
-    circleGlow.Thickness = 2
-    circleGlow.Transparency = 1
-    circleGlow.Parent = circle
-
     local click = Instance.new("TextButton")
     click.Size = UDim2.new(1, 0, 1, 0)
     click.BackgroundTransparency = 1
@@ -681,7 +641,6 @@ local function criarToggle(parent, texto, ordem, callback)
     return row, click
 end
 
--- ═══ BOTÃO BONITO ═══
 local function criarBotao(parent, texto, ordem, callback)
     local b = Instance.new("TextButton")
     b.Size = UDim2.new(1, 0, 0, 40)
@@ -730,7 +689,6 @@ local function criarBotao(parent, texto, ordem, callback)
     return b
 end
 
--- Animação de entrada
 MainFrame.Size = UDim2.new(0, 0, 0, 0)
 MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
 ShadowFrame.Size = UDim2.new(0, 0, 0, 0)
@@ -745,9 +703,6 @@ TweenService:Create(ShadowFrame, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.
     Position = NORMAL_POS,
 }):Play()
 
---════════════════════════════════════════════════
--- 📑 CRIAR AS ABAS (com emojis)
---════════════════════════════════════════════════
 local AbaPrincipal  = criarAba("⚔️ Principal", 1)
 local AbaACBypass   = criarAba("🛡️ AC Bypass", 2)
 local AbaExtras     = criarAba("✨ Extras", 3)
@@ -755,9 +710,6 @@ local AbaTeleporte  = criarAba("🌀 Teleporte", 4)
 local AbaBasico     = criarAba("🎮 Básico", 5)
 local AbaCreditos   = criarAba("💎 Créditos", 6)
 
---════════════════════════════════════════════════
--- 🎯 ABA PRINCIPAL (JJS)
---════════════════════════════════════════════════
 criarToggle(AbaPrincipal, "⚔️ Gojo Kill All", 1, function(ativo)
     if ativo then
         task.spawn(function()
@@ -804,9 +756,6 @@ criarToggle(AbaPrincipal, "🛡️ Auto Dodge", 6, function(ativo)
     print("[Aether] Auto Dodge: " .. (ativo and "ON" or "OFF"))
 end)
 
---════════════════════════════════════════════════
--- 🎯 ABA AC BYPASS
---════════════════════════════════════════════════
 criarToggle(AbaACBypass, "🔓 Bypass Anti-Cheat", 1, function(ativo)
     print("[Aether] AC Bypass: " .. (ativo and "ON" or "OFF"))
 end)
@@ -819,9 +768,6 @@ criarBotao(AbaACBypass, "▶️ Executar Bypass Completo", 3, function()
     print("[Aether] Executando bypass...")
 end)
 
---════════════════════════════════════════════════
--- 🎯 ABA EXTRAS
---════════════════════════════════════════════════
 local espAtivo = false
 local espFolder = Instance.new("Folder", ScreenGui)
 espFolder.Name = "AetherESP"
@@ -905,160 +851,150 @@ criarToggle(AbaExtras, "💤 Anti-AFK", 5, function(ativo)
     else
         _G.Aether_AntiAFK = false
     end
-end)
-
---════════════════════════════════════════════════
--- 🎯 ABA TELEPORTE
---════════════════════════════════════════════════
-criarBotao(AbaTeleporte, "🎲 TP Jogador Aleatório", 1, function()
-    local jogadores = {}
-    for _, p in ipairs(Players:GetPlayers()) do
-        if p ~= LP and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
-            table.insert(jogadores, p)
+end)    criarBotao(AbaTeleporte, "🎲 TP Jogador Aleatório", 1, function()
+        local jogadores = {}
+        for _, p in ipairs(Players:GetPlayers()) do
+            if p ~= LP and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+                table.insert(jogadores, p)
+            end
         end
-    end
-    if #jogadores > 0 then
-        local alvo = jogadores[math.random(1, #jogadores)]
+        if #jogadores > 0 then
+            local alvo = jogadores[math.random(1, #jogadores)]
+            local meuRoot = LP.Character and LP.Character:FindFirstChild("HumanoidRootPart")
+            local rootAlvo = alvo.Character:FindFirstChild("HumanoidRootPart")
+            if meuRoot and rootAlvo then
+                meuRoot.CFrame = rootAlvo.CFrame + Vector3.new(0, 3, 0)
+            end
+        end
+    end)
+
+    criarBotao(AbaTeleporte, "👤 TP Todos os Jogadores", 2, function()
         local meuRoot = LP.Character and LP.Character:FindFirstChild("HumanoidRootPart")
-        local rootAlvo = alvo.Character:FindFirstChild("HumanoidRootPart")
-        if meuRoot and rootAlvo then
-            meuRoot.CFrame = rootAlvo.CFrame + Vector3.new(0, 3, 0)
-        end
-    end
-end)
-
-criarBotao(AbaTeleporte, "👤 TP Todos os Jogadores", 2, function()
-    local meuRoot = LP.Character and LP.Character:FindFirstChild("HumanoidRootPart")
-    if not meuRoot then return end
-    for _, p in ipairs(Players:GetPlayers()) do
-        if p ~= LP and p.Character then
-            local rootAlvo = p.Character:FindFirstChild("HumanoidRootPart")
-            if rootAlvo then
-                meuRoot.CFrame = rootAlvo.CFrame
-                task.wait(0.1)
-            end
-        end
-    end
-end)
-
-criarBotao(AbaTeleporte, "🏠 Voltar ao Spawn", 3, function()
-    local char = LP.Character
-    local root = char and char:FindFirstChild("HumanoidRootPart")
-    local spawn = workspace:FindFirstChildOfClass("SpawnLocation")
-    if root and spawn then
-        root.CFrame = spawn.CFrame + Vector3.new(0, 3, 0)
-    end
-end)
-
---════════════════════════════════════════════════
--- 🎯 ABA BÁSICO
---════════════════════════════════════════════════
-criarToggle(AbaBasico, "💨 Speed 200", 1, function(ativo)
-    local hum = LP.Character and LP.Character:FindFirstChildOfClass("Humanoid")
-    if hum then hum.WalkSpeed = ativo and 200 or 16 end
-end)
-
-criarToggle(AbaBasico, "⬆️ Jump Power 150", 2, function(ativo)
-    local hum = LP.Character and LP.Character:FindFirstChildOfClass("Humanoid")
-    if hum then
-        hum.UseJumpPower = true
-        hum.JumpPower = ativo and 150 or 50
-    end
-end)
-
-local flyAtivo = false
-local flyConn, flyBV
-criarToggle(AbaBasico, "🕊️ Fly", 3, function(ativo)
-    flyAtivo = ativo
-    if ativo then
-        local char = LP.Character
-        local hum = char and char:FindFirstChildOfClass("Humanoid")
-        local root = char and char:FindFirstChild("HumanoidRootPart")
-        if not root or not hum then return end
-        hum.PlatformStand = true
-        flyBV = Instance.new("BodyVelocity")
-        flyBV.MaxForce = Vector3.new(9e9, 9e9, 9e9)
-        flyBV.Velocity = Vector3.zero
-        flyBV.Parent = root
-
-        flyConn = RunService.Heartbeat:Connect(function()
-            if not flyAtivo then return end
-            local c = LP.Character
-            local r = c and c:FindFirstChild("HumanoidRootPart")
-            if not r then return end
-            local cam = workspace.CurrentCamera
-            local vel = Vector3.zero
-            local speed = 80
-            if UIS:IsKeyDown(Enum.KeyCode.W) then vel += cam.CFrame.LookVector * speed end
-            if UIS:IsKeyDown(Enum.KeyCode.S) then vel -= cam.CFrame.LookVector * speed end
-            if UIS:IsKeyDown(Enum.KeyCode.A) then vel -= cam.CFrame.RightVector * speed end
-            if UIS:IsKeyDown(Enum.KeyCode.D) then vel += cam.CFrame.RightVector * speed end
-            if UIS:IsKeyDown(Enum.KeyCode.Space) then vel += Vector3.new(0, speed, 0) end
-            flyBV.Velocity = vel
-        end)
-    else
-        if flyConn then flyConn:Disconnect(); flyConn = nil end
-        if flyBV then flyBV:Destroy(); flyBV = nil end
-        local hum = LP.Character and LP.Character:FindFirstChildOfClass("Humanoid")
-        if hum then hum.PlatformStand = false end
-    end
-end)
-
-local noclipAtivo = false
-criarToggle(AbaBasico, "👻 Noclip", 4, function(ativo)
-    noclipAtivo = ativo
-    if ativo then
-        task.spawn(function()
-            while noclipAtivo do
-                local char = LP.Character
-                if char then
-                    for _, part in ipairs(char:GetDescendants()) do
-                        if part:IsA("BasePart") then part.CanCollide = false end
-                    end
+        if not meuRoot then return end
+        for _, p in ipairs(Players:GetPlayers()) do
+            if p ~= LP and p.Character then
+                local rootAlvo = p.Character:FindFirstChild("HumanoidRootPart")
+                if rootAlvo then
+                    meuRoot.CFrame = rootAlvo.CFrame
+                    task.wait(0.1)
                 end
-                task.wait(0.2)
             end
-        end)
-    end
-end)
+        end
+    end)
 
-UIS.JumpRequest:Connect(function()
-    if infJumpAtivo then
+    criarBotao(AbaTeleporte, "🏠 Voltar ao Spawn", 3, function()
+        local char = LP.Character
+        local root = char and char:FindFirstChild("HumanoidRootPart")
+        local spawn = workspace:FindFirstChildOfClass("SpawnLocation")
+        if root and spawn then
+            root.CFrame = spawn.CFrame + Vector3.new(0, 3, 0)
+        end
+    end)
+
+    criarToggle(AbaBasico, "💨 Speed 200", 1, function(ativo)
         local hum = LP.Character and LP.Character:FindFirstChildOfClass("Humanoid")
-        if hum then hum:ChangeState(Enum.HumanoidStateType.Jumping) end
-    end
-end)
+        if hum then hum.WalkSpeed = ativo and 200 or 16 end
+    end)
 
---════════════════════════════════════════════════
--- 🎯 ABA CRÉDITOS
---════════════════════════════════════════════════
-local creditosFrame = Instance.new("Frame")
-creditosFrame.Size = UDim2.new(1, 0, 0, 130)
-creditosFrame.BackgroundColor3 = Color3.fromRGB(32, 22, 48)
-creditosFrame.BorderSizePixel = 0
-creditosFrame.LayoutOrder = 1
-creditosFrame.ZIndex = 4
-creditosFrame.Parent = AbaCreditos
-Instance.new("UICorner", creditosFrame).CornerRadius = UDim.new(0, 10)
+    criarToggle(AbaBasico, "⬆️ Jump Power 150", 2, function(ativo)
+        local hum = LP.Character and LP.Character:FindFirstChildOfClass("Humanoid")
+        if hum then
+            hum.UseJumpPower = true
+            hum.JumpPower = ativo and 150 or 50
+        end
+    end)
 
-local creditosStroke = Instance.new("UIStroke")
-creditosStroke.Color = COR_ROXO
-creditosStroke.Thickness = 1
-creditosStroke.Transparency = 0.7
-creditosStroke.Parent = creditosFrame
+    local flyAtivo = false
+    local flyConn, flyBV
+    criarToggle(AbaBasico, "🕊️ Fly", 3, function(ativo)
+        flyAtivo = ativo
+        if ativo then
+            local char = LP.Character
+            local hum = char and char:FindFirstChildOfClass("Humanoid")
+            local root = char and char:FindFirstChild("HumanoidRootPart")
+            if not root or not hum then return end
+            hum.PlatformStand = true
+            flyBV = Instance.new("BodyVelocity")
+            flyBV.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+            flyBV.Velocity = Vector3.zero
+            flyBV.Parent = root
 
-local creditosTxt = Instance.new("TextLabel")
-creditosTxt.Size = UDim2.new(1, -24, 1, -24)
-creditosTxt.Position = UDim2.new(0, 12, 0, 12)
-creditosTxt.BackgroundTransparency = 1
-creditosTxt.Text = "🌌 AETHER HUB\n\n✨ Feito por: atsu\n📦 Versão: 2.0\n\n💜 Obrigado por usar!"
-creditosTxt.TextColor3 = Color3.fromRGB(230, 210, 255)
-creditosTxt.Font = Enum.Font.Gotham
-creditosTxt.TextSize = 12
-creditosTxt.TextWrapped = true
-creditosTxt.TextYAlignment = Enum.TextYAlignment.Top
-creditosTxt.ZIndex = 5
-creditosTxt.Parent = creditosFrameend
+            flyConn = RunService.Heartbeat:Connect(function()
+                if not flyAtivo then return end
+                local c = LP.Character
+                local r = c and c:FindFirstChild("HumanoidRootPart")
+                if not r then return end
+                local cam = workspace.CurrentCamera
+                local vel = Vector3.zero
+                local speed = 80
+                if UIS:IsKeyDown(Enum.KeyCode.W) then vel += cam.CFrame.LookVector * speed end
+                if UIS:IsKeyDown(Enum.KeyCode.S) then vel -= cam.CFrame.LookVector * speed end
+                if UIS:IsKeyDown(Enum.KeyCode.A) then vel -= cam.CFrame.RightVector * speed end
+                if UIS:IsKeyDown(Enum.KeyCode.D) then vel += cam.CFrame.RightVector * speed end
+                if UIS:IsKeyDown(Enum.KeyCode.Space) then vel += Vector3.new(0, speed, 0) end
+                flyBV.Velocity = vel
+            end)
+        else
+            if flyConn then flyConn:Disconnect(); flyConn = nil end
+            if flyBV then flyBV:Destroy(); flyBV = nil end
+            local hum = LP.Character and LP.Character:FindFirstChildOfClass("Humanoid")
+            if hum then hum.PlatformStand = false end
+        end
+    end)
+
+    local noclipAtivo = false
+    criarToggle(AbaBasico, "👻 Noclip", 4, function(ativo)
+        noclipAtivo = ativo
+        if ativo then
+            task.spawn(function()
+                while noclipAtivo do
+                    local char = LP.Character
+                    if char then
+                        for _, part in ipairs(char:GetDescendants()) do
+                            if part:IsA("BasePart") then part.CanCollide = false end
+                        end
+                    end
+                    task.wait(0.2)
+                end
+            end)
+        end
+    end)
+
+    UIS.JumpRequest:Connect(function()
+        if infJumpAtivo then
+            local hum = LP.Character and LP.Character:FindFirstChildOfClass("Humanoid")
+            if hum then hum:ChangeState(Enum.HumanoidStateType.Jumping) end
+        end
+    end)
+
+    local creditosFrame = Instance.new("Frame")
+    creditosFrame.Size = UDim2.new(1, 0, 0, 130)
+    creditosFrame.BackgroundColor3 = Color3.fromRGB(32, 22, 48)
+    creditosFrame.BorderSizePixel = 0
+    creditosFrame.LayoutOrder = 1
+    creditosFrame.ZIndex = 4
+    creditosFrame.Parent = AbaCreditos
+    Instance.new("UICorner", creditosFrame).CornerRadius = UDim.new(0, 10)
+
+    local creditosStroke = Instance.new("UIStroke")
+    creditosStroke.Color = COR_ROXO
+    creditosStroke.Thickness = 1
+    creditosStroke.Transparency = 0.7
+    creditosStroke.Parent = creditosFrame
+
+    local creditosTxt = Instance.new("TextLabel")
+    creditosTxt.Size = UDim2.new(1, -24, 1, -24)
+    creditosTxt.Position = UDim2.new(0, 12, 0, 12)
+    creditosTxt.BackgroundTransparency = 1
+    creditosTxt.Text = "🌌 AETHER HUB\n\n✨ Feito por: atsu\n📦 Versão: 2.0\n\n💜 Obrigado por usar!"
+    creditosTxt.TextColor3 = Color3.fromRGB(230, 210, 255)
+    creditosTxt.Font = Enum.Font.Gotham
+    creditosTxt.TextSize = 12
+    creditosTxt.TextWrapped = true
+    creditosTxt.TextYAlignment = Enum.TextYAlignment.Top
+    creditosTxt.ZIndex = 5
+    creditosTxt.Parent = creditosFrame
+end
 
 --═══════════════════════════════════════════════════════
 -- BOOT
