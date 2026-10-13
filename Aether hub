@@ -1,6 +1,6 @@
 --[[
     ═══════════════════════════════════════════════════════
-    🌌 AETHER HUB | UI MODERNA (Sidebar + Toggles + Rolagem)
+    🌌 AETHER HUB | UI MOBILE (Sidebar + Toggles + Rolagem)
     by: atsu
     ═══════════════════════════════════════════════════════
 ]]
@@ -15,10 +15,10 @@ local VirtualUser = game:GetService("VirtualUser")
 local LP          = Players.LocalPlayer
 
 --═══════════════════════════════════════════════════════
--- 🔑 KEY SYSTEM SIMPLES
+-- 🔑 KEY SYSTEM
 --═══════════════════════════════════════════════════════
 local KeysAutorizadas = {
-    ["AETHER-92728"] = 11332248347,
+    ["staff"] = 11332248347,
 }
 
 for _, n in ipairs({"AetherKey", "AetherHub", "AetherFlyUI"}) do
@@ -31,7 +31,7 @@ end
 local loadMainHub
 
 --═══════════════════════════════════════════════════════
--- 🔑 KEY SYSTEM
+-- 🔑 KEY GUI
 --═══════════════════════════════════════════════════════
 local function createKeyGui()
     local gui = Instance.new("ScreenGui")
@@ -40,8 +40,8 @@ local function createKeyGui()
     gui.Parent = CoreGui
 
     local frame = Instance.new("Frame")
-    frame.Size = UDim2.new(0, 340, 0, 230)
-    frame.Position = UDim2.new(0.5, -170, 0.5, -115)
+    frame.Size = UDim2.new(0, 300, 0, 210)
+    frame.Position = UDim2.new(0.5, -150, 0.5, -105)
     frame.BackgroundColor3 = Color3.fromRGB(20, 15, 30)
     frame.BorderSizePixel = 0
     frame.Active = true
@@ -57,61 +57,60 @@ local function createKeyGui()
     stroke.Parent = frame
 
     local title = Instance.new("TextLabel")
-    title.Size = UDim2.new(1, 0, 0, 50)
-    title.Position = UDim2.new(0, 0, 0, 15)
+    title.Size = UDim2.new(1, 0, 0, 45)
+    title.Position = UDim2.new(0, 0, 0, 12)
     title.BackgroundTransparency = 1
     title.Text = "🌌 AETHER HUB"
     title.TextColor3 = Color3.fromRGB(210, 170, 255)
     title.Font = Enum.Font.GothamBold
-    title.TextSize = 26
+    title.TextSize = 22
     title.Parent = frame
 
     local sub = Instance.new("TextLabel")
-    sub.Size = UDim2.new(1, 0, 0, 22)
-    sub.Position = UDim2.new(0, 0, 0, 62)
+    sub.Size = UDim2.new(1, 0, 0, 20)
+    sub.Position = UDim2.new(0, 0, 0, 55)
     sub.BackgroundTransparency = 1
     sub.Text = "Digite a Key de Acesso"
     sub.TextColor3 = Color3.fromRGB(160, 130, 200)
     sub.Font = Enum.Font.Gotham
-    sub.TextSize = 14
+    sub.TextSize = 12
     sub.Parent = frame
 
     local box = Instance.new("TextBox")
-    box.Size = UDim2.new(0, 260, 0, 40)
-    box.Position = UDim2.new(0.5, -130, 0, 100)
+    box.Size = UDim2.new(0, 230, 0, 36)
+    box.Position = UDim2.new(0.5, -115, 0, 88)
     box.BackgroundColor3 = Color3.fromRGB(35, 20, 55)
     box.BorderSizePixel = 0
     box.Text = ""
-    box.PlaceholderText = "AETHER-XXXXX"
+    box.PlaceholderText = "Digite sua key..."
     box.TextColor3 = Color3.fromRGB(220, 200, 255)
     box.PlaceholderColor3 = Color3.fromRGB(130, 100, 180)
     box.Font = Enum.Font.Gotham
-    box.TextSize = 16
+    box.TextSize = 14
     box.ClearTextOnFocus = false
     box.Parent = frame
-
-    local bc = Instance.new("UICorner"); bc.CornerRadius = UDim.new(0, 10); bc.Parent = box
+    Instance.new("UICorner", box).CornerRadius = UDim.new(0, 10)
 
     local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(0, 260, 0, 40)
-    btn.Position = UDim2.new(0.5, -130, 0, 150)
+    btn.Size = UDim2.new(0, 230, 0, 36)
+    btn.Position = UDim2.new(0.5, -115, 0, 134)
     btn.BackgroundColor3 = Color3.fromRGB(140, 80, 230)
     btn.BorderSizePixel = 0
     btn.Text = "Verificar"
     btn.TextColor3 = Color3.fromRGB(255, 255, 255)
     btn.Font = Enum.Font.GothamBold
-    btn.TextSize = 16
+    btn.TextSize = 14
     btn.Parent = frame
     Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 10)
 
     local status = Instance.new("TextLabel")
-    status.Size = UDim2.new(1, 0, 0, 20)
-    status.Position = UDim2.new(0, 0, 0, 200)
+    status.Size = UDim2.new(1, 0, 0, 18)
+    status.Position = UDim2.new(0, 0, 0, 180)
     status.BackgroundTransparency = 1
     status.Text = ""
     status.TextColor3 = Color3.fromRGB(220, 80, 100)
     status.Font = Enum.Font.Gotham
-    status.TextSize = 13
+    status.TextSize = 12
     status.Parent = frame
 
     local function tryVerify()
@@ -156,8 +155,9 @@ loadMainHub = function()
     local COR_TOGGLE_ON  = Color3.fromRGB(140, 90, 230)
     local COR_TOGGLE_OFF = Color3.fromRGB(80, 80, 85)
 
-    local NORMAL_SIZE = UDim2.new(0, 700, 0, 420)
-    local NORMAL_POS  = UDim2.new(0.5, -350, 0.5, -210)
+    -- 📱 TAMANHO ADAPTADO PARA MOBILE
+    local NORMAL_SIZE = UDim2.new(0, 480, 0, 320)
+    local NORMAL_POS  = UDim2.new(0.5, -240, 0.5, -160)
 
     local ScreenGui = Instance.new("ScreenGui")
     ScreenGui.Name = "AetherHub"
@@ -175,87 +175,97 @@ loadMainHub = function()
     MainFrame.Active = true
     MainFrame.Draggable = true
     MainFrame.Parent = ScreenGui
-    Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 18)
+    Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 14)
 
     local MainStroke = Instance.new("UIStroke")
     MainStroke.Color = Color3.fromRGB(200, 200, 200)
-    MainStroke.Thickness = 2
+    MainStroke.Thickness = 1.5
     MainStroke.Transparency = 0.1
     MainStroke.Parent = MainFrame
 
+    -- Barra superior
     local TopBar = Instance.new("Frame")
-    TopBar.Size = UDim2.new(1, 0, 0, 45)
+    TopBar.Size = UDim2.new(1, 0, 0, 38)
     TopBar.BackgroundTransparency = 1
     TopBar.Parent = MainFrame
 
     local HubTitle = Instance.new("TextLabel")
-    HubTitle.Size = UDim2.new(0, 300, 1, 0)
-    HubTitle.Position = UDim2.new(0, 20, 0, 0)
+    HubTitle.Size = UDim2.new(0, 250, 1, 0)
+    HubTitle.Position = UDim2.new(0, 15, 0, 0)
     HubTitle.BackgroundTransparency = 1
     HubTitle.Text = "🌌 Aether Hub"
     HubTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
     HubTitle.Font = Enum.Font.GothamBold
-    HubTitle.TextSize = 20
+    HubTitle.TextSize = 16
     HubTitle.TextXAlignment = Enum.TextXAlignment.Left
     HubTitle.Parent = TopBar
 
-    local CloseBtn = Instance.new("TextButton")
-    CloseBtn.Size = UDim2.new(0, 30, 0, 30)
-    CloseBtn.Position = UDim2.new(1, -40, 0.5, -15)
-    CloseBtn.BackgroundTransparency = 1
-    CloseBtn.Text = "✕"
-    CloseBtn.TextColor3 = Color3.fromRGB(220, 220, 220)
-    CloseBtn.Font = Enum.Font.GothamBold
-    CloseBtn.TextSize = 18
-    CloseBtn.Parent = TopBar
-    CloseBtn.MouseButton1Click:Connect(function()
-        ScreenGui:Destroy()
-    end)
+    -- Botão de minimizar (−)
+    local MinBtn = Instance.new("TextButton")
+    MinBtn.Size = UDim2.new(0, 26, 0, 26)
+    MinBtn.Position = UDim2.new(1, -34, 0.5, -13)
+    MinBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 42)
+    MinBtn.BorderSizePixel = 0
+    MinBtn.Text = "−"
+    MinBtn.TextColor3 = Color3.fromRGB(230, 230, 230)
+    MinBtn.Font = Enum.Font.GothamBold
+    MinBtn.TextSize = 18
+    MinBtn.AutoButtonColor = false
+    MinBtn.Parent = TopBar
+    Instance.new("UICorner", MinBtn).CornerRadius = UDim.new(0, 6)
 
+    local MinBtnStroke = Instance.new("UIStroke")
+    MinBtnStroke.Color = Color3.fromRGB(140, 90, 230)
+    MinBtnStroke.Thickness = 1
+    MinBtnStroke.Transparency = 0.3
+    MinBtnStroke.Parent = MinBtn
+
+    -- Sidebar
     local Sidebar = Instance.new("Frame")
-    Sidebar.Size = UDim2.new(0, 180, 1, -60)
-    Sidebar.Position = UDim2.new(0, 15, 0, 50)
+    Sidebar.Size = UDim2.new(0, 130, 1, -50)
+    Sidebar.Position = UDim2.new(0, 12, 0, 42)
     Sidebar.BackgroundColor3 = COR_PAINEL
     Sidebar.BorderSizePixel = 0
     Sidebar.Parent = MainFrame
-    Instance.new("UICorner", Sidebar).CornerRadius = UDim.new(0, 14)
+    Instance.new("UICorner", Sidebar).CornerRadius = UDim.new(0, 12)
 
     local TabList = Instance.new("Frame")
-    TabList.Size = UDim2.new(1, -20, 1, -20)
-    TabList.Position = UDim2.new(0, 10, 0, 10)
+    TabList.Size = UDim2.new(1, -14, 1, -14)
+    TabList.Position = UDim2.new(0, 7, 0, 7)
     TabList.BackgroundTransparency = 1
     TabList.Parent = Sidebar
 
     local TabLayout = Instance.new("UIListLayout")
-    TabLayout.Padding = UDim.new(0, 6)
+    TabLayout.Padding = UDim.new(0, 5)
     TabLayout.SortOrder = Enum.SortOrder.LayoutOrder
     TabLayout.Parent = TabList
 
+    -- Área de conteúdo
     local ContentArea = Instance.new("Frame")
-    ContentArea.Size = UDim2.new(1, -225, 1, -60)
-    ContentArea.Position = UDim2.new(0, 210, 0, 50)
+    ContentArea.Size = UDim2.new(1, -166, 1, -50)
+    ContentArea.Position = UDim2.new(0, 154, 0, 42)
     ContentArea.BackgroundColor3 = COR_PAINEL
     ContentArea.BorderSizePixel = 0
     ContentArea.Parent = MainFrame
-    Instance.new("UICorner", ContentArea).CornerRadius = UDim.new(0, 14)
+    Instance.new("UICorner", ContentArea).CornerRadius = UDim.new(0, 12)
 
     local ContentTitle = Instance.new("TextLabel")
-    ContentTitle.Size = UDim2.new(1, 0, 0, 50)
-    ContentTitle.Position = UDim2.new(0, 0, 0, 15)
+    ContentTitle.Size = UDim2.new(1, 0, 0, 35)
+    ContentTitle.Position = UDim2.new(0, 0, 0, 8)
     ContentTitle.BackgroundTransparency = 1
     ContentTitle.Text = "Principal"
     ContentTitle.TextColor3 = Color3.fromRGB(80, 80, 80)
     ContentTitle.Font = Enum.Font.GothamBold
-    ContentTitle.TextSize = 36
+    ContentTitle.TextSize = 26
     ContentTitle.Parent = ContentArea
 
     -- ⚡ LISTA COM ROLAGEM (estilo WhatsApp)
     local FunctionList = Instance.new("ScrollingFrame")
-    FunctionList.Size = UDim2.new(1, -30, 1, -90)
-    FunctionList.Position = UDim2.new(0, 15, 0, 75)
+    FunctionList.Size = UDim2.new(1, -24, 1, -58)
+    FunctionList.Position = UDim2.new(0, 12, 0, 50)
     FunctionList.BackgroundTransparency = 1
     FunctionList.BorderSizePixel = 0
-    FunctionList.ScrollBarThickness = 6
+    FunctionList.ScrollBarThickness = 5
     FunctionList.ScrollBarImageColor3 = Color3.fromRGB(140, 90, 230)
     FunctionList.CanvasSize = UDim2.new(0, 0, 0, 0)
     FunctionList.AutomaticCanvasSize = Enum.AutomaticSize.Y
@@ -263,12 +273,79 @@ loadMainHub = function()
     FunctionList.Parent = ContentArea
 
     local FuncLayout = Instance.new("UIListLayout")
-    FuncLayout.Padding = UDim.new(0, 8)
+    FuncLayout.Padding = UDim.new(0, 6)
     FuncLayout.SortOrder = Enum.SortOrder.LayoutOrder
     FuncLayout.Parent = FunctionList
 
     FuncLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-        FunctionList.CanvasSize = UDim2.new(0, 0, 0, FuncLayout.AbsoluteContentSize.Y + 10)
+        FunctionList.CanvasSize = UDim2.new(0, 0, 0, FuncLayout.AbsoluteContentSize.Y + 8)
+    end)
+
+    --════════════════════════════════════════════════
+    -- 🔽 SISTEMA DE MINIMIZAR / RESTAURAR
+    --════════════════════════════════════════════════
+    local MiniPanel = Instance.new("TextButton")
+    MiniPanel.Size = UDim2.new(0, 50, 0, 50)
+    MiniPanel.Position = UDim2.new(0, 20, 0.5, -25)
+    MiniPanel.BackgroundColor3 = Color3.fromRGB(25, 20, 35)
+    MiniPanel.BorderSizePixel = 0
+    MiniPanel.Text = "+"
+    MiniPanel.TextColor3 = Color3.fromRGB(200, 150, 255)
+    MiniPanel.Font = Enum.Font.GothamBold
+    MiniPanel.TextSize = 26
+    MiniPanel.AutoButtonColor = false
+    MiniPanel.Draggable = true
+    MiniPanel.Visible = false
+    MiniPanel.ZIndex = 100
+    MiniPanel.Parent = ScreenGui
+    Instance.new("UICorner", MiniPanel).CornerRadius = UDim.new(1, 0)
+
+    local MiniStroke = Instance.new("UIStroke")
+    MiniStroke.Color = Color3.fromRGB(140, 90, 230)
+    MiniStroke.Thickness = 2
+    MiniStroke.Transparency = 0.15
+    MiniStroke.Parent = MiniPanel
+
+    -- Minimizar
+    MinBtn.MouseButton1Click:Connect(function()
+        TweenService:Create(MainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
+            Size = UDim2.new(0, 0, 0, 0),
+            Position = UDim2.new(0.5, 0, 0.5, 0),
+        }):Play()
+
+        task.wait(0.3)
+        MainFrame.Visible = false
+
+        MiniPanel.Visible = true
+        MiniPanel.Size = UDim2.new(0, 0, 0, 0)
+        TweenService:Create(MiniPanel, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+            Size = UDim2.new(0, 50, 0, 50),
+        }):Play()
+    end)
+
+    -- Restaurar
+    MiniPanel.MouseButton1Click:Connect(function()
+        TweenService:Create(MiniPanel, TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
+            Size = UDim2.new(0, 0, 0, 0),
+        }):Play()
+
+        task.wait(0.25)
+        MiniPanel.Visible = false
+
+        MainFrame.Visible = true
+        MainFrame.Size = UDim2.new(0, 0, 0, 0)
+        MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+        TweenService:Create(MainFrame, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+            Size = NORMAL_SIZE,
+            Position = NORMAL_POS,
+        }):Play()
+    end)
+
+    MinBtn.MouseEnter:Connect(function()
+        TweenService:Create(MinBtn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(70, 45, 110)}):Play()
+    end)
+    MinBtn.MouseLeave:Connect(function()
+        TweenService:Create(MinBtn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(40, 40, 42)}):Play()
     end)--════════════════════════════════════════════════
 -- 🛠️ FUNÇÕES AUXILIARES
 --════════════════════════════════════════════════
@@ -293,17 +370,17 @@ end
 
 local function criarAba(nome, ordem)
     local botao = Instance.new("TextButton")
-    botao.Size = UDim2.new(1, 0, 0, 42)
+    botao.Size = UDim2.new(1, 0, 0, 34)
     botao.BackgroundColor3 = COR_ABA_OFF
     botao.BorderSizePixel = 0
     botao.Text = nome
     botao.TextColor3 = COR_TEXTO_OFF
     botao.Font = Enum.Font.GothamMedium
-    botao.TextSize = 14
+    botao.TextSize = 12
     botao.LayoutOrder = ordem
     botao.AutoButtonColor = false
     botao.Parent = TabList
-    Instance.new("UICorner", botao).CornerRadius = UDim.new(0, 10)
+    Instance.new("UICorner", botao).CornerRadius = UDim.new(0, 8)
 
     local abaFrame = Instance.new("Frame")
     abaFrame.Size = UDim2.new(1, 0, 0, 0)
@@ -312,12 +389,12 @@ local function criarAba(nome, ordem)
     abaFrame.Parent = FunctionList
 
     local abaLayout = Instance.new("UIListLayout")
-    abaLayout.Padding = UDim.new(0, 8)
+    abaLayout.Padding = UDim.new(0, 6)
     abaLayout.SortOrder = Enum.SortOrder.LayoutOrder
     abaLayout.Parent = abaFrame
 
     abaLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-        abaFrame.Size = UDim2.new(1, 0, 0, abaLayout.AbsoluteContentSize.Y + 10)
+        abaFrame.Size = UDim2.new(1, 0, 0, abaLayout.AbsoluteContentSize.Y + 8)
     end)
 
     botao.MouseButton1Click:Connect(function()
@@ -335,35 +412,35 @@ end
 
 local function criarToggle(parent, texto, ordem, callback)
     local row = Instance.new("Frame")
-    row.Size = UDim2.new(1, 0, 0, 52)
+    row.Size = UDim2.new(1, 0, 0, 44)
     row.BackgroundColor3 = Color3.fromRGB(30, 30, 32)
     row.BorderSizePixel = 0
     row.LayoutOrder = ordem
     row.Parent = parent
-    Instance.new("UICorner", row).CornerRadius = UDim.new(0, 12)
+    Instance.new("UICorner", row).CornerRadius = UDim.new(0, 10)
 
     local lbl = Instance.new("TextLabel")
     lbl.Size = UDim2.new(0.7, 0, 1, 0)
-    lbl.Position = UDim2.new(0, 18, 0, 0)
+    lbl.Position = UDim2.new(0, 14, 0, 0)
     lbl.BackgroundTransparency = 1
     lbl.Text = texto
     lbl.TextColor3 = Color3.fromRGB(240, 240, 240)
     lbl.Font = Enum.Font.Gotham
-    lbl.TextSize = 15
+    lbl.TextSize = 13
     lbl.TextXAlignment = Enum.TextXAlignment.Left
     lbl.Parent = row
 
     local toggleBg = Instance.new("Frame")
-    toggleBg.Size = UDim2.new(0, 50, 0, 28)
-    toggleBg.Position = UDim2.new(1, -68, 0.5, -14)
+    toggleBg.Size = UDim2.new(0, 42, 0, 24)
+    toggleBg.Position = UDim2.new(1, -56, 0.5, -12)
     toggleBg.BackgroundColor3 = COR_TOGGLE_OFF
     toggleBg.BorderSizePixel = 0
     toggleBg.Parent = row
     Instance.new("UICorner", toggleBg).CornerRadius = UDim.new(1, 0)
 
     local circle = Instance.new("Frame")
-    circle.Size = UDim2.new(0, 22, 0, 22)
-    circle.Position = UDim2.new(0, 3, 0.5, -11)
+    circle.Size = UDim2.new(0, 18, 0, 18)
+    circle.Position = UDim2.new(0, 3, 0.5, -9)
     circle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     circle.BorderSizePixel = 0
     circle.Parent = toggleBg
@@ -380,10 +457,10 @@ local function criarToggle(parent, texto, ordem, callback)
         estado = not estado
         if estado then
             TweenService:Create(toggleBg, TweenInfo.new(0.2), {BackgroundColor3 = COR_TOGGLE_ON}):Play()
-            TweenService:Create(circle, TweenInfo.new(0.2), {Position = UDim2.new(1, -25, 0.5, -11)}):Play()
+            TweenService:Create(circle, TweenInfo.new(0.2), {Position = UDim2.new(1, -21, 0.5, -9)}):Play()
         else
             TweenService:Create(toggleBg, TweenInfo.new(0.2), {BackgroundColor3 = COR_TOGGLE_OFF}):Play()
-            TweenService:Create(circle, TweenInfo.new(0.2), {Position = UDim2.new(0, 3, 0.5, -11)}):Play()
+            TweenService:Create(circle, TweenInfo.new(0.2), {Position = UDim2.new(0, 3, 0.5, -9)}):Play()
         end
         if callback then
             local ok, err = pcall(callback, estado)
@@ -396,17 +473,17 @@ end
 
 local function criarBotao(parent, texto, ordem, callback)
     local b = Instance.new("TextButton")
-    b.Size = UDim2.new(1, 0, 0, 46)
+    b.Size = UDim2.new(1, 0, 0, 40)
     b.BackgroundColor3 = Color3.fromRGB(45, 30, 70)
     b.BorderSizePixel = 0
     b.Text = texto
     b.TextColor3 = Color3.fromRGB(220, 200, 255)
     b.Font = Enum.Font.GothamMedium
-    b.TextSize = 14
+    b.TextSize = 13
     b.LayoutOrder = ordem
     b.AutoButtonColor = false
     b.Parent = parent
-    Instance.new("UICorner", b).CornerRadius = UDim.new(0, 12)
+    Instance.new("UICorner", b).CornerRadius = UDim.new(0, 10)
 
     local s = Instance.new("UIStroke")
     s.Color = Color3.fromRGB(140, 90, 230)
@@ -453,11 +530,7 @@ local AbaCreditos   = criarAba("Créditos", 6)
 -- 🎯 ABA PRINCIPAL
 --════════════════════════════════════════════════
 criarToggle(AbaPrincipal, "Gojo Kill All", 1, function(ativo)
-    if ativo then
-        print("[Aether] Gojo Kill All ATIVADO")
-    else
-        print("[Aether] Gojo Kill All DESATIVADO")
-    end
+    print("[Aether] Gojo Kill All: " .. (ativo and "ON" or "OFF"))
 end)
 
 criarToggle(AbaPrincipal, "Mahito Ult Inf", 2, function(ativo)
@@ -501,7 +574,7 @@ end)
 --════════════════════════════════════════════════
 -- 🎯 ABA TELEPORTE
 --════════════════════════════════════════════════
-criarBotao(AbaTeleporte, "Teleportar para Jogador Aleatório", 1, function()
+criarBotao(AbaTeleporte, "Teleportar Jogador Aleatório", 1, function()
     print("[Aether] Teleportando...")
 end)
 
@@ -525,26 +598,26 @@ end)
 -- 🎯 ABA CRÉDITOS
 --════════════════════════════════════════════════
 local creditosFrame = Instance.new("Frame")
-creditosFrame.Size = UDim2.new(1, 0, 0, 150)
+creditosFrame.Size = UDim2.new(1, 0, 0, 130)
 creditosFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 32)
 creditosFrame.BorderSizePixel = 0
 creditosFrame.LayoutOrder = 1
 creditosFrame.Parent = AbaCreditos
-Instance.new("UICorner", creditosFrame).CornerRadius = UDim.new(0, 12)
+Instance.new("UICorner", creditosFrame).CornerRadius = UDim.new(0, 10)
 
 local creditosTxt = Instance.new("TextLabel")
-creditosTxt.Size = UDim2.new(1, -30, 1, -30)
-creditosTxt.Position = UDim2.new(0, 15, 0, 15)
+creditosTxt.Size = UDim2.new(1, -24, 1, -24)
+creditosTxt.Position = UDim2.new(0, 12, 0, 12)
 creditosTxt.BackgroundTransparency = 1
 creditosTxt.Text = "🌌 AETHER HUB\n\nFeito por: atsu\nVersão: 1.0"
 creditosTxt.TextColor3 = Color3.fromRGB(230, 230, 230)
 creditosTxt.Font = Enum.Font.Gotham
-creditosTxt.TextSize = 14
+creditosTxt.TextSize = 12
 creditosTxt.TextWrapped = true
 creditosTxt.TextYAlignment = Enum.TextYAlignment.Top
 creditosTxt.Parent = creditosFrame
 
--- Loop de tema na borda
+-- Loop de cor na borda
 task.spawn(function()
     local cores = {
         Color3.fromRGB(190, 150, 255),
