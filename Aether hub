@@ -742,9 +742,7 @@ end)
 
 criarToggle(AbaPrincipal, "🛡️ Auto Dodge", 6, function(ativo)
     print("[Aether] Auto Dodge: " .. (ativo and "ON" or "OFF"))
-end)
-
-criarToggle(AbaACBypass, "🔓 Bypass Anti-Cheat", 1, function(ativo)
+end)criarToggle(AbaACBypass, "🔓 Bypass Anti-Cheat", 1, function(ativo)
     print("[Aether] AC Bypass: " .. (ativo and "ON" or "OFF"))
 end)
 
@@ -839,123 +837,123 @@ criarToggle(AbaExtras, "💤 Anti-AFK", 5, function(ativo)
     else
         _G.Aether_AntiAFK = false
     end
-end)    criarBotao(AbaTeleporte, "🎲 TP Jogador Aleatório", 1, function()
-        local jogadores = {}
-        for _, p in ipairs(Players:GetPlayers()) do
-            if p ~= LP and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
-                table.insert(jogadores, p)
-            end
-        end
-        if #jogadores > 0 then
-            local alvo = jogadores[math.random(1, #jogadores)]
-            local meuRoot = LP.Character and LP.Character:FindFirstChild("HumanoidRootPart")
-            local rootAlvo = alvo.Character:FindFirstChild("HumanoidRootPart")
-            if meuRoot and rootAlvo then
-                meuRoot.CFrame = rootAlvo.CFrame + Vector3.new(0, 3, 0)
-            end
-        end
-    end)
+end)
 
-    criarBotao(AbaTeleporte, "👤 TP Todos os Jogadores", 2, function()
+criarBotao(AbaTeleporte, "🎲 TP Jogador Aleatório", 1, function()
+    local jogadores = {}
+    for _, p in ipairs(Players:GetPlayers()) do
+        if p ~= LP and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+            table.insert(jogadores, p)
+        end
+    end
+    if #jogadores > 0 then
+        local alvo = jogadores[math.random(1, #jogadores)]
         local meuRoot = LP.Character and LP.Character:FindFirstChild("HumanoidRootPart")
-        if not meuRoot then return end
-        for _, p in ipairs(Players:GetPlayers()) do
-            if p ~= LP and p.Character then
-                local rootAlvo = p.Character:FindFirstChild("HumanoidRootPart")
-                if rootAlvo then
-                    meuRoot.CFrame = rootAlvo.CFrame
-                    task.wait(0.1)
-                end
+        local rootAlvo = alvo.Character:FindFirstChild("HumanoidRootPart")
+        if meuRoot and rootAlvo then
+            meuRoot.CFrame = rootAlvo.CFrame + Vector3.new(0, 3, 0)
+        end
+    end
+end)
+
+criarBotao(AbaTeleporte, "👤 TP Todos os Jogadores", 2, function()
+    local meuRoot = LP.Character and LP.Character:FindFirstChild("HumanoidRootPart")
+    if not meuRoot then return end
+    for _, p in ipairs(Players:GetPlayers()) do
+        if p ~= LP and p.Character then
+            local rootAlvo = p.Character:FindFirstChild("HumanoidRootPart")
+            if rootAlvo then
+                meuRoot.CFrame = rootAlvo.CFrame
+                task.wait(0.1)
             end
         end
-    end)
+    end
+end)
 
-    criarBotao(AbaTeleporte, "🏠 Voltar ao Spawn", 3, function()
+criarBotao(AbaTeleporte, "🏠 Voltar ao Spawn", 3, function()
+    local char = LP.Character
+    local root = char and char:FindFirstChild("HumanoidRootPart")
+    local spawn = workspace:FindFirstChildOfClass("SpawnLocation")
+    if root and spawn then
+        root.CFrame = spawn.CFrame + Vector3.new(0, 3, 0)
+    end
+end)
+
+criarToggle(AbaBasico, "💨 Speed 200", 1, function(ativo)
+    local hum = LP.Character and LP.Character:FindFirstChildOfClass("Humanoid")
+    if hum then hum.WalkSpeed = ativo and 200 or 16 end
+end)
+
+criarToggle(AbaBasico, "⬆️ Jump Power 150", 2, function(ativo)
+    local hum = LP.Character and LP.Character:FindFirstChildOfClass("Humanoid")
+    if hum then
+        hum.UseJumpPower = true
+        hum.JumpPower = ativo and 150 or 50
+    end
+end)
+
+local flyAtivo = false
+local flyConn, flyBV
+criarToggle(AbaBasico, "🕊️ Fly", 3, function(ativo)
+    flyAtivo = ativo
+    if ativo then
         local char = LP.Character
+        local hum = char and char:FindFirstChildOfClass("Humanoid")
         local root = char and char:FindFirstChild("HumanoidRootPart")
-        local spawn = workspace:FindFirstChildOfClass("SpawnLocation")
-        if root and spawn then
-            root.CFrame = spawn.CFrame + Vector3.new(0, 3, 0)
-        end
-    end)
+        if not root or not hum then return end
+        hum.PlatformStand = true
+        flyBV = Instance.new("BodyVelocity")
+        flyBV.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+        flyBV.Velocity = Vector3.zero
+        flyBV.Parent = root
 
-    criarToggle(AbaBasico, "💨 Speed 200", 1, function(ativo)
+        flyConn = RunService.Heartbeat:Connect(function()
+            if not flyAtivo then return end
+            local c = LP.Character
+            local r = c and c:FindFirstChild("HumanoidRootPart")
+            if not r then return end
+            local cam = workspace.CurrentCamera
+            local vel = Vector3.zero
+            local speed = 80
+            if UIS:IsKeyDown(Enum.KeyCode.W) then vel += cam.CFrame.LookVector * speed end
+            if UIS:IsKeyDown(Enum.KeyCode.S) then vel -= cam.CFrame.LookVector * speed end
+            if UIS:IsKeyDown(Enum.KeyCode.A) then vel -= cam.CFrame.RightVector * speed end
+            if UIS:IsKeyDown(Enum.KeyCode.D) then vel += cam.CFrame.RightVector * speed end
+            if UIS:IsKeyDown(Enum.KeyCode.Space) then vel += Vector3.new(0, speed, 0) end
+            flyBV.Velocity = vel
+        end)
+    else
+        if flyConn then flyConn:Disconnect(); flyConn = nil end
+        if flyBV then flyBV:Destroy(); flyBV = nil end
         local hum = LP.Character and LP.Character:FindFirstChildOfClass("Humanoid")
-        if hum then hum.WalkSpeed = ativo and 200 or 16 end
-    end)
+        if hum then hum.PlatformStand = false end
+    end
+end)
 
-    criarToggle(AbaBasico, "⬆️ Jump Power 150", 2, function(ativo)
-        local hum = LP.Character and LP.Character:FindFirstChildOfClass("Humanoid")
-        if hum then
-            hum.UseJumpPower = true
-            hum.JumpPower = ativo and 150 or 50
-        end
-    end)
-
-    local flyAtivo = false
-    local flyConn, flyBV
-    criarToggle(AbaBasico, "🕊️ Fly", 3, function(ativo)
-        flyAtivo = ativo
-        if ativo then
-            local char = LP.Character
-            local hum = char and char:FindFirstChildOfClass("Humanoid")
-            local root = char and char:FindFirstChild("HumanoidRootPart")
-            if not root or not hum then return end
-            hum.PlatformStand = true
-            flyBV = Instance.new("BodyVelocity")
-            flyBV.MaxForce = Vector3.new(9e9, 9e9, 9e9)
-            flyBV.Velocity = Vector3.zero
-            flyBV.Parent = root
-
-            flyConn = RunService.Heartbeat:Connect(function()
-                if not flyAtivo then return end
-                local c = LP.Character
-                local r = c and c:FindFirstChild("HumanoidRootPart")
-                if not r then return end
-                local cam = workspace.CurrentCamera
-                local vel = Vector3.zero
-                local speed = 80
-                if UIS:IsKeyDown(Enum.KeyCode.W) then vel += cam.CFrame.LookVector * speed end
-                if UIS:IsKeyDown(Enum.KeyCode.S) then vel -= cam.CFrame.LookVector * speed end
-                if UIS:IsKeyDown(Enum.KeyCode.A) then vel -= cam.CFrame.RightVector * speed end
-                if UIS:IsKeyDown(Enum.KeyCode.D) then vel += cam.CFrame.RightVector * speed end
-                if UIS:IsKeyDown(Enum.KeyCode.Space) then vel += Vector3.new(0, speed, 0) end
-                flyBV.Velocity = vel
-            end)
-        else
-            if flyConn then flyConn:Disconnect(); flyConn = nil end
-            if flyBV then flyBV:Destroy(); flyBV = nil end
-            local hum = LP.Character and LP.Character:FindFirstChildOfClass("Humanoid")
-            if hum then hum.PlatformStand = false end
-        end
-    end)
-
-    local noclipAtivo = false
-    criarToggle(AbaBasico, "👻 Noclip", 4, function(ativo)
-        noclipAtivo = ativo
-        if ativo then
-            task.spawn(function()
-                while noclipAtivo do
-                    local char = LP.Character
-                    if char then
-                        for _, part in ipairs(char:GetDescendants()) do
-                            if part:IsA("BasePart") then part.CanCollide = false end
-                        end
+local noclipAtivo = false
+criarToggle(AbaBasico, "👻 Noclip", 4, function(ativo)
+    noclipAtivo = ativo
+    if ativo then
+        task.spawn(function()
+            while noclipAtivo do
+                local char = LP.Character
+                if char then
+                    for _, part in ipairs(char:GetDescendants()) do
+                        if part:IsA("BasePart") then part.CanCollide = false end
                     end
-                    task.wait(0.2)
                 end
-            end)
-        end
-    end)
+                task.wait(0.2)
+            end
+        end)
+    end
+end)
 
-    UIS.JumpRequest:Connect(function()
-        if infJumpAtivo then
-            local hum = LP.Character and LP.Character:FindFirstChildOfClass("Humanoid")
-            if hum then hum:ChangeState(Enum.HumanoidStateType.Jumping) end
-        end
-    end)
-
-    local creditosFrame = Instance.new("Frame")
+UIS.JumpRequest:Connect(function()
+    if infJumpAtivo then
+        local hum = LP.Character and LP.Character:FindFirstChildOfClass("Humanoid")
+        if hum then hum:ChangeState(Enum.HumanoidStateType.Jumping) end
+    end
+end)    local creditosFrame = Instance.new("Frame")
     creditosFrame.Size = UDim2.new(1, 0, 0, 130)
     creditosFrame.BackgroundColor3 = Color3.fromRGB(32, 22, 48)
     creditosFrame.BorderSizePixel = 0
