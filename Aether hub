@@ -36,29 +36,11 @@ local function createKeyGui()
     frame.Parent = gui
     Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 18)
 
-    local grad = Instance.new("UIGradient")
-    grad.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(35, 20, 60)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(15, 10, 25)),
-    })
-    grad.Rotation = 45
-    grad.Parent = frame
-
     local stroke = Instance.new("UIStroke")
     stroke.Color = Color3.fromRGB(160, 100, 255)
     stroke.Thickness = 1.5
     stroke.Transparency = 0.2
     stroke.Parent = frame
-
-    task.spawn(function()
-        while frame.Parent do
-            for i = 0, 1, 0.05 do
-                if not frame.Parent then break end
-                stroke.Transparency = 0.15 + math.abs(math.sin(i * math.pi)) * 0.35
-                task.wait(0.04)
-            end
-        end
-    end)
 
     local title = Instance.new("TextLabel")
     title.Size = UDim2.new(1, 0, 0, 45)
@@ -95,22 +77,6 @@ local function createKeyGui()
     box.Parent = frame
     Instance.new("UICorner", box).CornerRadius = UDim.new(0, 10)
 
-    local boxStroke = Instance.new("UIStroke")
-    boxStroke.Color = Color3.fromRGB(120, 80, 200)
-    boxStroke.Thickness = 1
-    boxStroke.Transparency = 0.5
-    boxStroke.Parent = box
-
-    box.Focused:Connect(function()
-        TweenService:Create(boxStroke, TweenInfo.new(0.2), {Transparency = 0}):Play()
-        TweenService:Create(boxStroke, TweenInfo.new(0.2), {Color = Color3.fromRGB(180, 120, 255)}):Play()
-    end)
-
-    box.FocusLost:Connect(function()
-        TweenService:Create(boxStroke, TweenInfo.new(0.2), {Transparency = 0.5}):Play()
-        TweenService:Create(boxStroke, TweenInfo.new(0.2), {Color = Color3.fromRGB(120, 80, 200)}):Play()
-    end)
-
     local btn = Instance.new("TextButton")
     btn.Size = UDim2.new(0, 230, 0, 38)
     btn.Position = UDim2.new(0.5, -115, 0, 138)
@@ -123,22 +89,6 @@ local function createKeyGui()
     btn.AutoButtonColor = false
     btn.Parent = frame
     Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 10)
-
-    local btnGrad = Instance.new("UIGradient")
-    btnGrad.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(170, 100, 255)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(110, 50, 200)),
-    })
-    btnGrad.Rotation = 90
-    btnGrad.Parent = btn
-
-    btn.MouseEnter:Connect(function()
-        TweenService:Create(btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(160, 100, 245)}):Play()
-    end)
-
-    btn.MouseLeave:Connect(function()
-        TweenService:Create(btn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(130, 70, 220)}):Play()
-    end)
 
     local status = Instance.new("TextLabel")
     status.Size = UDim2.new(1, 0, 0, 18)
@@ -199,16 +149,6 @@ endloadMainHub = function()
     ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     ScreenGui.Parent = CoreGui
 
-    local ShadowFrame = Instance.new("Frame")
-    ShadowFrame.Size = NORMAL_SIZE
-    ShadowFrame.Position = NORMAL_POS
-    ShadowFrame.BackgroundColor3 = COR_ROXO
-    ShadowFrame.BackgroundTransparency = 0.75
-    ShadowFrame.BorderSizePixel = 0
-    ShadowFrame.ZIndex = 0
-    ShadowFrame.Parent = ScreenGui
-    Instance.new("UICorner", ShadowFrame).CornerRadius = UDim.new(0, 18)
-
     local MainFrame = Instance.new("Frame")
     MainFrame.Name = "MainFrame"
     MainFrame.Size = NORMAL_SIZE
@@ -217,7 +157,6 @@ endloadMainHub = function()
     MainFrame.BorderSizePixel = 0
     MainFrame.Active = true
     MainFrame.Draggable = true
-    MainFrame.ZIndex = 1
     MainFrame.Parent = ScreenGui
     Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 16)
 
@@ -235,65 +174,21 @@ endloadMainHub = function()
     MainStroke.Transparency = 0.3
     MainStroke.Parent = MainFrame
 
-    task.spawn(function()
-        while MainFrame.Parent do
-            for i = 0, 1, 0.06 do
-                if not MainFrame.Parent then break end
-                MainStroke.Transparency = 0.2 + math.abs(math.sin(i * math.pi)) * 0.4
-                ShadowFrame.BackgroundTransparency = 0.7 + math.abs(math.sin(i * math.pi)) * 0.15
-                task.wait(0.03)
-            end
-        end
-    end)
-
     local TopBar = Instance.new("Frame")
     TopBar.Size = UDim2.new(1, 0, 0, 42)
     TopBar.BackgroundTransparency = 1
-    TopBar.ZIndex = 2
     TopBar.Parent = MainFrame
-
-    local LogoCircle = Instance.new("Frame")
-    LogoCircle.Size = UDim2.new(0, 26, 0, 26)
-    LogoCircle.Position = UDim2.new(0, 14, 0.5, -13)
-    LogoCircle.BackgroundColor3 = COR_ROXO
-    LogoCircle.BorderSizePixel = 0
-    LogoCircle.ZIndex = 3
-    LogoCircle.Parent = TopBar
-    Instance.new("UICorner", LogoCircle).CornerRadius = UDim.new(1, 0)
-
-    local LogoIcon = Instance.new("TextLabel")
-    LogoIcon.Size = UDim2.new(1, 0, 1, 0)
-    LogoIcon.BackgroundTransparency = 1
-    LogoIcon.Text = "*"
-    LogoIcon.TextColor3 = Color3.fromRGB(255, 255, 255)
-    LogoIcon.Font = Enum.Font.GothamBold
-    LogoIcon.TextSize = 14
-    LogoIcon.ZIndex = 4
-    LogoIcon.Parent = LogoCircle
 
     local HubTitle = Instance.new("TextLabel")
     HubTitle.Size = UDim2.new(0, 250, 1, 0)
-    HubTitle.Position = UDim2.new(0, 48, 0, 0)
+    HubTitle.Position = UDim2.new(0, 18, 0, 0)
     HubTitle.BackgroundTransparency = 1
     HubTitle.Text = "AETHER HUB"
     HubTitle.TextColor3 = Color3.fromRGB(230, 210, 255)
     HubTitle.Font = Enum.Font.GothamBold
     HubTitle.TextSize = 15
     HubTitle.TextXAlignment = Enum.TextXAlignment.Left
-    HubTitle.ZIndex = 3
     HubTitle.Parent = TopBar
-
-    local HubSub = Instance.new("TextLabel")
-    HubSub.Size = UDim2.new(0, 250, 1, 0)
-    HubSub.Position = UDim2.new(0, 150, 0, 0)
-    HubSub.BackgroundTransparency = 1
-    HubSub.Text = "by atsu"
-    HubSub.TextColor3 = Color3.fromRGB(120, 100, 160)
-    HubSub.Font = Enum.Font.Gotham
-    HubSub.TextSize = 10
-    HubSub.TextXAlignment = Enum.TextXAlignment.Left
-    HubSub.ZIndex = 3
-    HubSub.Parent = TopBar
 
     local MinBtn = Instance.new("TextButton")
     MinBtn.Size = UDim2.new(0, 28, 0, 28)
@@ -305,37 +200,21 @@ endloadMainHub = function()
     MinBtn.Font = Enum.Font.GothamBold
     MinBtn.TextSize = 18
     MinBtn.AutoButtonColor = false
-    MinBtn.ZIndex = 3
     MinBtn.Parent = TopBar
     Instance.new("UICorner", MinBtn).CornerRadius = UDim.new(0, 8)
-
-    local MinBtnStroke = Instance.new("UIStroke")
-    MinBtnStroke.Color = COR_ROXO
-    MinBtnStroke.Thickness = 1
-    MinBtnStroke.Transparency = 0.5
-    MinBtnStroke.Parent = MinBtn
 
     local Sidebar = Instance.new("Frame")
     Sidebar.Size = UDim2.new(0, 130, 1, -54)
     Sidebar.Position = UDim2.new(0, 12, 0, 46)
     Sidebar.BackgroundColor3 = COR_PAINEL
-    Sidebar.BackgroundTransparency = 0.35
     Sidebar.BorderSizePixel = 0
-    Sidebar.ZIndex = 2
     Sidebar.Parent = MainFrame
     Instance.new("UICorner", Sidebar).CornerRadius = UDim.new(0, 12)
-
-    local SidebarStroke = Instance.new("UIStroke")
-    SidebarStroke.Color = COR_ROXO
-    SidebarStroke.Thickness = 1
-    SidebarStroke.Transparency = 0.75
-    SidebarStroke.Parent = Sidebar
 
     local TabList = Instance.new("Frame")
     TabList.Size = UDim2.new(1, -14, 1, -14)
     TabList.Position = UDim2.new(0, 7, 0, 7)
     TabList.BackgroundTransparency = 1
-    TabList.ZIndex = 3
     TabList.Parent = Sidebar
 
     local TabLayout = Instance.new("UIListLayout")
@@ -347,17 +226,9 @@ endloadMainHub = function()
     ContentArea.Size = UDim2.new(1, -166, 1, -54)
     ContentArea.Position = UDim2.new(0, 154, 0, 46)
     ContentArea.BackgroundColor3 = COR_PAINEL
-    ContentArea.BackgroundTransparency = 0.35
     ContentArea.BorderSizePixel = 0
-    ContentArea.ZIndex = 2
     ContentArea.Parent = MainFrame
     Instance.new("UICorner", ContentArea).CornerRadius = UDim.new(0, 12)
-
-    local ContentStroke = Instance.new("UIStroke")
-    ContentStroke.Color = COR_ROXO
-    ContentStroke.Thickness = 1
-    ContentStroke.Transparency = 0.75
-    ContentStroke.Parent = ContentArea
 
     local ContentTitle = Instance.new("TextLabel")
     ContentTitle.Size = UDim2.new(1, 0, 0, 36)
@@ -367,7 +238,6 @@ endloadMainHub = function()
     ContentTitle.TextColor3 = Color3.fromRGB(80, 55, 120)
     ContentTitle.Font = Enum.Font.GothamBold
     ContentTitle.TextSize = 26
-    ContentTitle.ZIndex = 3
     ContentTitle.Parent = ContentArea
 
     local FunctionList = Instance.new("ScrollingFrame")
@@ -377,21 +247,15 @@ endloadMainHub = function()
     FunctionList.BorderSizePixel = 0
     FunctionList.ScrollBarThickness = 4
     FunctionList.ScrollBarImageColor3 = COR_ROXO
-    FunctionList.ScrollBarImageTransparency = 0.3
     FunctionList.CanvasSize = UDim2.new(0, 0, 0, 0)
     FunctionList.AutomaticCanvasSize = Enum.AutomaticSize.Y
     FunctionList.ScrollingDirection = Enum.ScrollingDirection.Y
-    FunctionList.ZIndex = 3
     FunctionList.Parent = ContentArea
 
     local FuncLayout = Instance.new("UIListLayout")
     FuncLayout.Padding = UDim.new(0, 7)
     FuncLayout.SortOrder = Enum.SortOrder.LayoutOrder
     FuncLayout.Parent = FunctionList
-
-    FuncLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-        FunctionList.CanvasSize = UDim2.new(0, 0, 0, FuncLayout.AbsoluteContentSize.Y + 10)
-    end)
 
     local MiniPanel = Instance.new("TextButton")
     MiniPanel.Size = UDim2.new(0, 50, 0, 50)
@@ -409,68 +273,14 @@ endloadMainHub = function()
     MiniPanel.Parent = ScreenGui
     Instance.new("UICorner", MiniPanel).CornerRadius = UDim.new(1, 0)
 
-    local MiniGrad = Instance.new("UIGradient")
-    MiniGrad.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(180, 110, 255)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(120, 60, 220)),
-    })
-    MiniGrad.Rotation = 45
-    MiniGrad.Parent = MiniPanel
-
-    task.spawn(function()
-        while MiniPanel.Parent do
-            if MiniPanel.Visible then
-                for i = 0, 1, 0.1 do
-                    if not MiniPanel.Visible then break end
-                    MiniPanel.Size = UDim2.new(0, 50 + math.sin(i * math.pi) * 4, 0, 50 + math.sin(i * math.pi) * 4)
-                    MiniPanel.Position = UDim2.new(0, 20 - math.sin(i * math.pi) * 2, 0.5, -25 - math.sin(i * math.pi) * 2)
-                    task.wait(0.04)
-                end
-            else
-                task.wait(0.2)
-            end
-        end
-    end)
-
     MinBtn.MouseButton1Click:Connect(function()
-        TweenService:Create(MainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
-            Size = UDim2.new(0, 0, 0, 0),
-            Position = UDim2.new(0.5, 0, 0.5, 0),
-        }):Play()
-        TweenService:Create(ShadowFrame, TweenInfo.new(0.3), {
-            Size = UDim2.new(0, 0, 0, 0),
-            Position = UDim2.new(0.5, 0, 0.5, 0),
-        }):Play()
-        task.wait(0.3)
         MainFrame.Visible = false
-        ShadowFrame.Visible = false
         MiniPanel.Visible = true
-        MiniPanel.Size = UDim2.new(0, 0, 0, 0)
-        TweenService:Create(MiniPanel, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-            Size = UDim2.new(0, 50, 0, 50),
-        }):Play()
     end)
 
     MiniPanel.MouseButton1Click:Connect(function()
-        TweenService:Create(MiniPanel, TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
-            Size = UDim2.new(0, 0, 0, 0),
-        }):Play()
-        task.wait(0.25)
         MiniPanel.Visible = false
         MainFrame.Visible = true
-        ShadowFrame.Visible = true
-        MainFrame.Size = UDim2.new(0, 0, 0, 0)
-        MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-        TweenService:Create(MainFrame, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-            Size = NORMAL_SIZE,
-            Position = NORMAL_POS,
-        }):Play()
-        ShadowFrame.Size = UDim2.new(0, 0, 0, 0)
-        ShadowFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-        TweenService:Create(ShadowFrame, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-            Size = NORMAL_SIZE,
-            Position = NORMAL_POS,
-        }):Play()
     end)
 
     MinBtn.MouseEnter:Connect(function()
@@ -486,14 +296,12 @@ local function trocarAba(nomeAba)
     for nome, dados in pairs(Abas) do
         if nome == nomeAba then
             dados.frame.Visible = true
-            TweenService:Create(dados.botao, TweenInfo.new(0.25), {BackgroundColor3 = COR_ABA_ATIVA}):Play()
-            TweenService:Create(dados.botao, TweenInfo.new(0.25), {TextColor3 = Color3.fromRGB(255, 255, 255)}):Play()
-            TweenService:Create(dados.botaoStroke, TweenInfo.new(0.25), {Transparency = 0.2}):Play()
+            dados.botao.BackgroundColor3 = COR_ABA_ATIVA
+            dados.botao.TextColor3 = Color3.fromRGB(255, 255, 255)
         else
             dados.frame.Visible = false
-            TweenService:Create(dados.botao, TweenInfo.new(0.25), {BackgroundColor3 = COR_ABA_OFF}):Play()
-            TweenService:Create(dados.botao, TweenInfo.new(0.25), {TextColor3 = COR_TEXTO_OFF}):Play()
-            TweenService:Create(dados.botaoStroke, TweenInfo.new(0.25), {Transparency = 0.8}):Play()
+            dados.botao.BackgroundColor3 = COR_ABA_OFF
+            dados.botao.TextColor3 = COR_TEXTO_OFF
         end
     end
     ContentTitle.Text = nomeAba
@@ -511,21 +319,13 @@ local function criarAba(nome, ordem)
     botao.TextSize = 12
     botao.LayoutOrder = ordem
     botao.AutoButtonColor = false
-    botao.ZIndex = 4
     botao.Parent = TabList
     Instance.new("UICorner", botao).CornerRadius = UDim.new(0, 8)
-
-    local botaoStroke = Instance.new("UIStroke")
-    botaoStroke.Color = COR_ROXO
-    botaoStroke.Thickness = 1
-    botaoStroke.Transparency = 0.8
-    botaoStroke.Parent = botao
 
     local abaFrame = Instance.new("Frame")
     abaFrame.Size = UDim2.new(1, 0, 0, 0)
     abaFrame.BackgroundTransparency = 1
     abaFrame.Visible = false
-    abaFrame.ZIndex = 4
     abaFrame.Parent = FunctionList
 
     local abaLayout = Instance.new("UIListLayout")
@@ -541,7 +341,7 @@ local function criarAba(nome, ordem)
         trocarAba(nome)
     end)
 
-    Abas[nome] = { botao = botao, frame = abaFrame, botaoStroke = botaoStroke }
+    Abas[nome] = { botao = botao, frame = abaFrame }
     if not AbaAtual then trocarAba(nome) end
     return abaFrame
 end
@@ -552,15 +352,8 @@ local function criarToggle(parent, texto, ordem, callback)
     row.BackgroundColor3 = Color3.fromRGB(32, 22, 48)
     row.BorderSizePixel = 0
     row.LayoutOrder = ordem
-    row.ZIndex = 4
     row.Parent = parent
     Instance.new("UICorner", row).CornerRadius = UDim.new(0, 10)
-
-    local rowStroke = Instance.new("UIStroke")
-    rowStroke.Color = COR_ROXO
-    rowStroke.Thickness = 1
-    rowStroke.Transparency = 0.85
-    rowStroke.Parent = row
 
     local lbl = Instance.new("TextLabel")
     lbl.Size = UDim2.new(0.72, 0, 1, 0)
@@ -571,7 +364,6 @@ local function criarToggle(parent, texto, ordem, callback)
     lbl.Font = Enum.Font.Gotham
     lbl.TextSize = 13
     lbl.TextXAlignment = Enum.TextXAlignment.Left
-    lbl.ZIndex = 5
     lbl.Parent = row
 
     local toggleBg = Instance.new("Frame")
@@ -579,22 +371,14 @@ local function criarToggle(parent, texto, ordem, callback)
     toggleBg.Position = UDim2.new(1, -56, 0.5, -12)
     toggleBg.BackgroundColor3 = COR_TOGGLE_OFF
     toggleBg.BorderSizePixel = 0
-    toggleBg.ZIndex = 5
     toggleBg.Parent = row
     Instance.new("UICorner", toggleBg).CornerRadius = UDim.new(1, 0)
-
-    local toggleBgStroke = Instance.new("UIStroke")
-    toggleBgStroke.Color = COR_ROXO
-    toggleBgStroke.Thickness = 1
-    toggleBgStroke.Transparency = 0.8
-    toggleBgStroke.Parent = toggleBg
 
     local circle = Instance.new("Frame")
     circle.Size = UDim2.new(0, 18, 0, 18)
     circle.Position = UDim2.new(0, 3, 0.5, -9)
     circle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     circle.BorderSizePixel = 0
-    circle.ZIndex = 6
     circle.Parent = toggleBg
     Instance.new("UICorner", circle).CornerRadius = UDim.new(1, 0)
 
@@ -602,22 +386,17 @@ local function criarToggle(parent, texto, ordem, callback)
     click.Size = UDim2.new(1, 0, 1, 0)
     click.BackgroundTransparency = 1
     click.Text = ""
-    click.ZIndex = 7
     click.Parent = row
 
     local estado = false
     click.MouseButton1Click:Connect(function()
         estado = not estado
         if estado then
-            TweenService:Create(toggleBg, TweenInfo.new(0.25), {BackgroundColor3 = COR_TOGGLE_ON}):Play()
-            TweenService:Create(toggleBgStroke, TweenInfo.new(0.25), {Transparency = 0.2}):Play()
-            TweenService:Create(circle, TweenInfo.new(0.25), {Position = UDim2.new(1, -21, 0.5, -9)}):Play()
-            TweenService:Create(rowStroke, TweenInfo.new(0.25), {Transparency = 0.5}):Play()
+            toggleBg.BackgroundColor3 = COR_TOGGLE_ON
+            circle.Position = UDim2.new(1, -21, 0.5, -9)
         else
-            TweenService:Create(toggleBg, TweenInfo.new(0.25), {BackgroundColor3 = COR_TOGGLE_OFF}):Play()
-            TweenService:Create(toggleBgStroke, TweenInfo.new(0.25), {Transparency = 0.8}):Play()
-            TweenService:Create(circle, TweenInfo.new(0.25), {Position = UDim2.new(0, 3, 0.5, -9)}):Play()
-            TweenService:Create(rowStroke, TweenInfo.new(0.25), {Transparency = 0.85}):Play()
+            toggleBg.BackgroundColor3 = COR_TOGGLE_OFF
+            circle.Position = UDim2.new(0, 3, 0.5, -9)
         end
         if callback then
             local ok, err = pcall(callback, estado)
@@ -639,32 +418,15 @@ local function criarBotao(parent, texto, ordem, callback)
     b.TextSize = 13
     b.LayoutOrder = ordem
     b.AutoButtonColor = false
-    b.ZIndex = 4
     b.Parent = parent
     Instance.new("UICorner", b).CornerRadius = UDim.new(0, 10)
 
-    local bgGrad = Instance.new("UIGradient")
-    bgGrad.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(75, 45, 120)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(50, 30, 85)),
-    })
-    bgGrad.Rotation = 90
-    bgGrad.Parent = b
-
-    local s = Instance.new("UIStroke")
-    s.Color = COR_ROXO
-    s.Thickness = 1
-    s.Transparency = 0.5
-    s.Parent = b
-
     b.MouseEnter:Connect(function()
-        TweenService:Create(b, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(90, 55, 145)}):Play()
-        TweenService:Create(s, TweenInfo.new(0.15), {Transparency = 0.2}):Play()
+        b.BackgroundColor3 = Color3.fromRGB(90, 55, 145)
     end)
 
     b.MouseLeave:Connect(function()
-        TweenService:Create(b, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(60, 38, 95)}):Play()
-        TweenService:Create(s, TweenInfo.new(0.15), {Transparency = 0.5}):Play()
+        b.BackgroundColor3 = Color3.fromRGB(60, 38, 95)
     end)
 
     b.MouseButton1Click:Connect(function()
@@ -677,22 +439,8 @@ local function criarBotao(parent, texto, ordem, callback)
     return b
 end
 
-MainFrame.Size = UDim2.new(0, 0, 0, 0)
-MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-ShadowFrame.Size = UDim2.new(0, 0, 0, 0)
-ShadowFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-
-TweenService:Create(MainFrame, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-    Size = NORMAL_SIZE,
-    Position = NORMAL_POS,
-}):Play()
-TweenService:Create(ShadowFrame, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-    Size = NORMAL_SIZE,
-    Position = NORMAL_POS,
-}):Play()
-
 local AbaPrincipal  = criarAba("Principal", 1)
-local AbaACBypass   = criarAba("Bypass", 2)
+local AbaBypass     = criarAba("Bypass", 2)
 local AbaExtras     = criarAba("Extras", 3)
 local AbaTeleporte  = criarAba("Teleporte", 4)
 local AbaBasico     = criarAba("Basico", 5)
@@ -738,22 +486,8 @@ end)
 criarToggle(AbaPrincipal, "Auto Dodge", 6, function(ativo)
 end)
 
-criarToggle(AbaACBypass, "Bypass", 1, function(ativo)
-    if ativo then
-        task.spawn(function()
-            while _G.Aether_Bypass do
-                pcall(function()
-                    for _, obj in ipairs(LP.PlayerScripts:GetChildren()) do
-                        obj.Parent = nil
-                    end
-                end)
-                task.wait(0.5)
-            end
-        end)
-        _G.Aether_Bypass = true
-    else
-        _G.Aether_Bypass = false
-    end
+criarToggle(AbaBypass, "Bypass", 1, function(ativo)
+    _G.Aether_Bypass = ativo
 end)
 
 local espAtivo = false
@@ -787,21 +521,7 @@ end)
 
 criarToggle(AbaExtras, "FPS Booster", 2, function(ativo)
     if ativo then
-        task.spawn(function()
-            for _, v in ipairs(game:GetDescendants()) do
-                pcall(function()
-                    if v:IsA("BasePart") then
-                        v.Material = Enum.Material.SmoothPlastic
-                        v.CastShadow = false
-                    elseif v:IsA("Decal") or v:IsA("Texture") then
-                        v:Destroy()
-                    elseif v:IsA("ParticleEmitter") or v:IsA("Trail") then
-                        v.Enabled = false
-                    end
-                end)
-            end
-            workspace.GlobalShadows = false
-        end)
+        workspace.GlobalShadows = false
     else
         workspace.GlobalShadows = true
     end
@@ -858,21 +578,7 @@ criarBotao(AbaTeleporte, "TP Jogador Aleatorio", 1, function()
     end
 end)
 
-criarBotao(AbaTeleporte, "TP Todos os Jogadores", 2, function()
-    local meuRoot = LP.Character and LP.Character:FindFirstChild("HumanoidRootPart")
-    if not meuRoot then return end
-    for _, p in ipairs(Players:GetPlayers()) do
-        if p ~= LP and p.Character then
-            local rootAlvo = p.Character:FindFirstChild("HumanoidRootPart")
-            if rootAlvo then
-                meuRoot.CFrame = rootAlvo.CFrame
-                task.wait(0.1)
-            end
-        end
-    end
-end)
-
-criarBotao(AbaTeleporte, "Voltar ao Spawn", 3, function()
+criarBotao(AbaTeleporte, "Voltar ao Spawn", 2, function()
     local char = LP.Character
     local root = char and char:FindFirstChild("HumanoidRootPart")
     local spawn = workspace:FindFirstChildOfClass("SpawnLocation")
@@ -892,46 +598,8 @@ end)    criarToggle(AbaBasico, "Speed 200", 1, function(ativo)
         end
     end)
 
-    local flyAtivo = false
-    local flyConn, flyBV
-    criarToggle(AbaBasico, "Fly", 3, function(ativo)
-        flyAtivo = ativo
-        if ativo then
-            local char = LP.Character
-            local hum = char and char:FindFirstChildOfClass("Humanoid")
-            local root = char and char:FindFirstChild("HumanoidRootPart")
-            if not root or not hum then return end
-            hum.PlatformStand = true
-            flyBV = Instance.new("BodyVelocity")
-            flyBV.MaxForce = Vector3.new(9e9, 9e9, 9e9)
-            flyBV.Velocity = Vector3.zero
-            flyBV.Parent = root
-
-            flyConn = RunService.Heartbeat:Connect(function()
-                if not flyAtivo then return end
-                local c = LP.Character
-                local r = c and c:FindFirstChild("HumanoidRootPart")
-                if not r then return end
-                local cam = workspace.CurrentCamera
-                local vel = Vector3.zero
-                local speed = 80
-                if UIS:IsKeyDown(Enum.KeyCode.W) then vel += cam.CFrame.LookVector * speed end
-                if UIS:IsKeyDown(Enum.KeyCode.S) then vel -= cam.CFrame.LookVector * speed end
-                if UIS:IsKeyDown(Enum.KeyCode.A) then vel -= cam.CFrame.RightVector * speed end
-                if UIS:IsKeyDown(Enum.KeyCode.D) then vel += cam.CFrame.RightVector * speed end
-                if UIS:IsKeyDown(Enum.KeyCode.Space) then vel += Vector3.new(0, speed, 0) end
-                flyBV.Velocity = vel
-            end)
-        else
-            if flyConn then flyConn:Disconnect(); flyConn = nil end
-            if flyBV then flyBV:Destroy(); flyBV = nil end
-            local hum = LP.Character and LP.Character:FindFirstChildOfClass("Humanoid")
-            if hum then hum.PlatformStand = false end
-        end
-    end)
-
     local noclipAtivo = false
-    criarToggle(AbaBasico, "Noclip", 4, function(ativo)
+    criarToggle(AbaBasico, "Noclip", 3, function(ativo)
         noclipAtivo = ativo
         if ativo then
             task.spawn(function()
@@ -960,7 +628,6 @@ end)    criarToggle(AbaBasico, "Speed 200", 1, function(ativo)
     creditosFrame.BackgroundColor3 = Color3.fromRGB(32, 22, 48)
     creditosFrame.BorderSizePixel = 0
     creditosFrame.LayoutOrder = 1
-    creditosFrame.ZIndex = 4
     creditosFrame.Parent = AbaCreditos
     Instance.new("UICorner", creditosFrame).CornerRadius = UDim.new(0, 10)
 
@@ -974,7 +641,6 @@ end)    criarToggle(AbaBasico, "Speed 200", 1, function(ativo)
     creditosTxt.TextSize = 12
     creditosTxt.TextWrapped = true
     creditosTxt.TextYAlignment = Enum.TextYAlignment.Top
-    creditosTxt.ZIndex = 5
     creditosTxt.Parent = creditosFrame
 end
 
