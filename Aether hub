@@ -696,7 +696,8 @@ local AbaACBypass   = criarAba("Bypass", 2)
 local AbaExtras     = criarAba("Extras", 3)
 local AbaTeleporte  = criarAba("Teleporte", 4)
 local AbaBasico     = criarAba("Basico", 5)
-local AbaCreditos   = criarAba("Creditos", 6)criarToggle(AbaPrincipal, "Gojo Kill All", 1, function(ativo)
+local AbaCreditos   = criarAba("Creditos", 6)
+criarToggle(AbaPrincipal, "Gojo Kill All", 1, function(ativo)
     if ativo then
         task.spawn(function()
             while _G.Aether_GojoKillAll do
