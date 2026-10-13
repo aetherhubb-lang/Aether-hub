@@ -178,9 +178,7 @@ local function createKeyGui()
     box.FocusLost:Connect(function(enter)
         if enter then tryVerify() end
     end)
-end
-
-loadMainHub = function()
+endloadMainHub = function()
     local COR_FUNDO_1    = Color3.fromRGB(30, 18, 50)
     local COR_FUNDO_2    = Color3.fromRGB(12, 8, 20)
     local COR_PAINEL     = Color3.fromRGB(22, 14, 38)
@@ -481,401 +479,406 @@ loadMainHub = function()
 
     MinBtn.MouseLeave:Connect(function()
         TweenService:Create(MinBtn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(40, 28, 60)}):Play()
-    end)    local Abas = {}
-    local AbaAtual = nil
+    end)local Abas = {}
+local AbaAtual = nil
 
-    local function trocarAba(nomeAba)
-        for nome, dados in pairs(Abas) do
-            if nome == nomeAba then
-                dados.frame.Visible = true
-                TweenService:Create(dados.botao, TweenInfo.new(0.25), {BackgroundColor3 = COR_ABA_ATIVA}):Play()
-                TweenService:Create(dados.botao, TweenInfo.new(0.25), {TextColor3 = Color3.fromRGB(255, 255, 255)}):Play()
-                TweenService:Create(dados.botaoStroke, TweenInfo.new(0.25), {Transparency = 0.2}):Play()
-            else
-                dados.frame.Visible = false
-                TweenService:Create(dados.botao, TweenInfo.new(0.25), {BackgroundColor3 = COR_ABA_OFF}):Play()
-                TweenService:Create(dados.botao, TweenInfo.new(0.25), {TextColor3 = COR_TEXTO_OFF}):Play()
-                TweenService:Create(dados.botaoStroke, TweenInfo.new(0.25), {Transparency = 0.8}):Play()
-            end
-        end
-        ContentTitle.Text = nomeAba
-        AbaAtual = nomeAba
-    end
-
-    local function criarAba(nome, ordem)
-        local botao = Instance.new("TextButton")
-        botao.Size = UDim2.new(1, 0, 0, 34)
-        botao.BackgroundColor3 = COR_ABA_OFF
-        botao.BorderSizePixel = 0
-        botao.Text = nome
-        botao.TextColor3 = COR_TEXTO_OFF
-        botao.Font = Enum.Font.GothamMedium
-        botao.TextSize = 12
-        botao.LayoutOrder = ordem
-        botao.AutoButtonColor = false
-        botao.ZIndex = 4
-        botao.Parent = TabList
-        Instance.new("UICorner", botao).CornerRadius = UDim.new(0, 8)
-
-        local botaoStroke = Instance.new("UIStroke")
-        botaoStroke.Color = COR_ROXO
-        botaoStroke.Thickness = 1
-        botaoStroke.Transparency = 0.8
-        botaoStroke.Parent = botao
-
-        local abaFrame = Instance.new("Frame")
-        abaFrame.Size = UDim2.new(1, 0, 0, 0)
-        abaFrame.BackgroundTransparency = 1
-        abaFrame.Visible = false
-        abaFrame.ZIndex = 4
-        abaFrame.Parent = FunctionList
-
-        local abaLayout = Instance.new("UIListLayout")
-        abaLayout.Padding = UDim.new(0, 7)
-        abaLayout.SortOrder = Enum.SortOrder.LayoutOrder
-        abaLayout.Parent = abaFrame
-
-        abaLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-            abaFrame.Size = UDim2.new(1, 0, 0, abaLayout.AbsoluteContentSize.Y + 10)
-        end)
-
-        botao.MouseButton1Click:Connect(function()
-            trocarAba(nome)
-        end)
-
-        Abas[nome] = { botao = botao, frame = abaFrame, botaoStroke = botaoStroke }
-        if not AbaAtual then trocarAba(nome) end
-        return abaFrame
-    end
-
-    local function criarToggle(parent, texto, ordem, callback)
-        local row = Instance.new("Frame")
-        row.Size = UDim2.new(1, 0, 0, 46)
-        row.BackgroundColor3 = Color3.fromRGB(32, 22, 48)
-        row.BorderSizePixel = 0
-        row.LayoutOrder = ordem
-        row.ZIndex = 4
-        row.Parent = parent
-        Instance.new("UICorner", row).CornerRadius = UDim.new(0, 10)
-
-        local rowStroke = Instance.new("UIStroke")
-        rowStroke.Color = COR_ROXO
-        rowStroke.Thickness = 1
-        rowStroke.Transparency = 0.85
-        rowStroke.Parent = row
-
-        local lbl = Instance.new("TextLabel")
-        lbl.Size = UDim2.new(0.72, 0, 1, 0)
-        lbl.Position = UDim2.new(0, 14, 0, 0)
-        lbl.BackgroundTransparency = 1
-        lbl.Text = texto
-        lbl.TextColor3 = Color3.fromRGB(230, 220, 250)
-        lbl.Font = Enum.Font.Gotham
-        lbl.TextSize = 13
-        lbl.TextXAlignment = Enum.TextXAlignment.Left
-        lbl.ZIndex = 5
-        lbl.Parent = row
-
-        local toggleBg = Instance.new("Frame")
-        toggleBg.Size = UDim2.new(0, 42, 0, 24)
-        toggleBg.Position = UDim2.new(1, -56, 0.5, -12)
-        toggleBg.BackgroundColor3 = COR_TOGGLE_OFF
-        toggleBg.BorderSizePixel = 0
-        toggleBg.ZIndex = 5
-        toggleBg.Parent = row
-        Instance.new("UICorner", toggleBg).CornerRadius = UDim.new(1, 0)
-
-        local toggleBgStroke = Instance.new("UIStroke")
-        toggleBgStroke.Color = COR_ROXO
-        toggleBgStroke.Thickness = 1
-        toggleBgStroke.Transparency = 0.8
-        toggleBgStroke.Parent = toggleBg
-
-        local circle = Instance.new("Frame")
-        circle.Size = UDim2.new(0, 18, 0, 18)
-        circle.Position = UDim2.new(0, 3, 0.5, -9)
-        circle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-        circle.BorderSizePixel = 0
-        circle.ZIndex = 6
-        circle.Parent = toggleBg
-        Instance.new("UICorner", circle).CornerRadius = UDim.new(1, 0)
-
-        local click = Instance.new("TextButton")
-        click.Size = UDim2.new(1, 0, 1, 0)
-        click.BackgroundTransparency = 1
-        click.Text = ""
-        click.ZIndex = 7
-        click.Parent = row
-
-        local estado = false
-        click.MouseButton1Click:Connect(function()
-            estado = not estado
-            if estado then
-                TweenService:Create(toggleBg, TweenInfo.new(0.25), {BackgroundColor3 = COR_TOGGLE_ON}):Play()
-                TweenService:Create(toggleBgStroke, TweenInfo.new(0.25), {Transparency = 0.2}):Play()
-                TweenService:Create(circle, TweenInfo.new(0.25), {Position = UDim2.new(1, -21, 0.5, -9)}):Play()
-                TweenService:Create(rowStroke, TweenInfo.new(0.25), {Transparency = 0.5}):Play()
-            else
-                TweenService:Create(toggleBg, TweenInfo.new(0.25), {BackgroundColor3 = COR_TOGGLE_OFF}):Play()
-                TweenService:Create(toggleBgStroke, TweenInfo.new(0.25), {Transparency = 0.8}):Play()
-                TweenService:Create(circle, TweenInfo.new(0.25), {Position = UDim2.new(0, 3, 0.5, -9)}):Play()
-                TweenService:Create(rowStroke, TweenInfo.new(0.25), {Transparency = 0.85}):Play()
-            end
-            if callback then
-                local ok, err = pcall(callback, estado)
-                if not ok then warn("[Aether] " .. tostring(err)) end
-            end
-        end)
-
-        return row, click
-    end
-
-    local function criarBotao(parent, texto, ordem, callback)
-        local b = Instance.new("TextButton")
-        b.Size = UDim2.new(1, 0, 0, 40)
-        b.BackgroundColor3 = Color3.fromRGB(60, 38, 95)
-        b.BorderSizePixel = 0
-        b.Text = texto
-        b.TextColor3 = Color3.fromRGB(230, 210, 255)
-        b.Font = Enum.Font.GothamMedium
-        b.TextSize = 13
-        b.LayoutOrder = ordem
-        b.AutoButtonColor = false
-        b.ZIndex = 4
-        b.Parent = parent
-        Instance.new("UICorner", b).CornerRadius = UDim.new(0, 10)
-
-        local bgGrad = Instance.new("UIGradient")
-        bgGrad.Color = ColorSequence.new({
-            ColorSequenceKeypoint.new(0, Color3.fromRGB(75, 45, 120)),
-            ColorSequenceKeypoint.new(1, Color3.fromRGB(50, 30, 85)),
-        })
-        bgGrad.Rotation = 90
-        bgGrad.Parent = b
-
-        local s = Instance.new("UIStroke")
-        s.Color = COR_ROXO
-        s.Thickness = 1
-        s.Transparency = 0.5
-        s.Parent = b
-
-        b.MouseEnter:Connect(function()
-            TweenService:Create(b, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(90, 55, 145)}):Play()
-            TweenService:Create(s, TweenInfo.new(0.15), {Transparency = 0.2}):Play()
-        end)
-
-        b.MouseLeave:Connect(function()
-            TweenService:Create(b, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(60, 38, 95)}):Play()
-            TweenService:Create(s, TweenInfo.new(0.15), {Transparency = 0.5}):Play()
-        end)
-
-        b.MouseButton1Click:Connect(function()
-            if callback then
-                local ok, err = pcall(callback)
-                if not ok then warn("[Aether] " .. tostring(err)) end
-            end
-        end)
-
-        return b
-    end
-
-    MainFrame.Size = UDim2.new(0, 0, 0, 0)
-    MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-    ShadowFrame.Size = UDim2.new(0, 0, 0, 0)
-    ShadowFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-
-    TweenService:Create(MainFrame, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-        Size = NORMAL_SIZE,
-        Position = NORMAL_POS,
-    }):Play()
-    TweenService:Create(ShadowFrame, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-        Size = NORMAL_SIZE,
-        Position = NORMAL_POS,
-    }):Play()
-
-    local AbaPrincipal  = criarAba("Principal", 1)
-    local AbaACBypass   = criarAba("AC Bypass", 2)
-    local AbaExtras     = criarAba("Extras", 3)
-    local AbaTeleporte  = criarAba("Teleporte", 4)
-    local AbaBasico     = criarAba("Basico", 5)
-    local AbaCreditos   = criarAba("Creditos", 6)
-
-    criarToggle(AbaPrincipal, "Gojo Kill All", 1, function(ativo)
-        if ativo then
-            task.spawn(function()
-                while _G.Aether_GojoKillAll do
-                    for _, p in ipairs(Players:GetPlayers()) do
-                        if p ~= LP and p.Character then
-                            local meuRoot = LP.Character and LP.Character:FindFirstChild("HumanoidRootPart")
-                            local rootAlvo = p.Character:FindFirstChild("HumanoidRootPart")
-                            local humAlvo = p.Character:FindFirstChildOfClass("Humanoid")
-                            if meuRoot and rootAlvo and humAlvo and humAlvo.Health > 0 then
-                                meuRoot.CFrame = rootAlvo.CFrame
-                                RunService.Heartbeat:Wait()
-                            end
-                        end
-                    end
-                    task.wait()
-                end
-            end)
-            _G.Aether_GojoKillAll = true
+local function trocarAba(nomeAba)
+    for nome, dados in pairs(Abas) do
+        if nome == nomeAba then
+            dados.frame.Visible = true
+            TweenService:Create(dados.botao, TweenInfo.new(0.25), {BackgroundColor3 = COR_ABA_ATIVA}):Play()
+            TweenService:Create(dados.botao, TweenInfo.new(0.25), {TextColor3 = Color3.fromRGB(255, 255, 255)}):Play()
+            TweenService:Create(dados.botaoStroke, TweenInfo.new(0.25), {Transparency = 0.2}):Play()
         else
-            _G.Aether_GojoKillAll = false
+            dados.frame.Visible = false
+            TweenService:Create(dados.botao, TweenInfo.new(0.25), {BackgroundColor3 = COR_ABA_OFF}):Play()
+            TweenService:Create(dados.botao, TweenInfo.new(0.25), {TextColor3 = COR_TEXTO_OFF}):Play()
+            TweenService:Create(dados.botaoStroke, TweenInfo.new(0.25), {Transparency = 0.8}):Play()
+        end
+    end
+    ContentTitle.Text = nomeAba
+    AbaAtual = nomeAba
+end
+
+local function criarAba(nome, ordem)
+    local botao = Instance.new("TextButton")
+    botao.Size = UDim2.new(1, 0, 0, 34)
+    botao.BackgroundColor3 = COR_ABA_OFF
+    botao.BorderSizePixel = 0
+    botao.Text = nome
+    botao.TextColor3 = COR_TEXTO_OFF
+    botao.Font = Enum.Font.GothamMedium
+    botao.TextSize = 12
+    botao.LayoutOrder = ordem
+    botao.AutoButtonColor = false
+    botao.ZIndex = 4
+    botao.Parent = TabList
+    Instance.new("UICorner", botao).CornerRadius = UDim.new(0, 8)
+
+    local botaoStroke = Instance.new("UIStroke")
+    botaoStroke.Color = COR_ROXO
+    botaoStroke.Thickness = 1
+    botaoStroke.Transparency = 0.8
+    botaoStroke.Parent = botao
+
+    local abaFrame = Instance.new("Frame")
+    abaFrame.Size = UDim2.new(1, 0, 0, 0)
+    abaFrame.BackgroundTransparency = 1
+    abaFrame.Visible = false
+    abaFrame.ZIndex = 4
+    abaFrame.Parent = FunctionList
+
+    local abaLayout = Instance.new("UIListLayout")
+    abaLayout.Padding = UDim.new(0, 7)
+    abaLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    abaLayout.Parent = abaFrame
+
+    abaLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        abaFrame.Size = UDim2.new(1, 0, 0, abaLayout.AbsoluteContentSize.Y + 10)
+    end)
+
+    botao.MouseButton1Click:Connect(function()
+        trocarAba(nome)
+    end)
+
+    Abas[nome] = { botao = botao, frame = abaFrame, botaoStroke = botaoStroke }
+    if not AbaAtual then trocarAba(nome) end
+    return abaFrame
+end
+
+local function criarToggle(parent, texto, ordem, callback)
+    local row = Instance.new("Frame")
+    row.Size = UDim2.new(1, 0, 0, 46)
+    row.BackgroundColor3 = Color3.fromRGB(32, 22, 48)
+    row.BorderSizePixel = 0
+    row.LayoutOrder = ordem
+    row.ZIndex = 4
+    row.Parent = parent
+    Instance.new("UICorner", row).CornerRadius = UDim.new(0, 10)
+
+    local rowStroke = Instance.new("UIStroke")
+    rowStroke.Color = COR_ROXO
+    rowStroke.Thickness = 1
+    rowStroke.Transparency = 0.85
+    rowStroke.Parent = row
+
+    local lbl = Instance.new("TextLabel")
+    lbl.Size = UDim2.new(0.72, 0, 1, 0)
+    lbl.Position = UDim2.new(0, 14, 0, 0)
+    lbl.BackgroundTransparency = 1
+    lbl.Text = texto
+    lbl.TextColor3 = Color3.fromRGB(230, 220, 250)
+    lbl.Font = Enum.Font.Gotham
+    lbl.TextSize = 13
+    lbl.TextXAlignment = Enum.TextXAlignment.Left
+    lbl.ZIndex = 5
+    lbl.Parent = row
+
+    local toggleBg = Instance.new("Frame")
+    toggleBg.Size = UDim2.new(0, 42, 0, 24)
+    toggleBg.Position = UDim2.new(1, -56, 0.5, -12)
+    toggleBg.BackgroundColor3 = COR_TOGGLE_OFF
+    toggleBg.BorderSizePixel = 0
+    toggleBg.ZIndex = 5
+    toggleBg.Parent = row
+    Instance.new("UICorner", toggleBg).CornerRadius = UDim.new(1, 0)
+
+    local toggleBgStroke = Instance.new("UIStroke")
+    toggleBgStroke.Color = COR_ROXO
+    toggleBgStroke.Thickness = 1
+    toggleBgStroke.Transparency = 0.8
+    toggleBgStroke.Parent = toggleBg
+
+    local circle = Instance.new("Frame")
+    circle.Size = UDim2.new(0, 18, 0, 18)
+    circle.Position = UDim2.new(0, 3, 0.5, -9)
+    circle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    circle.BorderSizePixel = 0
+    circle.ZIndex = 6
+    circle.Parent = toggleBg
+    Instance.new("UICorner", circle).CornerRadius = UDim.new(1, 0)
+
+    local click = Instance.new("TextButton")
+    click.Size = UDim2.new(1, 0, 1, 0)
+    click.BackgroundTransparency = 1
+    click.Text = ""
+    click.ZIndex = 7
+    click.Parent = row
+
+    local estado = false
+    click.MouseButton1Click:Connect(function()
+        estado = not estado
+        if estado then
+            TweenService:Create(toggleBg, TweenInfo.new(0.25), {BackgroundColor3 = COR_TOGGLE_ON}):Play()
+            TweenService:Create(toggleBgStroke, TweenInfo.new(0.25), {Transparency = 0.2}):Play()
+            TweenService:Create(circle, TweenInfo.new(0.25), {Position = UDim2.new(1, -21, 0.5, -9)}):Play()
+            TweenService:Create(rowStroke, TweenInfo.new(0.25), {Transparency = 0.5}):Play()
+        else
+            TweenService:Create(toggleBg, TweenInfo.new(0.25), {BackgroundColor3 = COR_TOGGLE_OFF}):Play()
+            TweenService:Create(toggleBgStroke, TweenInfo.new(0.25), {Transparency = 0.8}):Play()
+            TweenService:Create(circle, TweenInfo.new(0.25), {Position = UDim2.new(0, 3, 0.5, -9)}):Play()
+            TweenService:Create(rowStroke, TweenInfo.new(0.25), {Transparency = 0.85}):Play()
+        end
+        if callback then
+            local ok, err = pcall(callback, estado)
+            if not ok then warn("[Aether] " .. tostring(err)) end
         end
     end)
 
-    criarToggle(AbaPrincipal, "Mahito Ult Inf", 2, function(ativo)
-        _G.Aether_MahitoUlt = ativo
+    return row, click
+end
+
+local function criarBotao(parent, texto, ordem, callback)
+    local b = Instance.new("TextButton")
+    b.Size = UDim2.new(1, 0, 0, 40)
+    b.BackgroundColor3 = Color3.fromRGB(60, 38, 95)
+    b.BorderSizePixel = 0
+    b.Text = texto
+    b.TextColor3 = Color3.fromRGB(230, 210, 255)
+    b.Font = Enum.Font.GothamMedium
+    b.TextSize = 13
+    b.LayoutOrder = ordem
+    b.AutoButtonColor = false
+    b.ZIndex = 4
+    b.Parent = parent
+    Instance.new("UICorner", b).CornerRadius = UDim.new(0, 10)
+
+    local bgGrad = Instance.new("UIGradient")
+    bgGrad.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(75, 45, 120)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(50, 30, 85)),
+    })
+    bgGrad.Rotation = 90
+    bgGrad.Parent = b
+
+    local s = Instance.new("UIStroke")
+    s.Color = COR_ROXO
+    s.Thickness = 1
+    s.Transparency = 0.5
+    s.Parent = b
+
+    b.MouseEnter:Connect(function()
+        TweenService:Create(b, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(90, 55, 145)}):Play()
+        TweenService:Create(s, TweenInfo.new(0.15), {Transparency = 0.2}):Play()
     end)
 
-    criarToggle(AbaPrincipal, "Hakari 60% Ult", 3, function(ativo)
-        _G.Aether_HakariUlt = ativo
+    b.MouseLeave:Connect(function()
+        TweenService:Create(b, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(60, 38, 95)}):Play()
+        TweenService:Create(s, TweenInfo.new(0.15), {Transparency = 0.5}):Play()
     end)
 
-    criarToggle(AbaPrincipal, "Auto Black Flash", 4, function(ativo)
+    b.MouseButton1Click:Connect(function()
+        if callback then
+            local ok, err = pcall(callback)
+            if not ok then warn("[Aether] " .. tostring(err)) end
+        end
     end)
 
-    criarToggle(AbaPrincipal, "Auto Combo", 5, function(ativo)
-    end)
+    return b
+end
 
-    criarToggle(AbaPrincipal, "Auto Dodge", 6, function(ativo)
-    end)
+MainFrame.Size = UDim2.new(0, 0, 0, 0)
+MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+ShadowFrame.Size = UDim2.new(0, 0, 0, 0)
+ShadowFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
 
-    criarToggle(AbaACBypass, "Bypass Anti-Cheat", 1, function(ativo)
-    end)
+TweenService:Create(MainFrame, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+    Size = NORMAL_SIZE,
+    Position = NORMAL_POS,
+}):Play()
+TweenService:Create(ShadowFrame, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+    Size = NORMAL_SIZE,
+    Position = NORMAL_POS,
+}):Play()
 
-    criarToggle(AbaACBypass, "Bypass Teleport", 2, function(ativo)
-    end)
-
-    criarBotao(AbaACBypass, "Executar Bypass Completo", 3, function()
-    end)
-
-    local espAtivo = false
-    local espFolder = Instance.new("Folder", ScreenGui)
-    espFolder.Name = "AetherESP"
-
-    criarToggle(AbaExtras, "ESP Jogadores", 1, function(ativo)
-        espAtivo = ativo
-        if ativo then
-            task.spawn(function()
-                while espAtivo do
-                    espFolder:ClearAllChildren()
-                    for _, p in ipairs(Players:GetPlayers()) do
-                        if p ~= LP and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
-                            local h = Instance.new("Highlight")
-                            h.Adornee = p.Character
-                            h.FillColor = COR_ROXO
-                            h.OutlineColor = Color3.fromRGB(255, 255, 255)
-                            h.FillTransparency = 0.5
-                            h.Parent = espFolder
+local AbaPrincipal  = criarAba("Principal", 1)
+local AbaACBypass   = criarAba("Bypass", 2)
+local AbaExtras     = criarAba("Extras", 3)
+local AbaTeleporte  = criarAba("Teleporte", 4)
+local AbaBasico     = criarAba("Basico", 5)
+local AbaCreditos   = criarAba("Creditos", 6)criarToggle(AbaPrincipal, "Gojo Kill All", 1, function(ativo)
+    if ativo then
+        task.spawn(function()
+            while _G.Aether_GojoKillAll do
+                for _, p in ipairs(Players:GetPlayers()) do
+                    if p ~= LP and p.Character then
+                        local meuRoot = LP.Character and LP.Character:FindFirstChild("HumanoidRootPart")
+                        local rootAlvo = p.Character:FindFirstChild("HumanoidRootPart")
+                        local humAlvo = p.Character:FindFirstChildOfClass("Humanoid")
+                        if meuRoot and rootAlvo and humAlvo and humAlvo.Health > 0 then
+                            meuRoot.CFrame = rootAlvo.CFrame
+                            RunService.Heartbeat:Wait()
                         end
                     end
-                    task.wait(1)
                 end
+                task.wait()
+            end
+        end)
+        _G.Aether_GojoKillAll = true
+    else
+        _G.Aether_GojoKillAll = false
+    end
+end)
+
+criarToggle(AbaPrincipal, "Mahito Ult Inf", 2, function(ativo)
+    _G.Aether_MahitoUlt = ativo
+end)
+
+criarToggle(AbaPrincipal, "Hakari 60% Ult", 3, function(ativo)
+    _G.Aether_HakariUlt = ativo
+end)
+
+criarToggle(AbaPrincipal, "Auto Black Flash", 4, function(ativo)
+end)
+
+criarToggle(AbaPrincipal, "Auto Combo", 5, function(ativo)
+end)
+
+criarToggle(AbaPrincipal, "Auto Dodge", 6, function(ativo)
+end)
+
+criarToggle(AbaACBypass, "Bypass", 1, function(ativo)
+    if ativo then
+        task.spawn(function()
+            while _G.Aether_Bypass do
+                pcall(function()
+                    for _, obj in ipairs(LP.PlayerScripts:GetChildren()) do
+                        obj.Parent = nil
+                    end
+                end)
+                task.wait(0.5)
+            end
+        end)
+        _G.Aether_Bypass = true
+    else
+        _G.Aether_Bypass = false
+    end
+end)
+
+local espAtivo = false
+local espFolder = Instance.new("Folder", ScreenGui)
+espFolder.Name = "AetherESP"
+
+criarToggle(AbaExtras, "ESP Jogadores", 1, function(ativo)
+    espAtivo = ativo
+    if ativo then
+        task.spawn(function()
+            while espAtivo do
                 espFolder:ClearAllChildren()
-            end)
-        else
+                for _, p in ipairs(Players:GetPlayers()) do
+                    if p ~= LP and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+                        local h = Instance.new("Highlight")
+                        h.Adornee = p.Character
+                        h.FillColor = COR_ROXO
+                        h.OutlineColor = Color3.fromRGB(255, 255, 255)
+                        h.FillTransparency = 0.5
+                        h.Parent = espFolder
+                    end
+                end
+                task.wait(1)
+            end
             espFolder:ClearAllChildren()
-        end
-    end)
+        end)
+    else
+        espFolder:ClearAllChildren()
+    end
+end)
 
-    criarToggle(AbaExtras, "FPS Booster", 2, function(ativo)
-        if ativo then
-            task.spawn(function()
-                for _, v in ipairs(game:GetDescendants()) do
-                    pcall(function()
-                        if v:IsA("BasePart") then
-                            v.Material = Enum.Material.SmoothPlastic
-                            v.CastShadow = false
-                        elseif v:IsA("Decal") or v:IsA("Texture") then
-                            v:Destroy()
-                        elseif v:IsA("ParticleEmitter") or v:IsA("Trail") then
-                            v.Enabled = false
-                        end
-                    end)
-                end
-                workspace.GlobalShadows = false
-            end)
-        else
-            workspace.GlobalShadows = true
-        end
-    end)
-
-    local infJumpAtivo = false
-    criarToggle(AbaExtras, "Infinite Jump", 3, function(ativo)
-        infJumpAtivo = ativo
-    end)
-
-    criarToggle(AbaExtras, "Fullbright", 4, function(ativo)
-        if ativo then
-            Lighting.Ambient = Color3.fromRGB(178, 178, 178)
-            Lighting.OutdoorAmbient = Color3.fromRGB(178, 178, 178)
-            Lighting.Brightness = 5
-        else
-            Lighting.Ambient = Color3.fromRGB(70, 70, 70)
-            Lighting.OutdoorAmbient = Color3.fromRGB(128, 128, 128)
-            Lighting.Brightness = 2
-        end
-    end)
-
-    criarToggle(AbaExtras, "Anti-AFK", 5, function(ativo)
-        if ativo then
-            task.spawn(function()
-                while _G.Aether_AntiAFK do
-                    pcall(function()
-                        VirtualUser:CaptureController()
-                        VirtualUser:ClickButton2(Vector2.new())
-                    end)
-                    task.wait(60)
-                end
-            end)
-            _G.Aether_AntiAFK = true
-        else
-            _G.Aether_AntiAFK = false
-        end
-    end)
-
-    criarBotao(AbaTeleporte, "TP Jogador Aleatorio", 1, function()
-        local jogadores = {}
-        for _, p in ipairs(Players:GetPlayers()) do
-            if p ~= LP and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
-                table.insert(jogadores, p)
+criarToggle(AbaExtras, "FPS Booster", 2, function(ativo)
+    if ativo then
+        task.spawn(function()
+            for _, v in ipairs(game:GetDescendants()) do
+                pcall(function()
+                    if v:IsA("BasePart") then
+                        v.Material = Enum.Material.SmoothPlastic
+                        v.CastShadow = false
+                    elseif v:IsA("Decal") or v:IsA("Texture") then
+                        v:Destroy()
+                    elseif v:IsA("ParticleEmitter") or v:IsA("Trail") then
+                        v.Enabled = false
+                    end
+                end)
             end
-        end
-        if #jogadores > 0 then
-            local alvo = jogadores[math.random(1, #jogadores)]
-            local meuRoot = LP.Character and LP.Character:FindFirstChild("HumanoidRootPart")
-            local rootAlvo = alvo.Character:FindFirstChild("HumanoidRootPart")
-            if meuRoot and rootAlvo then
-                meuRoot.CFrame = rootAlvo.CFrame + Vector3.new(0, 3, 0)
-            end
-        end
-    end)
+            workspace.GlobalShadows = false
+        end)
+    else
+        workspace.GlobalShadows = true
+    end
+end)
 
-    criarBotao(AbaTeleporte, "TP Todos os Jogadores", 2, function()
+local infJumpAtivo = false
+criarToggle(AbaExtras, "Infinite Jump", 3, function(ativo)
+    infJumpAtivo = ativo
+end)
+
+criarToggle(AbaExtras, "Fullbright", 4, function(ativo)
+    if ativo then
+        Lighting.Ambient = Color3.fromRGB(178, 178, 178)
+        Lighting.OutdoorAmbient = Color3.fromRGB(178, 178, 178)
+        Lighting.Brightness = 5
+    else
+        Lighting.Ambient = Color3.fromRGB(70, 70, 70)
+        Lighting.OutdoorAmbient = Color3.fromRGB(128, 128, 128)
+        Lighting.Brightness = 2
+    end
+end)
+
+criarToggle(AbaExtras, "Anti-AFK", 5, function(ativo)
+    if ativo then
+        task.spawn(function()
+            while _G.Aether_AntiAFK do
+                pcall(function()
+                    VirtualUser:CaptureController()
+                    VirtualUser:ClickButton2(Vector2.new())
+                end)
+                task.wait(60)
+            end
+        end)
+        _G.Aether_AntiAFK = true
+    else
+        _G.Aether_AntiAFK = false
+    end
+end)
+
+criarBotao(AbaTeleporte, "TP Jogador Aleatorio", 1, function()
+    local jogadores = {}
+    for _, p in ipairs(Players:GetPlayers()) do
+        if p ~= LP and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+            table.insert(jogadores, p)
+        end
+    end
+    if #jogadores > 0 then
+        local alvo = jogadores[math.random(1, #jogadores)]
         local meuRoot = LP.Character and LP.Character:FindFirstChild("HumanoidRootPart")
-        if not meuRoot then return end
-        for _, p in ipairs(Players:GetPlayers()) do
-            if p ~= LP and p.Character then
-                local rootAlvo = p.Character:FindFirstChild("HumanoidRootPart")
-                if rootAlvo then
-                    meuRoot.CFrame = rootAlvo.CFrame
-                    task.wait(0.1)
-                end
+        local rootAlvo = alvo.Character:FindFirstChild("HumanoidRootPart")
+        if meuRoot and rootAlvo then
+            meuRoot.CFrame = rootAlvo.CFrame + Vector3.new(0, 3, 0)
+        end
+    end
+end)
+
+criarBotao(AbaTeleporte, "TP Todos os Jogadores", 2, function()
+    local meuRoot = LP.Character and LP.Character:FindFirstChild("HumanoidRootPart")
+    if not meuRoot then return end
+    for _, p in ipairs(Players:GetPlayers()) do
+        if p ~= LP and p.Character then
+            local rootAlvo = p.Character:FindFirstChild("HumanoidRootPart")
+            if rootAlvo then
+                meuRoot.CFrame = rootAlvo.CFrame
+                task.wait(0.1)
             end
         end
-    end)
+    end
+end)
 
-    criarBotao(AbaTeleporte, "Voltar ao Spawn", 3, function()
-        local char = LP.Character
-        local root = char and char:FindFirstChild("HumanoidRootPart")
-        local spawn = workspace:FindFirstChildOfClass("SpawnLocation")
-        if root and spawn then
-            root.CFrame = spawn.CFrame + Vector3.new(0, 3, 0)
-        end
-    end)
-
-    criarToggle(AbaBasico, "Speed 200", 1, function(ativo)
+criarBotao(AbaTeleporte, "Voltar ao Spawn", 3, function()
+    local char = LP.Character
+    local root = char and char:FindFirstChild("HumanoidRootPart")
+    local spawn = workspace:FindFirstChildOfClass("SpawnLocation")
+    if root and spawn then
+        root.CFrame = spawn.CFrame + Vector3.new(0, 3, 0)
+    end
+end)    criarToggle(AbaBasico, "Speed 200", 1, function(ativo)
         local hum = LP.Character and LP.Character:FindFirstChildOfClass("Humanoid")
         if hum then hum.WalkSpeed = ativo and 200 or 16 end
     end)
