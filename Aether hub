@@ -132,11 +132,19 @@ end
 
 loadMainHub = function()
     local COR_ROXO = Color3.fromRGB(170, 100, 255)
-    local COR_ABA_ON = Color3.fromRGB(170, 100, 255)
-    local COR_ABA_OFF = Color3.fromRGB(32, 22, 48)
-    local COR_TXT_OFF = Color3.fromRGB(140, 120, 180)
     local COR_TOG_ON = Color3.fromRGB(170, 100, 255)
     local COR_TOG_OFF = Color3.fromRGB(60, 45, 90)
+    local temas = {
+        Roxo = Color3.fromRGB(170, 100, 255),
+        Vermelho = Color3.fromRGB(255, 80, 80),
+        Azul = Color3.fromRGB(80, 160, 255),
+        Rosa = Color3.fromRGB(255, 100, 200),
+        Verde = Color3.fromRGB(80, 255, 120),
+    }
+    local temaAtual = "Roxo"
+
+    local NORMAL_SIZE = UDim2.new(0, 320, 0, 400)
+    local NORMAL_POS = UDim2.new(0.5, -160, 0.5, -200)
 
     local ScreenGui = Instance.new("ScreenGui")
     ScreenGui.Name = "AetherHub"
@@ -144,275 +152,169 @@ loadMainHub = function()
     ScreenGui.Parent = CoreGui
 
     local MainFrame = Instance.new("Frame")
-    MainFrame.Size = UDim2.new(0, 480, 0, 320)
-    MainFrame.Position = UDim2.new(0.5, -240, 0.5, -160)
-    MainFrame.BackgroundColor3 = Color3.fromRGB(30, 18, 50)
+    MainFrame.Size = NORMAL_SIZE
+    MainFrame.Position = NORMAL_POS
+    MainFrame.BackgroundColor3 = Color3.fromRGB(20, 12, 32)
     MainFrame.BorderSizePixel = 0
     MainFrame.Active = true
     MainFrame.Draggable = true
     MainFrame.Parent = ScreenGui
-    Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 16)
+    Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 14)
 
-    local stroke = Instance.new("UIStroke")
-    stroke.Color = COR_ROXO
-    stroke.Thickness = 1.5
-    stroke.Parent = MainFrame
+    local MainStroke = Instance.new("UIStroke")
+    MainStroke.Color = COR_ROXO
+    MainStroke.Thickness = 2
+    MainStroke.Parent = MainFrame
 
-    local TopBar = Instance.new("Frame")
-    TopBar.Size = UDim2.new(1, 0, 0, 42)
-    TopBar.BackgroundTransparency = 1
-    TopBar.Parent = MainFrame
+    local Header = Instance.new("Frame")
+    Header.Size = UDim2.new(1, 0, 0, 50)
+    Header.BackgroundColor3 = Color3.fromRGB(25, 15, 42)
+    Header.BorderSizePixel = 0
+    Header.Parent = MainFrame
+    Instance.new("UICorner", Header).CornerRadius = UDim.new(0, 14)
 
-    local HubTitle = Instance.new("TextLabel")
-    HubTitle.Size = UDim2.new(0, 250, 1, 0)
-    HubTitle.Position = UDim2.new(0, 18, 0, 0)
-    HubTitle.BackgroundTransparency = 1
-    HubTitle.Text = "AETHER HUB"
-    HubTitle.TextColor3 = Color3.fromRGB(230, 210, 255)
-    HubTitle.Font = Enum.Font.GothamBold
-    HubTitle.TextSize = 15
-    HubTitle.TextXAlignment = Enum.TextXAlignment.Left
-    HubTitle.Parent = TopBar
+    local Logo = Instance.new("Frame")
+    Logo.Size = UDim2.new(0, 36, 0, 36)
+    Logo.Position = UDim2.new(0, 10, 0.5, -18)
+    Logo.BackgroundColor3 = Color3.fromRGB(25, 15, 42)
+    Logo.BorderSizePixel = 0
+    Logo.Parent = Header
+    Instance.new("UICorner", Logo).CornerRadius = UDim.new(0, 8)
+
+    local LogoStroke = Instance.new("UIStroke")
+    LogoStroke.Color = COR_ROXO
+    LogoStroke.Thickness = 1.5
+    LogoStroke.Parent = Logo
+
+    local LogoIcon = Instance.new("TextLabel")
+    LogoIcon.Size = UDim2.new(1, 0, 1, 0)
+    LogoIcon.BackgroundTransparency = 1
+    LogoIcon.Text = "✦"
+    LogoIcon.TextColor3 = COR_ROXO
+    LogoIcon.Font = Enum.Font.GothamBold
+    LogoIcon.TextSize = 18
+    LogoIcon.Parent = Logo
+
+    local Title = Instance.new("TextLabel")
+    Title.Size = UDim2.new(0, 200, 0, 22)
+    Title.Position = UDim2.new(0, 54, 0, 6)
+    Title.BackgroundTransparency = 1
+    Title.Text = "AETHER HUB"
+    Title.TextColor3 = COR_ROXO
+    Title.Font = Enum.Font.GothamBold
+    Title.TextSize = 15
+    Title.TextXAlignment = Enum.TextXAlignment.Left
+    Title.Parent = Header
+
+    local Author = Instance.new("TextLabel")
+    Author.Size = UDim2.new(0, 200, 0, 14)
+    Author.Position = UDim2.new(0, 54, 0, 28)
+    Author.BackgroundTransparency = 1
+    Author.Text = "by atsu"
+    Author.TextColor3 = Color3.fromRGB(160, 120, 220)
+    Author.Font = Enum.Font.Gotham
+    Author.TextSize = 10
+    Author.TextXAlignment = Enum.TextXAlignment.Left
+    Author.Parent = Header
 
     local MinBtn = Instance.new("TextButton")
     MinBtn.Size = UDim2.new(0, 28, 0, 28)
     MinBtn.Position = UDim2.new(1, -38, 0.5, -14)
-    MinBtn.BackgroundColor3 = Color3.fromRGB(40, 28, 60)
+    MinBtn.BackgroundColor3 = Color3.fromRGB(45, 25, 75)
     MinBtn.BorderSizePixel = 0
     MinBtn.Text = "-"
-    MinBtn.TextColor3 = Color3.fromRGB(200, 160, 255)
+    MinBtn.TextColor3 = COR_ROXO
     MinBtn.Font = Enum.Font.GothamBold
     MinBtn.TextSize = 18
-    MinBtn.Parent = TopBar
+    MinBtn.AutoButtonColor = false
+    MinBtn.Parent = Header
     Instance.new("UICorner", MinBtn).CornerRadius = UDim.new(0, 8)
 
-    local Sidebar = Instance.new("Frame")
-    Sidebar.Size = UDim2.new(0, 130, 1, -54)
-    Sidebar.Position = UDim2.new(0, 12, 0, 46)
-    Sidebar.BackgroundColor3 = Color3.fromRGB(22, 14, 38)
-    Sidebar.BorderSizePixel = 0
-    Sidebar.Parent = MainFrame
-    Instance.new("UICorner", Sidebar).CornerRadius = UDim.new(0, 12)
+    local MinStroke = Instance.new("UIStroke")
+    MinStroke.Color = COR_ROXO
+    MinStroke.Thickness = 1
+    MinStroke.Transparency = 0.3
+    MinStroke.Parent = MinBtn
 
-    local TabList = Instance.new("Frame")
-    TabList.Size = UDim2.new(1, -14, 1, -14)
-    TabList.Position = UDim2.new(0, 7, 0, 7)
-    TabList.BackgroundTransparency = 1
-    TabList.Parent = Sidebar
+    local ButtonList = Instance.new("ScrollingFrame")
+    ButtonList.Size = UDim2.new(1, -20, 1, -70)
+    ButtonList.Position = UDim2.new(0, 10, 0, 60)
+    ButtonList.BackgroundTransparency = 1
+    ButtonList.BorderSizePixel = 0
+    ButtonList.ScrollBarThickness = 3
+    ButtonList.ScrollBarImageColor3 = COR_ROXO
+    ButtonList.CanvasSize = UDim2.new(0, 0, 0, 0)
+    ButtonList.AutomaticCanvasSize = Enum.AutomaticSize.Y
+    ButtonList.Parent = MainFrame
 
-    local TabLayout = Instance.new("UIListLayout")
-    TabLayout.Padding = UDim.new(0, 5)
-    TabLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    TabLayout.Parent = TabList
+    local Layout = Instance.new("UIListLayout")
+    Layout.Padding = UDim.new(0, 6)
+    Layout.SortOrder = Enum.SortOrder.LayoutOrder
+    Layout.Parent = ButtonList
 
-    local ContentArea = Instance.new("Frame")
-    ContentArea.Size = UDim2.new(1, -166, 1, -54)
-    ContentArea.Position = UDim2.new(0, 154, 0, 46)
-    ContentArea.BackgroundColor3 = Color3.fromRGB(22, 14, 38)
-    ContentArea.BorderSizePixel = 0
-    ContentArea.Parent = MainFrame
-    Instance.new("UICorner", ContentArea).CornerRadius = UDim.new(0, 12)
+    local MiniBtn = Instance.new("TextButton")
+    MiniBtn.Size = UDim2.new(0, 50, 0, 50)
+    MiniBtn.Position = UDim2.new(0, 20, 0.5, -25)
+    MiniBtn.BackgroundColor3 = Color3.fromRGB(25, 15, 42)
+    MiniBtn.BorderSizePixel = 0
+    MiniBtn.Text = "+"
+    MiniBtn.TextColor3 = COR_ROXO
+    MiniBtn.Font = Enum.Font.GothamBold
+    MiniBtn.TextSize = 26
+    MiniBtn.Draggable = true
+    MiniBtn.Visible = false
+    MiniBtn.Parent = ScreenGui
+    Instance.new("UICorner", MiniBtn).CornerRadius = UDim.new(1, 0)
 
-    local ContentTitle = Instance.new("TextLabel")
-    ContentTitle.Size = UDim2.new(1, 0, 0, 36)
-    ContentTitle.Position = UDim2.new(0, 0, 0, 10)
-    ContentTitle.BackgroundTransparency = 1
-    ContentTitle.Text = "Principal"
-    ContentTitle.TextColor3 = Color3.fromRGB(80, 55, 120)
-    ContentTitle.Font = Enum.Font.GothamBold
-    ContentTitle.TextSize = 26
-    ContentTitle.Parent = ContentArea
+    local MiniStroke = Instance.new("UIStroke")
+    MiniStroke.Color = COR_ROXO
+    MiniStroke.Thickness = 2
+    MiniStroke.Parent = MiniBtn
 
-    local FunctionList = Instance.new("ScrollingFrame")
-    FunctionList.Size = UDim2.new(1, -24, 1, -58)
-    FunctionList.Position = UDim2.new(0, 12, 0, 50)
-    FunctionList.BackgroundTransparency = 1
-    FunctionList.BorderSizePixel = 0
-    FunctionList.ScrollBarThickness = 4
-    FunctionList.ScrollBarImageColor3 = COR_ROXO
-    FunctionList.CanvasSize = UDim2.new(0, 0, 0, 0)
-    FunctionList.AutomaticCanvasSize = Enum.AutomaticSize.Y
-    FunctionList.Parent = ContentArea
-
-    local FuncLayout = Instance.new("UIListLayout")
-    FuncLayout.Padding = UDim.new(0, 7)
-    FuncLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    FuncLayout.Parent = FunctionList
-
-    local MiniPanel = Instance.new("TextButton")
-    MiniPanel.Size = UDim2.new(0, 50, 0, 50)
-    MiniPanel.Position = UDim2.new(0, 20, 0.5, -25)
-    MiniPanel.BackgroundColor3 = COR_ROXO
-    MiniPanel.BorderSizePixel = 0
-    MiniPanel.Text = "+"
-    MiniPanel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    MiniPanel.Font = Enum.Font.GothamBold
-    MiniPanel.TextSize = 26
-    MiniPanel.Draggable = true
-    MiniPanel.Visible = false
-    MiniPanel.Parent = ScreenGui
-    Instance.new("UICorner", MiniPanel).CornerRadius = UDim.new(1, 0)
-
-    MinBtn.MouseButton1Click:Connect(function()
-        MainFrame.Visible = false
-        MiniPanel.Visible = true
-    end)
-
-    MiniPanel.MouseButton1Click:Connect(function()
-        MiniPanel.Visible = false
-        MainFrame.Visible = true
-    end)
-
-    local Abas = {}
-    local AbaAtual = nil
-
-    local function trocarAba(nomeAba)
-        for nome, dados in pairs(Abas) do
-            if nome == nomeAba then
-                dados.frame.Visible = true
-                dados.botao.BackgroundColor3 = COR_ABA_ON
-                dados.botao.TextColor3 = Color3.fromRGB(255, 255, 255)
-            else
-                dados.frame.Visible = false
-                dados.botao.BackgroundColor3 = COR_ABA_OFF
-                dados.botao.TextColor3 = COR_TXT_OFF
-            end
-        end
-        ContentTitle.Text = nomeAba
-        AbaAtual = nomeAba
-    end
-
-    local function criarAba(nome, ordem)
-        local botao = Instance.new("TextButton")
-        botao.Size = UDim2.new(1, 0, 0, 34)
-        botao.BackgroundColor3 = COR_ABA_OFF
-        botao.BorderSizePixel = 0
-        botao.Text = nome
-        botao.TextColor3 = COR_TXT_OFF
-        botao.Font = Enum.Font.GothamMedium
-        botao.TextSize = 12
-        botao.LayoutOrder = ordem
-        botao.Parent = TabList
-        Instance.new("UICorner", botao).CornerRadius = UDim.new(0, 8)
-
-        local abaFrame = Instance.new("Frame")
-        abaFrame.Size = UDim2.new(1, 0, 0, 0)
-        abaFrame.BackgroundTransparency = 1
-        abaFrame.Visible = false
-        abaFrame.Parent = FunctionList
-
-        local abaLayout = Instance.new("UIListLayout")
-        abaLayout.Padding = UDim.new(0, 7)
-        abaLayout.SortOrder = Enum.SortOrder.LayoutOrder
-        abaLayout.Parent = abaFrame
-
-        abaLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-            abaFrame.Size = UDim2.new(1, 0, 0, abaLayout.AbsoluteContentSize.Y + 10)
-        end)
-
-        botao.MouseButton1Click:Connect(function()
-            trocarAba(nome)
-        end)
-
-        Abas[nome] = { botao = botao, frame = abaFrame }
-        if not AbaAtual then trocarAba(nome) end
-        return abaFrame
-    end
-
-    local function criarToggle(parent, texto, ordem, callback)
-        local row = Instance.new("Frame")
-        row.Size = UDim2.new(1, 0, 0, 46)
-        row.BackgroundColor3 = Color3.fromRGB(32, 22, 48)
-        row.BorderSizePixel = 0
-        row.LayoutOrder = ordem
-        row.Parent = parent
-        Instance.new("UICorner", row).CornerRadius = UDim.new(0, 10)
-
-        local lbl = Instance.new("TextLabel")
-        lbl.Size = UDim2.new(0.72, 0, 1, 0)
-        lbl.Position = UDim2.new(0, 14, 0, 0)
-        lbl.BackgroundTransparency = 1
-        lbl.Text = texto
-        lbl.TextColor3 = Color3.fromRGB(230, 220, 250)
-        lbl.Font = Enum.Font.Gotham
-        lbl.TextSize = 13
-        lbl.TextXAlignment = Enum.TextXAlignment.Left
-        lbl.Parent = row
-
-        local bg = Instance.new("Frame")
-        bg.Size = UDim2.new(0, 42, 0, 24)
-        bg.Position = UDim2.new(1, -56, 0.5, -12)
-        bg.BackgroundColor3 = COR_TOG_OFF
-        bg.BorderSizePixel = 0
-        bg.Parent = row
-        Instance.new("UICorner", bg).CornerRadius = UDim.new(1, 0)
-
-        local circle = Instance.new("Frame")
-        circle.Size = UDim2.new(0, 18, 0, 18)
-        circle.Position = UDim2.new(0, 3, 0.5, -9)
-        circle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-        circle.BorderSizePixel = 0
-        circle.Parent = bg
-        Instance.new("UICorner", circle).CornerRadius = UDim.new(1, 0)
-
-        local click = Instance.new("TextButton")
-        click.Size = UDim2.new(1, 0, 1, 0)
-        click.BackgroundTransparency = 1
-        click.Text = ""
-        click.Parent = row
-
-        local estado = false
-        click.MouseButton1Click:Connect(function()
-            estado = not estado
-            if estado then
-                bg.BackgroundColor3 = COR_TOG_ON
-                circle.Position = UDim2.new(1, -21, 0.5, -9)
-            else
-                bg.BackgroundColor3 = COR_TOG_OFF
-                circle.Position = UDim2.new(0, 3, 0.5, -9)
-            end
-            if callback then pcall(callback, estado) end
-        end)
-
-        return row
-    end
-
-    local function criarBotao(parent, texto, ordem, callback)
+    local function makeButton(texto, ordem, parent)
+        parent = parent or ButtonList
         local b = Instance.new("TextButton")
-        b.Size = UDim2.new(1, 0, 0, 40)
-        b.BackgroundColor3 = Color3.fromRGB(60, 38, 95)
+        b.Size = UDim2.new(1, 0, 0, 38)
+        b.BackgroundColor3 = Color3.fromRGB(35, 20, 55)
         b.BorderSizePixel = 0
         b.Text = texto
-        b.TextColor3 = Color3.fromRGB(230, 210, 255)
-        b.Font = Enum.Font.GothamMedium
+        b.TextColor3 = COR_ROXO
+        b.Font = Enum.Font.GothamBold
         b.TextSize = 13
         b.LayoutOrder = ordem
+        b.AutoButtonColor = false
         b.Parent = parent
-        Instance.new("UICorner", b).CornerRadius = UDim.new(0, 10)
+        Instance.new("UICorner", b).CornerRadius = UDim.new(0, 8)
 
-        b.MouseButton1Click:Connect(function()
-            if callback then pcall(callback) end
+        local s = Instance.new("UIStroke")
+        s.Color = COR_ROXO
+        s.Thickness = 1
+        s.Transparency = 0.5
+        s.Parent = b
+
+        b.MouseEnter:Connect(function()
+            TweenService:Create(b, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(55, 30, 85)}):Play()
+        end)
+        b.MouseLeave:Connect(function()
+            TweenService:Create(b, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(35, 20, 55)}):Play()
         end)
 
         return b
     end
 
-    local AbaP = criarAba("Principal", 1)
-    local AbaB = criarAba("Bypass", 2)
-    local AbaE = criarAba("Extras", 3)
-    local AbaT = criarAba("Teleporte", 4)
-    local AbaBs = criarAba("Basico", 5)
-    local AbaC = criarAba("Creditos", 6)
-
-    criarToggle(AbaP, "Gojo 0.2", 1, function(ativo)
-        if ativo then
+    local gojoAtivo = false
+    local gojoBtn = makeButton("Gojo 0.2: OFF", 1)
+    gojoBtn.MouseButton1Click:Connect(function()
+        gojoAtivo = not gojoAtivo
+        gojoBtn.Text = "Gojo 0.2: " .. (gojoAtivo and "ON" or "OFF")
+        if gojoAtivo then
             task.spawn(function()
-                while _G.Aether_Gojo do
+                while gojoAtivo do
                     local char = LP.Character
                     local root = char and char:FindFirstChild("HumanoidRootPart")
                     if root then
                         for _, p in ipairs(Players:GetPlayers()) do
-                            if not _G.Aether_Gojo then break end
+                            if not gojoAtivo then break end
                             if p ~= LP and p.Character then
                                 local tr = p.Character:FindFirstChild("HumanoidRootPart")
                                 local hum = p.Character:FindFirstChildOfClass("Humanoid")
@@ -426,54 +328,56 @@ loadMainHub = function()
                     RunService.Heartbeat:Wait()
                 end
             end)
-            _G.Aether_Gojo = true
-        else
-            _G.Aether_Gojo = false
         end
     end)
 
-    criarToggle(AbaP, "Focus", 2, function(ativo)
-        if ativo then
-            task.spawn(function()
-                local angle = 0
-                while _G.Aether_Focus do
-                    local char = LP.Character
-                    local root = char and char:FindFirstChild("HumanoidRootPart")
-                    if root then
-                        local best, bestD = nil, math.huge
-                        for _, p in ipairs(Players:GetPlayers()) do
-                            if p ~= LP and p.Character then
-                                local tr = p.Character:FindFirstChild("HumanoidRootPart")
-                                local hum = p.Character:FindFirstChildOfClass("Humanoid")
-                                if tr and hum and hum.Health > 0 then
-                                    local d = (tr.Position - root.Position).Magnitude
-                                    if d < bestD then bestD = d; best = tr end
-                                end
-                            end
-                        end
-                        if best then
-                            angle = angle + 0.1
-                            local offset = Vector3.new(math.cos(angle) * 6, 3, math.sin(angle) * 6)
-                            local hum = char:FindFirstChildOfClass("Humanoid")
-                            if hum then hum.PlatformStand = true end
-                            root.CFrame = CFrame.new(best.Position + offset, best.Position)
-                        end
-                    end
-                    RunService.Heartbeat:Wait()
-                end
-                local hum = LP.Character and LP.Character:FindFirstChildOfClass("Humanoid")
-                if hum then hum.PlatformStand = false end
+    local flyAtivo = false
+    local flyBtn = makeButton("Fly: OFF", 2)
+    local flyBV, flyConn
+    flyBtn.MouseButton1Click:Connect(function()
+        flyAtivo = not flyAtivo
+        flyBtn.Text = "Fly: " .. (flyAtivo and "ON" or "OFF")
+        if flyAtivo then
+            local char = LP.Character
+            local hum = char and char:FindFirstChildOfClass("Humanoid")
+            local root = char and char:FindFirstChild("HumanoidRootPart")
+            if not root or not hum then return end
+            hum.PlatformStand = true
+            flyBV = Instance.new("BodyVelocity")
+            flyBV.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+            flyBV.Velocity = Vector3.zero
+            flyBV.Parent = root
+            flyConn = RunService.Heartbeat:Connect(function()
+                if not flyAtivo then return end
+                local c = LP.Character
+                local r = c and c:FindFirstChild("HumanoidRootPart")
+                if not r then return end
+                local cam = workspace.CurrentCamera
+                local vel = Vector3.zero
+                local speed = 80
+                if UIS:IsKeyDown(Enum.KeyCode.W) then vel += cam.CFrame.LookVector * speed end
+                if UIS:IsKeyDown(Enum.KeyCode.S) then vel -= cam.CFrame.LookVector * speed end
+                if UIS:IsKeyDown(Enum.KeyCode.A) then vel -= cam.CFrame.RightVector * speed end
+                if UIS:IsKeyDown(Enum.KeyCode.D) then vel += cam.CFrame.RightVector * speed end
+                if UIS:IsKeyDown(Enum.KeyCode.Space) then vel += Vector3.new(0, speed, 0) end
+                flyBV.Velocity = vel
             end)
-            _G.Aether_Focus = true
         else
-            _G.Aether_Focus = false
+            if flyConn then flyConn:Disconnect(); flyConn = nil end
+            if flyBV then flyBV:Destroy(); flyBV = nil end
+            local hum = LP.Character and LP.Character:FindFirstChildOfClass("Humanoid")
+            if hum then hum.PlatformStand = false end
         end
     end)
 
-    criarToggle(AbaB, "Bypass", 1, function(ativo)
-        if ativo then
+    local bypassAtivo = false
+    local bypassBtn = makeButton("Bypass: OFF", 3)
+    bypassBtn.MouseButton1Click:Connect(function()
+        bypassAtivo = not bypassAtivo
+        bypassBtn.Text = "Bypass: " .. (bypassAtivo and "ON" or "OFF")
+        if bypassAtivo then
             task.spawn(function()
-                while _G.Aether_Bypass do
+                while bypassAtivo do
                     pcall(function()
                         local char = LP.Character
                         local root = char and char:FindFirstChild("HumanoidRootPart")
@@ -504,19 +408,70 @@ loadMainHub = function()
                     task.wait(3)
                 end
             end)
-            _G.Aether_Bypass = true
-        else
-            _G.Aether_Bypass = false
         end
     end)
+
+    local focusAtivo = false
+    local focusBtn = makeButton("Focus: OFF", 4)
+    local focusConn
+    focusBtn.MouseButton1Click:Connect(function()
+        focusAtivo = not focusAtivo
+        focusBtn.Text = "Focus: " .. (focusAtivo and "ON" or "OFF")
+        if focusAtivo then
+            task.spawn(function()
+                local angle = 0
+                while focusAtivo do
+                    local char = LP.Character
+                    local root = char and char:FindFirstChild("HumanoidRootPart")
+                    if root then
+                        local best, bestD = nil, math.huge
+                        for _, p in ipairs(Players:GetPlayers()) do
+                            if p ~= LP and p.Character then
+                                local tr = p.Character:FindFirstChild("HumanoidRootPart")
+                                local hum = p.Character:FindFirstChildOfClass("Humanoid")
+                                if tr and hum and hum.Health > 0 then
+                                    local d = (tr.Position - root.Position).Magnitude
+                                    if d < bestD then bestD = d; best = tr end
+                                end
+                            end
+                        end
+                        if best then
+                            angle = angle + 0.1
+                            local offset = Vector3.new(math.cos(angle) * 6, 3, math.sin(angle) * 6)
+                            local hum = char:FindFirstChildOfClass("Humanoid")
+                            if hum then hum.PlatformStand = true end
+                            root.CFrame = CFrame.new(best.Position + offset, best.Position)
+                        end
+                    end
+                    RunService.Heartbeat:Wait()
+                end
+                local hum = LP.Character and LP.Character:FindFirstChildOfClass("Humanoid")
+                if hum then hum.PlatformStand = false end
+            end)
+        end
+    end)
+
+    local extrasFrame = Instance.new("Frame")
+    extrasFrame.Size = UDim2.new(1, 0, 1, 0)
+    extrasFrame.BackgroundTransparency = 1
+    extrasFrame.Visible = false
+    extrasFrame.Parent = ButtonList
+
+    local extrasLayout = Instance.new("UIListLayout")
+    extrasLayout.Padding = UDim.new(0, 6)
+    extrasLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    extrasLayout.Parent = extrasFrame
+
+    local extrasBtn = makeButton("✨ Extras: OFF", 5)
 
     local espAtivo = false
     local espFolder = Instance.new("Folder", ScreenGui)
     espFolder.Name = "AetherESP"
-
-    criarToggle(AbaE, "ESP Jogadores", 1, function(ativo)
-        espAtivo = ativo
-        if ativo then
+    local espBtn = makeButton("ESP: OFF", 1, extrasFrame)
+    espBtn.MouseButton1Click:Connect(function()
+        espAtivo = not espAtivo
+        espBtn.Text = "ESP: " .. (espAtivo and "ON" or "OFF")
+        if espAtivo then
             task.spawn(function()
                 while espAtivo do
                     espFolder:ClearAllChildren()
@@ -536,11 +491,15 @@ loadMainHub = function()
             end)
         else
             espFolder:ClearAllChildren()
-           end
+        end
     end)
 
-    criarToggle(AbaE, "FPS Booster", 2, function(ativo)
-        if ativo then
+    local fpsBtn = makeButton("FPS Booster: OFF", 2, extrasFrame)
+    local fpsAtivo = false
+    fpsBtn.MouseButton1Click:Connect(function()
+        fpsAtivo = not fpsAtivo
+        fpsBtn.Text = "FPS Booster: " .. (fpsAtivo and "ON" or "OFF")
+        if fpsAtivo then
             task.spawn(function()
                 for _, v in ipairs(game:GetDescendants()) do
                     pcall(function()
@@ -561,13 +520,26 @@ loadMainHub = function()
         end
     end)
 
+        local infJumpBtn = makeButton("Infinite Jump: OFF", 3, extrasFrame)
     local infJumpAtivo = false
-    criarToggle(AbaE, "Infinite Jump", 3, function(ativo)
-        infJumpAtivo = ativo
+    infJumpBtn.MouseButton1Click:Connect(function()
+        infJumpAtivo = not infJumpAtivo
+        infJumpBtn.Text = "Infinite Jump: " .. (infJumpAtivo and "ON" or "OFF")
     end)
 
-    criarToggle(AbaE, "Fullbright", 4, function(ativo)
-        if ativo then
+    UIS.JumpRequest:Connect(function()
+        if infJumpAtivo then
+            local hum = LP.Character and LP.Character:FindFirstChildOfClass("Humanoid")
+            if hum then hum:ChangeState(Enum.HumanoidStateType.Jumping) end
+        end
+    end)
+
+    local fbBtn = makeButton("Fullbright: OFF", 4, extrasFrame)
+    local fbAtivo = false
+    fbBtn.MouseButton1Click:Connect(function()
+        fbAtivo = not fbAtivo
+        fbBtn.Text = "Fullbright: " .. (fbAtivo and "ON" or "OFF")
+        if fbAtivo then
             Lighting.Ambient = Color3.fromRGB(178, 178, 178)
             Lighting.OutdoorAmbient = Color3.fromRGB(178, 178, 178)
             Lighting.Brightness = 5
@@ -578,10 +550,14 @@ loadMainHub = function()
         end
     end)
 
-    criarToggle(AbaE, "Anti-AFK", 5, function(ativo)
-        if ativo then
+    local afkBtn = makeButton("Anti-AFK: OFF", 5, extrasFrame)
+    local afkAtivo = false
+    afkBtn.MouseButton1Click:Connect(function()
+        afkAtivo = not afkAtivo
+        afkBtn.Text = "Anti-AFK: " .. (afkAtivo and "ON" or "OFF")
+        if afkAtivo then
             task.spawn(function()
-                while _G.Aether_AntiAFK do
+                while afkAtivo do
                     pcall(function()
                         VirtualUser:CaptureController()
                         VirtualUser:ClickButton2(Vector2.new())
@@ -589,130 +565,54 @@ loadMainHub = function()
                     task.wait(60)
                 end
             end)
-            _G.Aether_AntiAFK = true
-        else
-            _G.Aether_AntiAFK = false
         end
     end)
 
-    criarBotao(AbaT, "TP Jogador Aleatorio", 1, function()
-        local j = {}
-        for _, p in ipairs(Players:GetPlayers()) do
-            if p ~= LP and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
-                table.insert(j, p)
+    local voltarBtn = makeButton("⬅ Voltar", 6, extrasFrame)
+    voltarBtn.MouseButton1Click:Connect(function()
+        extrasFrame.Visible = false
+        ButtonList.Visible = true
+        extrasBtn.Text = "✨ Extras: OFF"
+    end)
+
+    extrasBtn.MouseButton1Click:Connect(function()
+        extrasFrame.Visible = not extrasFrame.Visible
+        ButtonList.Visible = not ButtonList.Visible
+        extrasBtn.Text = "✨ Extras: " .. (extrasFrame.Visible and "ON" or "OFF")
+    end)
+
+    local temaBtn = makeButton("Tema: Roxo", 6)
+    local temaOrdem = {"Roxo", "Vermelho", "Azul", "Rosa", "Verde"}
+    local temaIndex = 1
+    temaBtn.MouseButton1Click:Connect(function()
+        temaIndex = temaIndex % #temaOrdem + 1
+        local nome = temaOrdem[temaIndex]
+        local cor = temas[nome]
+        temaBtn.Text = "Tema: " .. nome
+        MainStroke.Color = cor
+        MinStroke.Color = cor
+        Title.TextColor3 = cor
+        LogoIcon.TextColor3 = cor
+        MiniStroke.Color = cor
+        MiniBtn.TextColor3 = cor
+        for _, obj in ipairs(ButtonList:GetDescendants()) do
+            if obj:IsA("TextButton") then
+                obj.TextColor3 = cor
+                local s = obj:FindFirstChildOfClass("UIStroke")
+                if s then s.Color = cor end
             end
         end
-        if #j > 0 then
-            local alvo = j[math.random(1, #j)]
-            local mr = LP.Character and LP.Character:FindFirstChild("HumanoidRootPart")
-            local ra = alvo.Character:FindFirstChild("HumanoidRootPart")
-            if mr and ra then
-                mr.CFrame = ra.CFrame + Vector3.new(0, 3, 0)
-            end
-        end
     end)
 
-    criarBotao(AbaT, "Voltar ao Spawn", 2, function()
-        local c = LP.Character
-        local r = c and c:FindFirstChild("HumanoidRootPart")
-        local s = workspace:FindFirstChildOfClass("SpawnLocation")
-        if r and s then
-            r.CFrame = s.CFrame + Vector3.new(0, 3, 0)
-        end
+    MinBtn.MouseButton1Click:Connect(function()
+        MainFrame.Visible = false
+        MiniBtn.Visible = true
     end)
 
-    criarToggle(AbaBs, "Speed 200", 1, function(ativo)
-        local h = LP.Character and LP.Character:FindFirstChildOfClass("Humanoid")
-        if h then h.WalkSpeed = ativo and 200 or 16 end
+    MiniBtn.MouseButton1Click:Connect(function()
+        MiniBtn.Visible = false
+        MainFrame.Visible = true
     end)
-
-    criarToggle(AbaBs, "Jump Power 150", 2, function(ativo)
-        local h = LP.Character and LP.Character:FindFirstChildOfClass("Humanoid")
-        if h then
-            h.UseJumpPower = true
-            h.JumpPower = ativo and 150 or 50
-        end
-    end)
-
-    local flyAtivo = false
-    local flyConn, flyBV
-    criarToggle(AbaBs, "Fly", 3, function(ativo)
-        flyAtivo = ativo
-        if ativo then
-            local char = LP.Character
-            local hum = char and char:FindFirstChildOfClass("Humanoid")
-            local root = char and char:FindFirstChild("HumanoidRootPart")
-            if not root or not hum then return end
-            hum.PlatformStand = true
-            flyBV = Instance.new("BodyVelocity")
-            flyBV.MaxForce = Vector3.new(9e9, 9e9, 9e9)
-            flyBV.Velocity = Vector3.zero
-            flyBV.Parent = root
-
-            flyConn = RunService.Heartbeat:Connect(function()
-                if not flyAtivo then return end
-                local c = LP.Character
-                local r = c and c:FindFirstChild("HumanoidRootPart")
-                if not r then return end
-                local cam = workspace.CurrentCamera
-                local vel = Vector3.zero
-                local speed = 80
-                if UIS:IsKeyDown(Enum.KeyCode.W) then vel += cam.CFrame.LookVector * speed end
-                if UIS:IsKeyDown(Enum.KeyCode.S) then vel -= cam.CFrame.LookVector * speed end
-                if UIS:IsKeyDown(Enum.KeyCode.A) then vel -= cam.CFrame.RightVector * speed end
-                if UIS:IsKeyDown(Enum.KeyCode.D) then vel += cam.CFrame.RightVector * speed end
-                if UIS:IsKeyDown(Enum.KeyCode.Space) then vel += Vector3.new(0, speed, 0) end
-                flyBV.Velocity = vel
-            end)
-        else
-            if flyConn then flyConn:Disconnect(); flyConn = nil end
-            if flyBV then flyBV:Destroy(); flyBV = nil end
-            local hum = LP.Character and LP.Character:FindFirstChildOfClass("Humanoid")
-            if hum then hum.PlatformStand = false end
-        end
-    end)
-
-    local noclipAtivo = false
-    criarToggle(AbaBs, "Noclip", 4, function(ativo)
-        noclipAtivo = ativo
-        if ativo then
-            task.spawn(function()
-                while noclipAtivo do
-                    local c = LP.Character
-                    if c then
-                        for _, p in ipairs(c:GetDescendants()) do
-                            if p:IsA("BasePart") then p.CanCollide = false end
-                        end
-                    end
-                    task.wait(0.2)
-                end
-            end)
-        end
-    end)
-
-    UIS.JumpRequest:Connect(function()
-        if infJumpAtivo then
-            local h = LP.Character and LP.Character:FindFirstChildOfClass("Humanoid")
-            if h then h:ChangeState(Enum.HumanoidStateType.Jumping) end
-        end
-    end)
-
-    local cf = Instance.new("Frame")
-    cf.Size = UDim2.new(1, 0, 0, 130)
-    cf.BackgroundColor3 = Color3.fromRGB(32, 22, 48)
-    cf.BorderSizePixel = 0
-    cf.Parent = AbaC
-    Instance.new("UICorner", cf).CornerRadius = UDim.new(0, 10)
-
-    local ct = Instance.new("TextLabel")
-    ct.Size = UDim2.new(1, -24, 1, -24)
-    ct.Position = UDim2.new(0, 12, 0, 12)
-    ct.BackgroundTransparency = 1
-    ct.Text = "AETHER HUB - by atsu"
-    ct.TextColor3 = Color3.fromRGB(230, 210, 255)
-    ct.Font = Enum.Font.Gotham
-    ct.TextSize = 12
-    ct.Parent = cf
 end
 
 if _G.AetherAuthenticated then
