@@ -1,0 +1,571 @@
+local CoreGui = game:GetService("CoreGui")
+local Players = game:GetService("Players")
+local UIS = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
+local Lighting = game:GetService("Lighting")
+local VirtualUser = game:GetService("VirtualUser")
+local LP = Players.LocalPlayer
+
+local KeysAutorizadas = {
+    ["staff"] = 11332248347,
+}
+
+for _, n in ipairs({"AetherKey", "AetherHub"}) do
+    pcall(function()
+        local g = CoreGui:FindFirstChild(n)
+        if g then g:Destroy() end
+    end)
+end
+
+local loadMainHub
+
+local function createKeyGui()
+    local gui = Instance.new("ScreenGui")
+    gui.Name = "AetherKey"
+    gui.ResetOnSpawn = false
+    gui.Parent = CoreGui
+
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(0, 300, 0, 220)
+    frame.Position = UDim2.new(0.5, -150, 0.5, -110)
+    frame.BackgroundColor3 = Color3.fromRGB(18, 12, 28)
+    frame.BorderSizePixel = 0
+    frame.Active = true
+    frame.Draggable = true
+    frame.Parent = gui
+    Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 18)
+
+    local stroke = Instance.new("UIStroke")
+    stroke.Color = Color3.fromRGB(160, 100, 255)
+    stroke.Thickness = 1.5
+    stroke.Parent = frame
+
+    local title = Instance.new("TextLabel")
+    title.Size = UDim2.new(1, 0, 0, 45)
+    title.Position = UDim2.new(0, 0, 0, 14)
+    title.BackgroundTransparency = 1
+    title.Text = "AETHER HUB"
+    title.TextColor3 = Color3.fromRGB(200, 160, 255)
+    title.Font = Enum.Font.GothamBold
+    title.TextSize = 22
+    title.Parent = frame
+
+    local sub = Instance.new("TextLabel")
+    sub.Size = UDim2.new(1, 0, 0, 18)
+    sub.Position = UDim2.new(0, 0, 0, 58)
+    sub.BackgroundTransparency = 1
+    sub.Text = "Digite a Key de Acesso"
+    sub.TextColor3 = Color3.fromRGB(150, 120, 200)
+    sub.Font = Enum.Font.Gotham
+    sub.TextSize = 12
+    sub.Parent = frame
+
+    local box = Instance.new("TextBox")
+    box.Size = UDim2.new(0, 230, 0, 38)
+    box.Position = UDim2.new(0.5, -115, 0, 90)
+    box.BackgroundColor3 = Color3.fromRGB(28, 18, 48)
+    box.BorderSizePixel = 0
+    box.Text = ""
+    box.PlaceholderText = "Digite sua key..."
+    box.TextColor3 = Color3.fromRGB(220, 200, 255)
+    box.PlaceholderColor3 = Color3.fromRGB(110, 85, 160)
+    box.Font = Enum.Font.Gotham
+    box.TextSize = 14
+    box.ClearTextOnFocus = false
+    box.Parent = frame
+    Instance.new("UICorner", box).CornerRadius = UDim.new(0, 10)
+
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0, 230, 0, 38)
+    btn.Position = UDim2.new(0.5, -115, 0, 138)
+    btn.BackgroundColor3 = Color3.fromRGB(130, 70, 220)
+    btn.BorderSizePixel = 0
+    btn.Text = "Verificar"
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.Font = Enum.Font.GothamBold
+    btn.TextSize = 14
+    btn.AutoButtonColor = false
+    btn.Parent = frame
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 10)
+
+    local status = Instance.new("TextLabel")
+    status.Size = UDim2.new(1, 0, 0, 18)
+    status.Position = UDim2.new(0, 0, 0, 188)
+    status.BackgroundTransparency = 1
+    status.Text = ""
+    status.TextColor3 = Color3.fromRGB(220, 80, 100)
+    status.Font = Enum.Font.Gotham
+    status.TextSize = 12
+    status.Parent = frame
+
+    local function tryVerify()
+        local k = box.Text
+        if k == "" then
+            status.Text = "Digite uma key!"
+            return
+        end
+        local id = KeysAutorizadas[k]
+        if not id then
+            status.Text = "Key invalida"
+            box.Text = ""
+            return
+        end
+        if id ~= LP.UserId then
+            status.Text = "Key nao pertence a voce"
+            return
+        end
+        status.Text = "Acesso Concedido"
+        status.TextColor3 = Color3.fromRGB(60, 220, 100)
+        task.wait(0.9)
+        gui:Destroy()
+        _G.AetherAuthenticated = true
+        loadMainHub()
+    end
+
+    btn.MouseButton1Click:Connect(tryVerify)
+    box.FocusLost:Connect(function(enter)
+        if enter then tryVerify() end
+    end)
+end
+
+loadMainHub = function()
+    local COR_ROXO = Color3.fromRGB(170, 100, 255)
+    local COR_ABA_ON = Color3.fromRGB(170, 100, 255)
+    local COR_ABA_OFF = Color3.fromRGB(32, 22, 48)
+    local COR_TXT_OFF = Color3.fromRGB(140, 120, 180)
+    local COR_TOG_ON = Color3.fromRGB(170, 100, 255)
+    local COR_TOG_OFF = Color3.fromRGB(60, 45, 90)
+
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "AetherHub"
+    ScreenGui.ResetOnSpawn = false
+    ScreenGui.Parent = CoreGui
+
+    local MainFrame = Instance.new("Frame")
+    MainFrame.Size = UDim2.new(0, 480, 0, 320)
+    MainFrame.Position = UDim2.new(0.5, -240, 0.5, -160)
+    MainFrame.BackgroundColor3 = Color3.fromRGB(30, 18, 50)
+    MainFrame.BorderSizePixel = 0
+    MainFrame.Active = true
+    MainFrame.Draggable = true
+    MainFrame.Parent = ScreenGui
+    Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 16)
+
+    local stroke = Instance.new("UIStroke")
+    stroke.Color = COR_ROXO
+    stroke.Thickness = 1.5
+    stroke.Parent = MainFrame
+
+    local TopBar = Instance.new("Frame")
+    TopBar.Size = UDim2.new(1, 0, 0, 42)
+    TopBar.BackgroundTransparency = 1
+    TopBar.Parent = MainFrame
+
+    local HubTitle = Instance.new("TextLabel")
+    HubTitle.Size = UDim2.new(0, 250, 1, 0)
+    HubTitle.Position = UDim2.new(0, 18, 0, 0)
+    HubTitle.BackgroundTransparency = 1
+    HubTitle.Text = "AETHER HUB"
+    HubTitle.TextColor3 = Color3.fromRGB(230, 210, 255)
+    HubTitle.Font = Enum.Font.GothamBold
+    HubTitle.TextSize = 15
+    HubTitle.TextXAlignment = Enum.TextXAlignment.Left
+    HubTitle.Parent = TopBar
+
+    local MinBtn = Instance.new("TextButton")
+    MinBtn.Size = UDim2.new(0, 28, 0, 28)
+    MinBtn.Position = UDim2.new(1, -38, 0.5, -14)
+    MinBtn.BackgroundColor3 = Color3.fromRGB(40, 28, 60)
+    MinBtn.BorderSizePixel = 0
+    MinBtn.Text = "-"
+    MinBtn.TextColor3 = Color3.fromRGB(200, 160, 255)
+    MinBtn.Font = Enum.Font.GothamBold
+    MinBtn.TextSize = 18
+    MinBtn.Parent = TopBar
+    Instance.new("UICorner", MinBtn).CornerRadius = UDim.new(0, 8)
+
+    local Sidebar = Instance.new("Frame")
+    Sidebar.Size = UDim2.new(0, 130, 1, -54)
+    Sidebar.Position = UDim2.new(0, 12, 0, 46)
+    Sidebar.BackgroundColor3 = Color3.fromRGB(22, 14, 38)
+    Sidebar.BorderSizePixel = 0
+    Sidebar.Parent = MainFrame
+    Instance.new("UICorner", Sidebar).CornerRadius = UDim.new(0, 12)
+
+    local TabList = Instance.new("Frame")
+    TabList.Size = UDim2.new(1, -14, 1, -14)
+    TabList.Position = UDim2.new(0, 7, 0, 7)
+    TabList.BackgroundTransparency = 1
+    TabList.Parent = Sidebar
+
+    local TabLayout = Instance.new("UIListLayout")
+    TabLayout.Padding = UDim.new(0, 5)
+    TabLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    TabLayout.Parent = TabList
+
+    local ContentArea = Instance.new("Frame")
+    ContentArea.Size = UDim2.new(1, -166, 1, -54)
+    ContentArea.Position = UDim2.new(0, 154, 0, 46)
+    ContentArea.BackgroundColor3 = Color3.fromRGB(22, 14, 38)
+    ContentArea.BorderSizePixel = 0
+    ContentArea.Parent = MainFrame
+    Instance.new("UICorner", ContentArea).CornerRadius = UDim.new(0, 12)
+
+    local ContentTitle = Instance.new("TextLabel")
+    ContentTitle.Size = UDim2.new(1, 0, 0, 36)
+    ContentTitle.Position = UDim2.new(0, 0, 0, 10)
+    ContentTitle.BackgroundTransparency = 1
+    ContentTitle.Text = "Principal"
+    ContentTitle.TextColor3 = Color3.fromRGB(80, 55, 120)
+    ContentTitle.Font = Enum.Font.GothamBold
+    ContentTitle.TextSize = 26
+    ContentTitle.Parent = ContentArea
+
+    local FunctionList = Instance.new("ScrollingFrame")
+    FunctionList.Size = UDim2.new(1, -24, 1, -58)
+    FunctionList.Position = UDim2.new(0, 12, 0, 50)
+    FunctionList.BackgroundTransparency = 1
+    FunctionList.BorderSizePixel = 0
+    FunctionList.ScrollBarThickness = 4
+    FunctionList.ScrollBarImageColor3 = COR_ROXO
+    FunctionList.CanvasSize = UDim2.new(0, 0, 0, 0)
+    FunctionList.AutomaticCanvasSize = Enum.AutomaticSize.Y
+    FunctionList.Parent = ContentArea
+
+    local FuncLayout = Instance.new("UIListLayout")
+    FuncLayout.Padding = UDim.new(0, 7)
+    FuncLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    FuncLayout.Parent = FunctionList
+
+    local MiniPanel = Instance.new("TextButton")
+    MiniPanel.Size = UDim2.new(0, 50, 0, 50)
+    MiniPanel.Position = UDim2.new(0, 20, 0.5, -25)
+    MiniPanel.BackgroundColor3 = COR_ROXO
+    MiniPanel.BorderSizePixel = 0
+    MiniPanel.Text = "+"
+    MiniPanel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    MiniPanel.Font = Enum.Font.GothamBold
+    MiniPanel.TextSize = 26
+    MiniPanel.Draggable = true
+    MiniPanel.Visible = false
+    MiniPanel.Parent = ScreenGui
+    Instance.new("UICorner", MiniPanel).CornerRadius = UDim.new(1, 0)
+
+    MinBtn.MouseButton1Click:Connect(function()
+        MainFrame.Visible = false
+        MiniPanel.Visible = true
+    end)
+
+    MiniPanel.MouseButton1Click:Connect(function()
+        MiniPanel.Visible = false
+        MainFrame.Visible = true
+    end)
+
+    local Abas = {}
+    local AbaAtual = nil
+
+    local function trocarAba(nomeAba)
+        for nome, dados in pairs(Abas) do
+            if nome == nomeAba then
+                dados.frame.Visible = true
+                dados.botao.BackgroundColor3 = COR_ABA_ON
+                dados.botao.TextColor3 = Color3.fromRGB(255, 255, 255)
+            else
+                dados.frame.Visible = false
+                dados.botao.BackgroundColor3 = COR_ABA_OFF
+                dados.botao.TextColor3 = COR_TXT_OFF
+            end
+        end
+        ContentTitle.Text = nomeAba
+        AbaAtual = nomeAba
+    end
+
+    local function criarAba(nome, ordem)
+        local botao = Instance.new("TextButton")
+        botao.Size = UDim2.new(1, 0, 0, 34)
+        botao.BackgroundColor3 = COR_ABA_OFF
+        botao.BorderSizePixel = 0
+        botao.Text = nome
+        botao.TextColor3 = COR_TXT_OFF
+        botao.Font = Enum.Font.GothamMedium
+        botao.TextSize = 12
+        botao.LayoutOrder = ordem
+        botao.Parent = TabList
+        Instance.new("UICorner", botao).CornerRadius = UDim.new(0, 8)
+
+        local abaFrame = Instance.new("Frame")
+        abaFrame.Size = UDim2.new(1, 0, 0, 0)
+        abaFrame.BackgroundTransparency = 1
+        abaFrame.Visible = false
+        abaFrame.Parent = FunctionList
+
+        local abaLayout = Instance.new("UIListLayout")
+        abaLayout.Padding = UDim.new(0, 7)
+        abaLayout.SortOrder = Enum.SortOrder.LayoutOrder
+        abaLayout.Parent = abaFrame
+
+        abaLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+            abaFrame.Size = UDim2.new(1, 0, 0, abaLayout.AbsoluteContentSize.Y + 10)
+        end)
+
+        botao.MouseButton1Click:Connect(function()
+            trocarAba(nome)
+        end)
+
+        Abas[nome] = { botao = botao, frame = abaFrame }
+        if not AbaAtual then trocarAba(nome) end
+        return abaFrame
+    end
+
+    local function criarToggle(parent, texto, ordem, callback)
+        local row = Instance.new("Frame")
+        row.Size = UDim2.new(1, 0, 0, 46)
+        row.BackgroundColor3 = Color3.fromRGB(32, 22, 48)
+        row.BorderSizePixel = 0
+        row.LayoutOrder = ordem
+        row.Parent = parent
+        Instance.new("UICorner", row).CornerRadius = UDim.new(0, 10)
+
+        local lbl = Instance.new("TextLabel")
+        lbl.Size = UDim2.new(0.72, 0, 1, 0)
+        lbl.Position = UDim2.new(0, 14, 0, 0)
+        lbl.BackgroundTransparency = 1
+        lbl.Text = texto
+        lbl.TextColor3 = Color3.fromRGB(230, 220, 250)
+        lbl.Font = Enum.Font.Gotham
+        lbl.TextSize = 13
+        lbl.TextXAlignment = Enum.TextXAlignment.Left
+        lbl.Parent = row
+
+        local bg = Instance.new("Frame")
+        bg.Size = UDim2.new(0, 42, 0, 24)
+        bg.Position = UDim2.new(1, -56, 0.5, -12)
+        bg.BackgroundColor3 = COR_TOG_OFF
+        bg.BorderSizePixel = 0
+        bg.Parent = row
+        Instance.new("UICorner", bg).CornerRadius = UDim.new(1, 0)
+
+        local circle = Instance.new("Frame")
+        circle.Size = UDim2.new(0, 18, 0, 18)
+        circle.Position = UDim2.new(0, 3, 0.5, -9)
+        circle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+        circle.BorderSizePixel = 0
+        circle.Parent = bg
+        Instance.new("UICorner", circle).CornerRadius = UDim.new(1, 0)
+
+        local click = Instance.new("TextButton")
+        click.Size = UDim2.new(1, 0, 1, 0)
+        click.BackgroundTransparency = 1
+        click.Text = ""
+        click.Parent = row
+
+        local estado = false
+        click.MouseButton1Click:Connect(function()
+            estado = not estado
+            if estado then
+                bg.BackgroundColor3 = COR_TOG_ON
+                circle.Position = UDim2.new(1, -21, 0.5, -9)
+            else
+                bg.BackgroundColor3 = COR_TOG_OFF
+                circle.Position = UDim2.new(0, 3, 0.5, -9)
+            end
+            if callback then pcall(callback, estado) end
+        end)
+
+        return row
+    end
+
+    local function criarBotao(parent, texto, ordem, callback)
+        local b = Instance.new("TextButton")
+        b.Size = UDim2.new(1, 0, 0, 40)
+        b.BackgroundColor3 = Color3.fromRGB(60, 38, 95)
+        b.BorderSizePixel = 0
+        b.Text = texto
+        b.TextColor3 = Color3.fromRGB(230, 210, 255)
+        b.Font = Enum.Font.GothamMedium
+        b.TextSize = 13
+        b.LayoutOrder = ordem
+        b.Parent = parent
+        Instance.new("UICorner", b).CornerRadius = UDim.new(0, 10)
+
+        b.MouseButton1Click:Connect(function()
+            if callback then pcall(callback) end
+        end)
+
+        return b
+    end
+
+    local AbaP = criarAba("Principal", 1)
+    local AbaB = criarAba("Bypass", 2)
+    local AbaC = criarAba("Creditos", 3)
+
+    criarToggle(AbaP, "Gojo Kill All", 1, function(ativo)
+        if ativo then
+            task.spawn(function()
+                while _G.Aether_Gojo do
+                    local char = LP.Character
+                    local root = char and char:FindFirstChild("HumanoidRootPart")
+                    if root then
+                        for _, p in ipairs(Players:GetPlayers()) do
+                            if not _G.Aether_Gojo then break end
+                            if p ~= LP and p.Character then
+                                local tr = p.Character:FindFirstChild("HumanoidRootPart")
+                                local hum = p.Character:FindFirstChildOfClass("Humanoid")
+                                if tr and hum and hum.Health > 0 then
+                                    root.CFrame = tr.CFrame
+                                    RunService.Heartbeat:Wait()
+                                end
+                            end
+                        end
+                    end
+                    RunService.Heartbeat:Wait()
+                end
+            end)
+            _G.Aether_Gojo = true
+        else
+            _G.Aether_Gojo = false
+        end
+    end)
+
+    local flyAtivo = false
+    local flyConn, flyBV
+    criarToggle(AbaP, "Fly", 2, function(ativo)
+        flyAtivo = ativo
+        if ativo then
+            local char = LP.Character
+            local hum = char and char:FindFirstChildOfClass("Humanoid")
+            local root = char and char:FindFirstChild("HumanoidRootPart")
+            if not root or not hum then return end
+            hum.PlatformStand = true
+            flyBV = Instance.new("BodyVelocity")
+            flyBV.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+            flyBV.Velocity = Vector3.zero
+            flyBV.Parent = root
+
+            flyConn = RunService.Heartbeat:Connect(function()
+                if not flyAtivo then return end
+                local c = LP.Character
+                local r = c and c:FindFirstChild("HumanoidRootPart")
+                if not r then return end
+                local cam = workspace.CurrentCamera
+                local vel = Vector3.zero
+                local speed = 80
+                if UIS:IsKeyDown(Enum.KeyCode.W) then vel += cam.CFrame.LookVector * speed end
+                if UIS:IsKeyDown(Enum.KeyCode.S) then vel -= cam.CFrame.LookVector * speed end
+                if UIS:IsKeyDown(Enum.KeyCode.A) then vel -= cam.CFrame.RightVector * speed end
+                if UIS:IsKeyDown(Enum.KeyCode.D) then vel += cam.CFrame.RightVector * speed end
+                if UIS:IsKeyDown(Enum.KeyCode.Space) then vel += Vector3.new(0, speed, 0) end
+                flyBV.Velocity = vel
+            end)
+        else
+            if flyConn then flyConn:Disconnect(); flyConn = nil end
+            if flyBV then flyBV:Destroy(); flyBV = nil end
+            local hum = LP.Character and LP.Character:FindFirstChildOfClass("Humanoid")
+            if hum then hum.PlatformStand = false end
+        end
+    end)
+
+    criarToggle(AbaP, "Focus", 3, function(ativo)
+        if ativo then
+            task.spawn(function()
+                local angle = 0
+                while _G.Aether_Focus do
+                    local char = LP.Character
+                    local root = char and char:FindFirstChild("HumanoidRootPart")
+                    if root then
+                        local best, bestD = nil, math.huge
+                        for _, p in ipairs(Players:GetPlayers()) do
+                            if p ~= LP and p.Character then
+                                local tr = p.Character:FindFirstChild("HumanoidRootPart")
+                                local hum = p.Character:FindFirstChildOfClass("Humanoid")
+                                if tr and hum and hum.Health > 0 then
+                                    local d = (tr.Position - root.Position).Magnitude
+                                    if d < bestD then bestD = d; best = tr end
+                                end
+                            end
+                        end
+                        if best then
+                            angle = angle + 0.1
+                            local offset = Vector3.new(math.cos(angle) * 6, 3, math.sin(angle) * 6)
+                            local hum = char:FindFirstChildOfClass("Humanoid")
+                            if hum then hum.PlatformStand = true end
+                            root.CFrame = CFrame.new(best.Position + offset, best.Position)
+                        end
+                    end
+                    RunService.Heartbeat:Wait()
+                end
+                local hum = LP.Character and LP.Character:FindFirstChildOfClass("Humanoid")
+                if hum then hum.PlatformStand = false end
+            end)
+            _G.Aether_Focus = true
+        else
+            _G.Aether_Focus = false
+        end
+    end)
+
+    criarToggle(AbaB, "Bypass", 1, function(ativo)
+        if ativo then
+            task.spawn(function()
+                while _G.Aether_Bypass do
+                    pcall(function()
+                        local char = LP.Character
+                        local root = char and char:FindFirstChild("HumanoidRootPart")
+                        local hum = char and char:FindFirstChildOfClass("Humanoid")
+                        if root and hum then
+                            local jogadores = Players:GetPlayers()
+                            for i = #jogadores, 1, -1 do
+                                if jogadores[i] == LP then table.remove(jogadores, i) end
+                            end
+                            if #jogadores > 0 then
+                                local alvo = jogadores[math.random(1, #jogadores)]
+                                if alvo.Character and alvo.Character:FindFirstChild("HumanoidRootPart") then
+                                    hum.PlatformStand = true
+                                    local bv = Instance.new("BodyVelocity")
+                                    bv.MaxForce = Vector3.new(9e6, 9e6, 9e6)
+                                    bv.Velocity = Vector3.new(0, 150, 0)
+                                    bv.Parent = root
+                                                                        task.wait(1.3)
+                                    bv.Velocity = Vector3.new(-300, 0, 0)
+                                    task.wait(2.4)
+                                    bv.Velocity = Vector3.zero
+                                    hum.PlatformStand = false
+                                    bv:Destroy()
+                                end
+                            end
+                        end
+                    end)
+                    task.wait(3)
+                end
+            end)
+            _G.Aether_Bypass = true
+        else
+            _G.Aether_Bypass = false
+        end
+    end)
+
+    local cf = Instance.new("Frame")
+    cf.Size = UDim2.new(1, 0, 0, 130)
+    cf.BackgroundColor3 = Color3.fromRGB(32, 22, 48)
+    cf.BorderSizePixel = 0
+    cf.Parent = AbaC
+    Instance.new("UICorner", cf).CornerRadius = UDim.new(0, 10)
+
+    local ct = Instance.new("TextLabel")
+    ct.Size = UDim2.new(1, -24, 1, -24)
+    ct.Position = UDim2.new(0, 12, 0, 12)
+    ct.BackgroundTransparency = 1
+    ct.Text = "AETHER HUB - by atsu"
+    ct.TextColor3 = Color3.fromRGB(230, 210, 255)
+    ct.Font = Enum.Font.Gotham
+    ct.TextSize = 12
+    ct.Parent = cf
+end
+
+if _G.AetherAuthenticated then
+    loadMainHub()
+else
+    createKeyGui()
+end
+
+print("Aether Hub carregado!")
